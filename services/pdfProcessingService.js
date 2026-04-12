@@ -29,10 +29,12 @@ export const processPdf = async (fileBuffer, metadata) => {
     const finalRecords = [];
 
     // Helper syntax transforming Streamifier callback natively to Async pattern
+    // Helper syntax transforming Streamifier callback natively to Async pattern
     const uploadToCloudinary = (buffer, fileName) => {
       return new Promise((resolve, reject) => {
         const stream = cloudinary.uploader.upload_stream(
-          { resource_type: 'raw', folder: 'upsc_answers', public_id: fileName },
+          // CHANGE IS HERE: 'raw' is now 'image'
+          { resource_type: 'image', folder: 'upsc_answers', public_id: fileName },
           (error, result) => {
             if (result) {
               resolve(result.secure_url);
