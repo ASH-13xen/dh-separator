@@ -29,12 +29,11 @@ export const processPdf = async (fileBuffer, metadata) => {
     const finalRecords = [];
 
     // Helper syntax transforming Streamifier callback natively to Async pattern
-    // Helper syntax transforming Streamifier callback natively to Async pattern
     const uploadToCloudinary = (buffer, fileName) => {
       return new Promise((resolve, reject) => {
         const stream = cloudinary.uploader.upload_stream(
-          // CHANGE IS HERE: 'raw' is now 'image'
-          { resource_type: 'image', folder: 'upsc_answers', public_id: fileName },
+          // FIX 1: Changed resource_type back to 'raw' for proper PDF document handling
+          { resource_type: 'raw', folder: 'upsc_answers', public_id: fileName },
           (error, result) => {
             if (result) {
               resolve(result.secure_url);
@@ -60,8 +59,8 @@ export const processPdf = async (fileBuffer, metadata) => {
 
         const subPdfBytes = await subPdf.save();
         
-        // FIX: Explicitly adding .pdf so browsers know how to open it
-        const fileNameObj = `Q${i + 1}_${Date.now()}.pdf`; 
+        // FIX 2: Removed the hardcoded .pdf so Cloudinary doesn't generate .pdf.pdf
+        const fileNameObj = `Q${i + 1}_${Date.now()}`; 
 
         // Shift processing straight into Native Cloud Engine
         console.log(`[PdfProcessingService] Streaming chunk Q${i + 1} to Cloudinary...`);
