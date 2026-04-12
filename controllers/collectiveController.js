@@ -137,7 +137,8 @@ export const generateCollectivePdf = async (req, res) => {
 
             // Append the actual physical PDF for the *selected* topper
             if (activeFileObj) {
-                const cloudUrl = activeFileObj.url;
+                // Add a helper replacer incase of Malformed Database String
+                const cloudUrl = activeFileObj.url.replace('https//', 'https://').replace('http//', 'http://');
 
                 try {
                     // Fetch the file remotely from Cloudinary over the network

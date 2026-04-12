@@ -57,7 +57,9 @@ export const processPdf = async (fileBuffer, metadata) => {
         copiedPages.forEach((page) => subPdf.addPage(page));
 
         const subPdfBytes = await subPdf.save();
-        const fileNameObj = `Q${i + 1}_${Date.now()}`; // Cloudinary adds the .pdf properly dynamically depending on asset bounds
+        
+        // FIX: Explicitly adding .pdf so browsers know how to open it
+        const fileNameObj = `Q${i + 1}_${Date.now()}.pdf`; 
 
         // Shift processing straight into Native Cloud Engine
         console.log(`[PdfProcessingService] Streaming chunk Q${i + 1} to Cloudinary...`);
