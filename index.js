@@ -13,7 +13,7 @@ const PORT = process.env.PORT || 5000;
 const MONGO_URI = process.env.MONGO_URI || 'mongodb://127.0.0.1:27017/upsc_db';
 
 // Middleware
-app.use(cors());
+app.use(cors({ origin: '*' }))
 app.use(express.json());
 
 // Routes
