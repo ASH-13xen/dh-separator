@@ -20,7 +20,6 @@ app.use(express.json());
 app.use('/api', uploadRoutes);
 app.use('/api/data', dataRoutes);
 app.use('/api/collective', collectiveRoutes);
-app.use('/extracted_pdfs', express.static('public/extracted_pdfs'));
 
 // Database Connection
 mongoose.connect(MONGO_URI)

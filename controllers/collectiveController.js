@@ -1,5 +1,3 @@
-import fs from 'fs';
-import path from 'path';
 import { UPSCQA } from '../models/UPSCQA.js';
 import { PDFDocument, rgb, StandardFonts } from 'pdf-lib';
 
@@ -139,13 +137,16 @@ export const generateCollectivePdf = async (req, res) => {
 
             // Append the actual physical PDF for the *selected* topper
             if (activeFileObj) {
-                const localPdfPath = path.join(process.cwd(), 'public', activeFileObj.url);
+                const cloudUrl = activeFileObj.url;
 
-                if (fs.existsSync(localPdfPath)) {
-                    try {
-                        const sourcePdfBuffer = fs.readFileSync(localPdfPath);
-                        const sourcePdfDoc = await PDFDocument.load(sourcePdfBuffer);
-                        const sourcePages = await pdfDoc.copyPages(sourcePdfDoc, sourcePdfDoc.getPageIndices());
+                try {
+                    // Fetch the file remotely from Cloudinary over the network
+                    const response = await fetch(cloudUrl);
+                    if (!response.ok) throw new Error(`Failed to fetch from ${cloudUrl}`);
+                    
+                    const arrayBuffer = await response.arrayBuffer();
+                    const sourcePdfDoc = await PDFDocument.load(arrayBuffer);
+                    const sourcePages = await pdfDoc.copyPages(sourcePdfDoc, sourcePdfDoc.getPageIndices());
                         
                         if (sourcePages.length > 0) {
                             const p0 = sourcePages[0];
@@ -197,9 +198,9 @@ export const generateCollectivePdf = async (req, res) => {
 
                         // Append all mapped pages directly
                         sourcePages.forEach(p => pdfDoc.addPage(p));
-                    } catch (pdfErr) {
-                        console.error(`Error appending PDF ${localPdfPath}:`, pdfErr);
-                    }
+                } catch (pdfErr) {
+                    // FIXED: Now properly logs the cloudUrl instead of crashing on the undefined localPdfPath
+                    console.error(`Error appending PDF ${cloudUrl}:`, pdfErr);
                 }
             }
         }
