@@ -110,7 +110,14 @@ export const processPdf = async (fileBuffer, metadata) => {
     const bulkResult = await UPSCQA.bulkWrite(bulkOps);
     console.log(`[PdfProcessingService] Successfully merged to DB. Matched: ${bulkResult.matchedCount}, Inserted: ${bulkResult.upsertedCount}, Modified: ${bulkResult.modifiedCount}`);
     
-    return finalRecords;
+    const savedRecords = await UPSCQA.find({
+      question_text: { $in: finalRecords.map(r => r.question_text) }
+    }).lean();
+
+    return finalRecords.map(record => {
+      const saved = savedRecords.find(r => r.question_text === record.question_text);
+      return { ...record, _id: saved?._id?.toString() };
+    });
 
   } catch (error) {
     console.error("[PdfProcessingService] Error:", error);
