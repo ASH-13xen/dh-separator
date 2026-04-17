@@ -10,18 +10,20 @@ export const handlePdfUpload = async (req, res) => {
       return res.status(400).json({ error: 'Please upload a valid PDF file.' });
     }
 
-    const topper_name = req.body.topper_name || 'Unknown Topper';
-    const topper_year = req.body.topper_year || '';
-    const topper_rank = req.body.topper_rank || '';
-    const topper_marks = req.body.topper_marks || '';
+    let parsedMetadataList = [{ topperName: 'Unknown Topper' }];
+    if (req.body.metadataList) {
+      try {
+        parsedMetadataList = JSON.parse(req.body.metadataList);
+      } catch (e) {
+        console.warn("[UploadController] Failed to parse metadataList. Using fallback.");
+      }
+    }
 
-    console.log(`[UploadController] Received file: ${req.file.originalname}, Topper: ${topper_name}, Size: ${req.file.size} bytes`);
+    console.log(`[UploadController] Received file: ${req.file.originalname}, Sheets specified: ${parsedMetadataList.length}, Size: ${req.file.size} bytes`);
     console.log(`[UploadController] Initiating processPdf...`);
     
-    // Pass the memory buffer and metadata to the service layer
-    const results = await processPdf(req.file.buffer, {
-        topper_name, topper_year, topper_rank, topper_marks
-    });
+    // Pass the memory buffer and metadata array to the service layer
+    const results = await processPdf(req.file.buffer, parsedMetadataList);
 
     console.log(`[UploadController] processPdf completed successfully. Total records generated: ${results.length}`);
 

@@ -128,9 +128,10 @@ export const processEntirePdfWithGemini = async (pdfBuffer) => {
       fileInfo = await fileManager.getFile(uploadResult.file.name);
     }
 
-    // UPDATED PROMPT: Explicitly instructing it to combine papers and use root subject names
+    // UPDATED PROMPT: Explicitly instructing to identify topper sheets and index them
     const prompt = `You are an expert UPSC document classifier. 
 Scan the attached document and identify every explicitly marked question. 
+The PDF contains multiple distinct answer sheets merged together. Each sheet belongs to a different candidate. The start of a new sheet is denoted by a title or separator page.
 Classify them STRICTLY according to the official UPSC syllabus provided below.
 
 --- OFFICIAL UPSC SYLLABUS ---
@@ -143,6 +144,7 @@ For every question found, provide:
 3. 'topic': The exact best-fit sub-topic from the syllabus. You must pick the topic from EITHER Paper I or Paper II under that main subject.
 4. 'start_page': The exact physical page number where it starts (Page 1 is the first page).
 5. 'end_page': The exact physical page number where the answer ends.
+6. 'answer_sheet_index': The 1-based index indicating which topper's answer sheet this question belongs to. The first answer sheet in the PDF is 1. When you see a title page for a new topper, increment this index for subsequent questions.
 
 RULES:
 - You MUST select the 'subject' from the exact predefined schema list.
@@ -163,9 +165,13 @@ RULES:
           },
           topic: { type: SchemaType.STRING },
           start_page: { type: SchemaType.INTEGER },
-          end_page: { type: SchemaType.INTEGER }
+          end_page: { type: SchemaType.INTEGER },
+          answer_sheet_index: { 
+            type: SchemaType.INTEGER,
+            description: "The 1-based index of the answer sheet this question belongs to."
+          }
         },
-        required: ["question_text", "subject", "topic", "start_page", "end_page"]
+        required: ["question_text", "subject", "topic", "start_page", "end_page", "answer_sheet_index"]
       }
     };
 

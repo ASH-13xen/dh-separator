@@ -11,7 +11,7 @@ cloudinary.config({
   api_secret: process.env.CLOUDINARY_API_SECRET 
 });
 
-export const processPdf = async (fileBuffer, metadata) => {
+export const processPdf = async (fileBuffer, metadataList) => {
   try {
     console.log(`[PdfProcessingService] Processing single-upload PDF...`);
     
@@ -66,6 +66,11 @@ export const processPdf = async (fileBuffer, metadata) => {
         console.log(`[PdfProcessingService] Streaming chunk Q${i + 1} to Cloudinary...`);
         const file_url = await uploadToCloudinary(subPdfBytes, fileNameObj);
 
+        // Identify the exact topper array index (fallback to index 0 if Gemini misses index or goes out of bounds)
+        let safeIndex = (item.answer_sheet_index || 1) - 1;
+        if (safeIndex < 0 || safeIndex >= metadataList.length) safeIndex = 0;
+        const mappedTopper = metadataList[safeIndex] || {};
+
         finalRecords.push({
             question_text: item.question_text,
             subject: item.subject,
@@ -73,10 +78,10 @@ export const processPdf = async (fileBuffer, metadata) => {
             start_page: item.start_page,
             end_page: item.end_page,
             file_url: file_url,
-            topper_name: metadata.topper_name,
-            topper_year: metadata.topper_year,
-            topper_rank: metadata.topper_rank,
-            topper_marks: metadata.topper_marks
+            topper_name: mappedTopper.topperName || 'Unknown Topper',
+            topper_year: mappedTopper.topperYear || '',
+            topper_rank: mappedTopper.topperRank || '',
+            topper_marks: mappedTopper.topperMarks || ''
         });
     }
 
