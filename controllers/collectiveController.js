@@ -26,19 +26,23 @@ export const previewSubjectData = async (req, res) => {
 
 export const generateCollectivePdf = async (req, res) => {
   try {
-    const { subject, selections } = req.body;
+    const { subject, selections, includedQuestionIds } = req.body;
     // selections maps: question_id -> specific file_url to use
+    // includedQuestionIds is an array of selected question _ids
 
     if (!subject) {
       return res.status(400).json({ error: 'Subject is required to generate collective PDF.' });
     }
 
-    let questionsResponse = await UPSCQA.find({ 
-       subject: { $regex: new RegExp(subject, 'i') } 
-    }).sort({ topic: 1 });
+    let query = { subject: { $regex: new RegExp(subject, 'i') } };
+    if (includedQuestionIds && Array.isArray(includedQuestionIds)) {
+      query._id = { $in: includedQuestionIds };
+    }
+
+    let questionsResponse = await UPSCQA.find(query).sort({ topic: 1 });
 
     if (!questionsResponse || questionsResponse.length === 0) {
-      return res.status(404).json({ error: 'No questions found.' });
+      return res.status(404).json({ error: 'No matched/selected questions found.' });
     }
 
     // 1. Initialize Master PDF Document
@@ -170,9 +174,10 @@ export const generateCollectivePdf = async (req, res) => {
                             
                             const dString = `[Q${qIdx + 1}] TOPPER: ${tName}${tYear}${tRank}${tMarks}`;
 
-                            // Small crisp font for metrics
+                            // Center align the text natively over the bar
+                            const textWidth = fontBold.widthOfTextAtSize(dString.toUpperCase(), 9);
                             p0.drawText(dString.toUpperCase(), {
-                                x: 15, y: barY + 8, size: 9, font: fontBold, color: rgb(0.1, 0.2, 0.4)
+                                x: (p0w - textWidth) / 2, y: barY + 8, size: 9, font: fontBold, color: rgb(0.1, 0.2, 0.4)
                             });
 
                             // Draw Question Text below the bar natively over the writing space

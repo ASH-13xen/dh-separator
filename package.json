@@ -20,6 +20,7 @@
     "form-data": "^4.0.5",
     "mongoose": "^9.4.1",
     "multer": "^2.1.1",
+    "node-cron": "^4.2.1",
     "pdf-lib": "^1.17.1",
     "streamifier": "^0.1.1"
   },
