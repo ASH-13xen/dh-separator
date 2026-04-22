@@ -1,0 +1,107 @@
+export const optionalSubPhilosophy = [
+  {
+    section: "Western Philosophy",
+    topics: [
+      {
+        title: "Classical to Modern Western Philosophy",
+        subtopics: [
+          "Plato and Aristotle: Ideas; Substance; Form and Matter; Causation; Actuality and Potentiality.",
+          "Rationalism (Descartes, Spinoza, Leibniz): Cartesian Method and Certain Knowledge; Substance; God; Mind-Body Dualism; Determinism and Freedom.",
+          "Empiricism (Locke, Berkeley, Hume): Theory of Knowledge; Substance and Qualities; Self and God; Scepticism.",
+          "Kant: Possibility of Synthetic a priori Judgments; Space and Time; Categories; Ideas of Reason; Antinomies; Critique of Proofs for the Existence of God.",
+          "Hegel: Dialectical Method; Absolute Idealism."
+        ]
+      },
+      {
+        title: "Contemporary Western Philosophy",
+        subtopics: [
+          "Moore, Russell and Early Wittgenstein: Defence of Commonsense; Refutation of Idealism; Logical Atomism; Logical Constructions; Incomplete Symbols; Picture Theory of Meaning; Saying and Showing.",
+          "Logical Positivism: Verification Theory of Meaning; Rejection of Metaphysics; Linguistic Theory of Necessary Propositions.",
+          "Later Wittgenstein: Meaning and Use; Language-games; Critique of Private Language.",
+          "Phenomenology (Husserl): Method; Theory of Essences; Avoidance of Psychologism.",
+          "Existentialism (Kierkegaard, Sartre, Heidegger): Existence and Essence; Choice, Responsibility and Authentic Existence; Being-in-the-world and Temporality.",
+          "Quine and Strawson: Critique of Empiricism; Theory of Basic Particulars and Persons."
+        ]
+      }
+    ]
+  },
+  {
+    section: "Indian Philosophy",
+    topics: [
+      {
+        title: "Heterodox Schools (Nastika)",
+        subtopics: [
+          "Carvaka: Theory of Knowledge; Rejection of Transcendent Entities.",
+          "Jainism: Theory of Reality; Saptabhanginaya; Bondage and Liberation.",
+          "Schools of Buddhism: Pratityasamutpada; Ksanikavada, Nairatmyavada."
+        ]
+      },
+      {
+        title: "Orthodox Schools (Astika)",
+        subtopics: [
+          "Nyaya—Vaisesika: Theory of Categories; Theory of Appearance; Theory of Pramana; Self, Liberation; God; Proofs for the Existence of God; Theory of Causation; Atomistic Theory of Creation.",
+          "Samkhya: Prakriti; Purusa; Causation; Liberation.",
+          "Yoga: Citta; Cittavrtti; Klesas; Samadhi; Kaivalya.",
+          "Mimamsa: Theory of Knowledge.",
+          "Schools of Vedanta: Brahman; Isvara; Atman; Jiva; Jagat; Maya; Avidya; Adhyasa; Moksa; Aprthaksiddhi; Pancavidhabheda."
+        ]
+      },
+      {
+        title: "Contemporary Indian Thinkers",
+        subtopics: [
+          "Aurobindo: Evolution, Involution; Integral Yoga."
+        ]
+      }
+    ]
+  },
+  {
+    section: "Socio-Political Philosophy",
+    topics: [
+      {
+        title: "Political Ideals, State, and Ideologies",
+        subtopics: [
+          "Social and Political ideals: Equality, Justice, Liberty.",
+          "Sovereignty: Austin, Bodin, Laski, Kautilya.",
+          "Individual and State: Rights; Duties and Accountability.",
+          "Forms of Government: Monarchy; Theocracy and Democracy.",
+          "Political Ideologies: Anarchism, Marxism and Socialism."
+        ]
+      },
+      {
+        title: "Social Issues, Ethics, and Development",
+        subtopics: [
+          "Humanism; Secularism; Multi-culturalism.",
+          "Crime and Punishment: Corruption, Mass Violence, Genocide, Capital Punishment.",
+          "Development and Social Progress.",
+          "Gender Discrimination: Female Foeticide, Land and Property Rights; Empowerment.",
+          "Caste Discrimination: Gandhi and Ambedkar."
+        ]
+      }
+    ]
+  },
+  {
+    section: "Philosophy of Religion",
+    topics: [
+      {
+        title: "God, Soul, and Evil",
+        subtopics: [
+          "Notions of God: Attributes; Relation to Man and the World. (Indian and Western).",
+          "Proofs for the Existence of God and their Critique (Indian and Western).",
+          "Problem of Evil.",
+          "Soul: Immortality; Rebirth and Liberation."
+        ]
+      },
+      {
+        title: "Faith, Experience, and Pluralism",
+        subtopics: [
+          "Reason, Revelation, and Faith.",
+          "Religious Experience: Nature and Object (Indian and Western).",
+          "Religion without God.",
+          "Religion and Morality.",
+          "Religious Pluralism and the Problem of Absolute Truth.",
+          "Nature of Religious Language: Analogical and Symbolic; Cognitivist and Non-cognitive."
+        ]
+      }
+    ]
+  }
+];

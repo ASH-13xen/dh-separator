@@ -2,8 +2,7 @@ import mongoose from 'mongoose';
 
 const upscQaSchema = new mongoose.Schema({
   question_text: { type: String, required: true },
-  subject: { type: String, required: true },
-  topic: { type: String, required: true },
+  tags: { type: [String], default: [] },
   start_page: { type: Number, required: true },
   end_page: { type: Number, required: true },
   file_urls: { 

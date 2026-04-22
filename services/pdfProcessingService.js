@@ -73,8 +73,7 @@ export const processPdf = async (fileBuffer, metadataList) => {
 
         finalRecords.push({
             question_text: item.question_text,
-            subject: item.subject,
-            topic: item.topic, 
+            tags: item.tags || [],
             start_page: item.start_page,
             end_page: item.end_page,
             file_url: file_url,
@@ -93,8 +92,7 @@ export const processPdf = async (fileBuffer, metadataList) => {
         filter: { question_text: record.question_text },
         update: { 
           $setOnInsert: {
-            subject: record.subject,
-            topic: record.topic,
+            tags: record.tags,
             start_page: record.start_page,
             end_page: record.end_page
           },

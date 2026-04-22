@@ -1,0 +1,188 @@
+export const optionalSubLaw = [
+  {
+    section: "Constitutional and Administrative Law",
+    topics: [
+      {
+        title: "Constitutional Framework and Rights",
+        subtopics: [
+          "Constitution and Constitutionalism: The distinctive features of the Constitution.",
+          "Fundamental Rights—Public interest litigation; Legal Aid; Legal services authority.",
+          "Relationship between Fundamental Rights, Directive Principles, and Fundamental duties.",
+          "Amendment of the Constitution.",
+          "Emergency provisions."
+        ]
+      },
+      {
+        title: "Executive, Legislature, and Judiciary",
+        subtopics: [
+          "Constitutional Position of the President and relation with the Council of Ministers.",
+          "Governor and his powers.",
+          "Supreme Court and the High Courts: (a) Appointments and transfer. (b) Powers, functions, and jurisdiction.",
+          "Legislative powers, privileges, and immunities."
+        ]
+      },
+      {
+        title: "Federalism, Local Bodies, and Services",
+        subtopics: [
+          "Centre, States, and local bodies: (a) Distribution of legislative powers between the Union and the States. (b) Local Bodies. (c) Administrative relationship among Union, State, and Local Bodies. (d) Eminent domain-State property-common property-community property.",
+          "Services under the Union and the States: (a) Recruitment and conditions of services; Constitutional safeguards; Administrative tribunals. (b) Union Public Service Commission and state public Service Commissions—Power and functions. (c) Election Commission—Power and functions."
+        ]
+      },
+      {
+        title: "Administrative Law and Governance",
+        subtopics: [
+          "Principle of Natural Justice—Emerging trends and judicial approach.",
+          "Delegated legislation and its constitutionality.",
+          "Separation of powers and constitutional governance.",
+          "Judicial review of administrative action.",
+          "Ombudsman: Lokayukta, Lokpal etc."
+        ]
+      }
+    ]
+  },
+  {
+    section: "International Law",
+    topics: [
+      {
+        title: "Fundamentals, State Jurisdiction, and Treaties",
+        subtopics: [
+          "Nature and Definition of International Law.",
+          "Relationship between International Law and Municipal Law.",
+          "State Recognition and State Succession.",
+          "Territorial jurisdiction of States, Extradition, and Asylum.",
+          "Treaties: Formation, application, termination, and reservation."
+        ]
+      },
+      {
+        title: "Law of the Sea, Individuals, and Human Rights",
+        subtopics: [
+          "Law of the sea: Inland Waters, Territorial Sea, Contiguous Zone, Continental Shelf, Exclusive Economic Zone, and High Seas.",
+          "Individuals: Nationality, statelessness; Human Rights, and procedures available for their enforcement."
+        ]
+      },
+      {
+        title: "UN, Dispute Settlement, and Use of Force",
+        subtopics: [
+          "United Nations: Its principal organs, powers and functions, and reform.",
+          "Peaceful settlement of disputes—different modes.",
+          "Lawful recourse to force: aggression, self-defense, intervention.",
+          "Fundamental principles of international humanitarian law—International conventions and contemporary developments.",
+          "Legality of the use of nuclear weapons; ban on testing of nuclear weapons; Nuclear nonproliferation treaty, CTST.",
+          "International Terrorism, State-sponsored terrorism, Hijacking, International Criminal Court."
+        ]
+      },
+      {
+        title: "International Economic and Environmental Law",
+        subtopics: [
+          "New International Economic Order and Monetary Law: WTO, TRIPS, GATT, IMF, World Bank.",
+          "Protection and Improvement of the Human Environment: International Efforts."
+        ]
+      }
+    ]
+  },
+  {
+    section: "Law of Crimes",
+    topics: [
+      {
+        title: "General Principles and Liabilities",
+        subtopics: [
+          "General principles of Criminal liability: mens rea and actus reus, mens rea in statutory offences.",
+          "Kinds of punishment and emerging trends as to abolition of capital punishment.",
+          "Preparations and criminal attempt.",
+          "General exceptions.",
+          "Joint and constructive liability.",
+          "Abetment.",
+          "Criminal conspiracy."
+        ]
+      },
+      {
+        title: "Specific Offences and Statutory Developments",
+        subtopics: [
+          "Offences against the State.",
+          "Offences against public tranquility.",
+          "Offences against human body.",
+          "Offences against property.",
+          "Offences against women.",
+          "Defamation.",
+          "Prevention of Corruption Act, 1988.",
+          "Protection of Civil Rights Act, 1955 and subsequent legislative developments.",
+          "Plea bargaining."
+        ]
+      }
+    ]
+  },
+  {
+    section: "Law of Torts",
+    topics: [
+      {
+        title: "Principles, Liabilities, and Defences",
+        subtopics: [
+          "Nature and definition.",
+          "Liability based upon fault and strict liability; Absolute liability.",
+          "Vicarious liability including State Liability.",
+          "General defences.",
+          "Joint tort fessors.",
+          "Remedies."
+        ]
+      },
+      {
+        title: "Specific Torts and Consumer Protection",
+        subtopics: [
+          "Negligence.",
+          "Defamation.",
+          "Nuisance.",
+          "Conspiracy.",
+          "False imprisonment.",
+          "Malicious prosecution.",
+          "Consumer Protection Act, 1986."
+        ]
+      }
+    ]
+  },
+  {
+    section: "Law of Contracts and Mercantile Law",
+    topics: [
+      {
+        title: "General Principles of Contract",
+        subtopics: [
+          "Nature and formation of contract/E-contract.",
+          "Factors vitiating free consent.",
+          "Void, voidable, illegal and unenforceable agreements.",
+          "Performance and discharge of contracts.",
+          "Quasi-contracts.",
+          "Consequences of breach of contract.",
+          "Standard form contracts."
+        ]
+      },
+      {
+        title: "Specific Contracts and Mercantile Law",
+        subtopics: [
+          "Contract of indemnity, guarantee and insurance.",
+          "Contract of agency.",
+          "Sale of goods and hire purchase.",
+          "Formation and dissolution of partnership.",
+          "Negotiable Instruments Act, 1881.",
+          "Arbitration and Conciliation Act, 1996."
+        ]
+      }
+    ]
+  },
+  {
+    section: "Contemporary Legal Developments",
+    topics: [
+      {
+        title: "Emerging Legal Concepts and Statutes",
+        subtopics: [
+          "Public Interest Litigation.",
+          "Intellectual property rights—Concept, types/prospects.",
+          "Information Technology Law including Cyber Laws—Concept, purpose/prospects.",
+          "Competition Law—Concept, purpose/prospects.",
+          "Alternate Dispute Resolution—Concept, types/prospects.",
+          "Major statutes concerning environmental law.",
+          "Right to Information Act.",
+          "Trial by media."
+        ]
+      }
+    ]
+  }
+];

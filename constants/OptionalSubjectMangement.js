@@ -1,0 +1,175 @@
+export const optionalSubManagement = [
+  {
+    section: "Managerial Foundations and Organisational Behaviour",
+    topics: [
+      {
+        title: "Managerial Function and Process",
+        subtopics: [
+          "Concept and foundations of management, Evolution of Management Thoughts.",
+          "Managerial Functions—Planning, Organizing, Controlling; Decision-making.",
+          "Role of Manager, Managerial skills; entrepreneurship; Management of innovation.",
+          "Managing in a global environment, Flexible Systems Management.",
+          "Social responsibility and managerial ethics; Process and customer orientation; Managerial processes on direct and indirect value chain."
+        ]
+      },
+      {
+        title: "Organisational Behaviour and Design",
+        subtopics: [
+          "Conceptual model of organization behaviour; The individual processes—personality, values and attitude, perception, motivation, learning and reinforcement, work stress and stress management.",
+          "The dynamics of Organization behaviour—power and politics, conflict and negotiation, leadership process and styles, communication.",
+          "The Organizational Processes—decision-making, job design; Classical, Neoclassical and Contingency approaches to organizational design.",
+          "Organizational theory and design—Organizational culture, managing cultural diversity, learning Organization.",
+          "Organizational change and development; Knowledge Based Enterprise—systems and processes; Networked and virtual organizations."
+        ]
+      }
+    ]
+  },
+  {
+    section: "Human Resource Management",
+    topics: [
+      {
+        title: "HR Planning and Recruitment",
+        subtopics: [
+          "HR challenges; HRM functions; The future challenges of HRM; Strategic Management of human resources.",
+          "Human resource planning; Job analysis; Job evaluation, Recruitment and selection."
+        ]
+      },
+      {
+        title: "Performance, Compensation and Employee Relations",
+        subtopics: [
+          "Training and development; Promotion and transfer; Performance management; Compensation management and benefits.",
+          "Employee morale and productivity; Management of Organizational climate and Industrial relations.",
+          "Human resources accounting and audit; Human resource information system; International human resource management."
+        ]
+      }
+    ]
+  },
+  {
+    section: "Accounting and Financial Management",
+    topics: [
+      {
+        title: "Accounting for Managers",
+        subtopics: [
+          "Financial accounting—concept, importance and scope, generally accepted accounting principles.",
+          "Preparation of financial statements with special reference to analysis of a balance sheet and measurement of business income.",
+          "Inventory valuation and depreciation, financial statement analysis, fund flow analysis, the statement of cash flows.",
+          "Management accounting concept, need, importance and scope.",
+          "Cost accounting—records and processes, cost ledger and control accounts, reconciliation and integration between financial and cost accounts.",
+          "Overhead cost and control, Job and process costing, Budget and budgetary control, Performance budgeting, Zero-base budgeting.",
+          "Relevant costing and costing for decision-making, standard costing and variance analysis, marginal costing and absorption costing."
+        ]
+      },
+      {
+        title: "Financial Management",
+        subtopics: [
+          "Goal of Finance Function. Concepts of value and return. Valuation of bonds and Shares.",
+          "Management of working capital: Estimation and Financing; Management of cash, receivables, inventory and current liabilities.",
+          "Cost of capital; Capital budgeting; Financial and operating leverage; Design of capital structure: theories and practices.",
+          "Shareholder value creation: dividend policy, corporate financial policy and strategy, management of corporate distress and restructuring strategy.",
+          "Capital and money markets: institutions and instruments; Leasing, hire purchase and venture capital; Regulation of capital market.",
+          "Risk and return: portfolio theory; CAPM; APT; Financial derivatives: option, futures, swap; Recent reforms in financial sector."
+        ]
+      }
+    ]
+  },
+  {
+    section: "Marketing Management",
+    topics: [
+      {
+        title: "Marketing Strategy and Consumer Behaviour",
+        subtopics: [
+          "Concept, evolution and scope; Marketing strategy formulation and components of marketing plan.",
+          "Segmenting and targeting the market; Positioning and differentiating the market offering.",
+          "Analyzing competition; Analyzing consumer markets; Industrial buyer behaviour.",
+          "Market research; Product strategy; Pricing strategies; Designing and managing Marketing channels."
+        ]
+      },
+      {
+        title: "Marketing Communication and Trends",
+        subtopics: [
+          "Integrated marketing communications; Building customer satisfaction, Value and retention.",
+          "Services and non-profit marketing; Ethics in marketing; Consumer protection.",
+          "Internet marketing; Retail management; Customer relationship management; Concept of holistic marketing."
+        ]
+      }
+    ]
+  },
+  {
+    section: "Quantitative Techniques and Operations Management",
+    topics: [
+      {
+        title: "Quantitative Techniques in Decision-making",
+        subtopics: [
+          "Descriptive statistics—tabular, graphical and numerical methods.",
+          "Introduction to probability, discrete and continuous probability distributions.",
+          "Inferential statistics—sampling distributions, central limit theorem, hypothesis testing for differences between means and proportions, inference about population variances, Chi-square and ANOVA.",
+          "Simple correlation and regression, time series and forecasting, decision theory, index numbers.",
+          "Linear programming—problem formulation, simplex method and graphical solution, sensitivity analysis."
+        ]
+      },
+      {
+        title: "Production and Operations Management",
+        subtopics: [
+          "Fundamentals of operations management; Organizing for production; Aggregate production planning, capacity planning.",
+          "Plant design: process planning, plant size and scale of operations, Management of facilities; Line balancing; Equipment replacement and maintenance.",
+          "Production control; Supply chain management—vendor evaluation and audit; Quality management; Statistical process control, Six Sigma.",
+          "Flexibility and agility in manufacturing systems; World class manufacturing; Project management concepts, R&D management, Management of service operations.",
+          "Role and importance of materials management, value analysis, make or buy decision; Inventory control, MRP; Waste management."
+        ]
+      }
+    ]
+  },
+  {
+    section: "Information Systems and Government-Business Interface",
+    topics: [
+      {
+        title: "Management Information System (MIS)",
+        subtopics: [
+          "Conceptual foundations of information systems; Information theory; Information resource management; Types of information Systems.",
+          "Systems Development—Overview of Systems and Design; System Development management life-cycle, Designing online and distributed environments; Implementation and control of project.",
+          "Trends in information technology; Managing data resources—Organising data. DSS and RDBMS.",
+          "Enterprise Resource Planning (ERP), Expert systems, e-Business architecture, e-Governance.",
+          "Information systems planning, Flexibility in information systems; User involvement; Evaluation of information systems."
+        ]
+      },
+      {
+        title: "Government Business Interface",
+        subtopics: [
+          "State participation in business, Interaction between Government, Business and different Chambers of Commerce and Industry in India.",
+          "Government’s policy with regard to Small Scale Industries; Government clearances for establishing a new enterprise.",
+          "Public Distribution System; Government control over price and distribution.",
+          "Consumer Protection Act (CPA) and The Role of Voluntary Organizations in protecting consumers’ rights.",
+          "New Industrial Policy of the Government: liberalization, deregulation and privatisation.",
+          "Indian planning system; Government policy concerning development of Backward areas/regions.",
+          "The Responsibilities of the business as well as the Government to protect the environment; Corporate Governance; Cyber Laws."
+        ]
+      }
+    ]
+  },
+  {
+    section: "Strategic Management and International Business",
+    topics: [
+      {
+        title: "Strategic Management (Strategic Cost Management)",
+        subtopics: [
+          "Business policy as a field of study; Nature and scope of strategic management, Strategic intent, vision, objectives and policies; Process of strategic planning and implementation.",
+          "Environmental analysis and internal analysis; SWOT analysis; Tools and techniques for strategic analysis—Impact matrix: The experience curve, BCG matrix, GEC mode, Industry analysis, Concept of value chain.",
+          "Strategic profile of a firm; Framework for analysing competition; Competitive advantage of a firm; Generic competitive strategies.",
+          "Growth strategies—expansion, integration and diversification; Concept of core competence, Strategic flexibility; Reinventing strategy; Strategy and structure.",
+          "Chief Executive and Board; turnaround management; Management of strategic change; Strategic alliances, Mergers and Acquisitions; Strategy and corporate evolution in the Indian context."
+        ]
+      },
+      {
+        title: "International Business",
+        subtopics: [
+          "International Business Environment: Changing composition of trade in goods and services; India’s Foreign Trade: Policy and trends.",
+          "Financing of International trade; Regional Economic Cooperation; FTAs.",
+          "Internationalisation of service firms; International production; Operation Management in International companies; International Taxation.",
+          "Global competitiveness and technological developments; Global E-Business; Designing global organisational structure and control; Multicultural management; Global business strategy; Global marketing strategies.",
+          "Export Management; Export-Import procedures; Joint Ventures; Foreign Investment: Foreign direct investment and foreign portfolio investment.",
+          "Cross-border Mergers and Acquisitions; Foreign Exchange Risk Exposure Management; World Financial Markets and International Banking; External Debt Management; Country Risk Analysis."
+        ]
+      }
+    ]
+  }
+];

@@ -1,0 +1,237 @@
+export const optionalSubSociology = [
+  {
+    section: "Fundamentals of Sociology, Science, and Research",
+    topics: [
+      {
+        title: "Sociology - The Discipline",
+        subtopics: [
+          "Modernity and social changes in Europe and emergence of Sociology.",
+          "Scope of the subject and comparison with other social sciences.",
+          "Sociology and common sense."
+        ]
+      },
+      {
+        title: "Sociology as Science",
+        subtopics: [
+          "Science, scientific method, and critique.",
+          "Major theoretical strands of research methodology.",
+          "Positivism and its critique.",
+          "Fact value and objectivity.",
+          "Non-positivist methodologies."
+        ]
+      },
+      {
+        title: "Research Methods and Analysis",
+        subtopics: [
+          "Qualitative and quantitative methods.",
+          "Techniques of data collection.",
+          "Variables, sampling, hypothesis, reliability, and validity."
+        ]
+      }
+    ]
+  },
+  {
+    section: "Sociological Thinkers, Stratification, and Mobility",
+    topics: [
+      {
+        title: "Sociological Thinkers",
+        subtopics: [
+          "Karl Marx - Historical materialism, mode of production, alienation, class struggle.",
+          "Emile Durkheim - Division of labour, social fact, suicide, religion and society.",
+          "Max Weber - Social action, ideal types, authority, bureaucracy, protestant ethic and the spirit of capitalism.",
+          "Talcott Parsons - Social system, pattern variables.",
+          "Robert K. Merton - Latent and manifest functions, conformity and deviance, reference groups.",
+          "Mead - Self and identity."
+        ]
+      },
+      {
+        title: "Stratification and Mobility",
+        subtopics: [
+          "Concepts - equality, inequality, hierarchy, exclusion, poverty, and deprivation.",
+          "Theories of social stratification - Structural functionalist theory, Marxist theory, Weberian theory.",
+          "Dimensions - Social stratification of class, status groups, gender, ethnicity and race.",
+          "Social mobility - open and closed systems, types of mobility, sources and causes of mobility."
+        ]
+      }
+    ]
+  },
+  {
+    section: "Social Institutions and Social Change",
+    topics: [
+      {
+        title: "Works and Economic Life",
+        subtopics: [
+          "Social organization of work in different types of society - slave society, feudal society, industrial capitalist society.",
+          "Formal and informal organization of work.",
+          "Labour and society."
+        ]
+      },
+      {
+        title: "Politics and Society",
+        subtopics: [
+          "Sociological theories of power.",
+          "Power elite, bureaucracy, pressure groups and political parties.",
+          "Nation, state, citizenship, democracy, civil society, ideology.",
+          "Protest, agitation, social movements, collective action, revolution."
+        ]
+      },
+      {
+        title: "Religion and Society",
+        subtopics: [
+          "Sociological theories of religion.",
+          "Types of religious practices: animism, monism, pluralism, sects, cults.",
+          "Religion in modern society: religion and science, secularization, religious revivalism, fundamentalism."
+        ]
+      },
+      {
+        title: "Systems of Kinship",
+        subtopics: [
+          "Family, household, marriage.",
+          "Types and forms of family.",
+          "Lineage and descent.",
+          "Patriarchy and sexual division of labour.",
+          "Contemporary trends."
+        ]
+      },
+      {
+        title: "Social Change in Modern Society",
+        subtopics: [
+          "Sociological theories of social change.",
+          "Development and dependency.",
+          "Agents of social change.",
+          "Education and social change.",
+          "Science, technology, and social change."
+        ]
+      }
+    ]
+  },
+  {
+    section: "Introducing Indian Society",
+    topics: [
+      {
+        title: "Perspectives on the Study of Indian Society",
+        subtopics: [
+          "Indology (G.S. Ghurye).",
+          "Structural functionalism (M. N. Srinivas).",
+          "Marxist sociology (A. R. Desai)."
+        ]
+      },
+      {
+        title: "Impact of Colonial Rule on Indian Society",
+        subtopics: [
+          "Social background of Indian nationalism.",
+          "Modernization of Indian tradition.",
+          "Protests and movements during the colonial period.",
+          "Social reforms."
+        ]
+      }
+    ]
+  },
+  {
+    section: "Social Structure in India",
+    topics: [
+      {
+        title: "Rural, Agrarian Structure and Caste System",
+        subtopics: [
+          "Rural and Agrarian Social Structure: The idea of Indian village and village studies.",
+          "Agrarian social structure— evolution of land tenure system, land reforms.",
+          "Caste System: Perspectives on the study of caste systems (G. S. Ghurye, M. N. Srinivas, Louis Dumont, Andre Beteille).",
+          "Features of caste system.",
+          "Untouchability-forms and perspectives."
+        ]
+      },
+      {
+        title: "Tribal Communities and Social Classes",
+        subtopics: [
+          "Tribal Communities in India: Definitional problems; Geographical spread.",
+          "Colonial policies and tribes; Issues of integration and autonomy.",
+          "Social Classes in India: Agrarian class structure; Industrial class structure; Middle classes in India."
+        ]
+      },
+      {
+        title: "Systems of Kinship and Religion in India",
+        subtopics: [
+          "Systems of Kinship in India: Lineage and descent in India; Types of kinship systems.",
+          "Family and marriage in India; Household dimensions of the family; Patriarchy, entitlements, and sexual division of labour.",
+          "Religion and Society: Religious communities in India; Problems of religious minorities."
+        ]
+      }
+    ]
+  },
+  {
+    section: "Social Changes in India: Transformations and Urbanisation",
+    topics: [
+      {
+        title: "Visions of Social Change in India",
+        subtopics: [
+          "Idea of development planning and mixed economy.",
+          "Constitution, law, and social change.",
+          "Education and social change."
+        ]
+      },
+      {
+        title: "Rural and Agrarian Transformation in India",
+        subtopics: [
+          "Programmes of rural development, Community Development Programme, cooperatives, poverty alleviation schemes.",
+          "Green revolution and social change.",
+          "Changing modes of production in Indian agriculture.",
+          "Problems of rural labour, bondage, migration."
+        ]
+      },
+      {
+        title: "Industrialization and Urbanisation in India",
+        subtopics: [
+          "Evolution of modern industry in India.",
+          "Growth of urban settlements in India.",
+          "Working class: structure, growth, class mobilization.",
+          "Informal sector, child labour.",
+          "Slums and deprivation in urban areas."
+        ]
+      }
+    ]
+  },
+  {
+    section: "Social Changes in India: Politics, Movements, and Challenges",
+    topics: [
+      {
+        title: "Politics and Society",
+        subtopics: [
+          "Nation, democracy and citizenship.",
+          "Political parties, pressure groups, social and political elite.",
+          "Regionalism and decentralization of power.",
+          "Secularization."
+        ]
+      },
+      {
+        title: "Social Movements in Modern India",
+        subtopics: [
+          "Peasants and farmers' movements.",
+          "Women’s movement.",
+          "Backward classes & Dalit movements.",
+          "Environmental movements.",
+          "Ethnicity and Identity movements."
+        ]
+      },
+      {
+        title: "Population Dynamics",
+        subtopics: [
+          "Population size, growth, composition and distribution.",
+          "Components of population growth: birth, death, migration.",
+          "Population Policy and family planning.",
+          "Emerging issues: ageing, sex ratios, child and infant mortality, reproductive health."
+        ]
+      },
+      {
+        title: "Challenges of Social Transformation",
+        subtopics: [
+          "Crisis of development: displacement, environmental problems and sustainability.",
+          "Poverty, deprivation and inequalities.",
+          "Violence against women.",
+          "Caste conflicts.",
+          "Ethnic conflicts, communalism, religious revivalism.",
+          "Illiteracy and disparities in education."
+        ]
+      }
+    ]
+  }
+];

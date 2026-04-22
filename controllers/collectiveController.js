@@ -3,15 +3,16 @@ import { PDFDocument, rgb, StandardFonts } from 'pdf-lib';
 
 export const previewSubjectData = async (req, res) => {
   try {
-    const { subject } = req.query;
+    const { tag, subject } = req.query;
+    const filterTag = tag || subject;
 
-    if (!subject) {
-      return res.status(400).json({ error: 'Subject is required.' });
+    if (!filterTag) {
+      return res.status(400).json({ error: 'Tag is required.' });
     }
 
     const questions = await UPSCQA.find({ 
-       subject: { $regex: new RegExp(subject, 'i') } 
-    }).sort({ topic: 1 });
+       tags: filterTag 
+    }).sort({ start_page: 1 });
 
     if (!questions || questions.length === 0) {
       return res.status(404).json({ error: 'No questions found.' });
@@ -26,20 +27,19 @@ export const previewSubjectData = async (req, res) => {
 
 export const generateCollectivePdf = async (req, res) => {
   try {
-    const { subject, selections, includedQuestionIds } = req.body;
-    // selections maps: question_id -> specific file_url to use
-    // includedQuestionIds is an array of selected question _ids
+    const { tag, subject, selections, includedQuestionIds } = req.body;
+    const filterTag = tag || subject;
 
-    if (!subject) {
-      return res.status(400).json({ error: 'Subject is required to generate collective PDF.' });
+    if (!filterTag) {
+      return res.status(400).json({ error: 'Tag is required to generate collective PDF.' });
     }
 
-    let query = { subject: { $regex: new RegExp(subject, 'i') } };
+    let query = { tags: filterTag };
     if (includedQuestionIds && Array.isArray(includedQuestionIds)) {
       query._id = { $in: includedQuestionIds };
     }
 
-    let questionsResponse = await UPSCQA.find(query).sort({ topic: 1 });
+    let questionsResponse = await UPSCQA.find(query).sort({ start_page: 1 });
 
     if (!questionsResponse || questionsResponse.length === 0) {
       return res.status(404).json({ error: 'No matched/selected questions found.' });
@@ -65,8 +65,8 @@ export const generateCollectivePdf = async (req, res) => {
       x: 50, y: th - 60, size: 28, font: fontBold, color: rgb(1, 1, 1)
     });
 
-    const subTextWidth = fontBold.widthOfTextAtSize(subject.toUpperCase(), 36);
-    titlePage.drawText(subject.toUpperCase(), {
+    const subTextWidth = fontBold.widthOfTextAtSize(filterTag.toUpperCase(), 36);
+    titlePage.drawText(filterTag.toUpperCase(), {
       x: (tw - subTextWidth)/2, y: th / 2, size: 36, font: fontBold, color: rgb(0.1, 0.1, 0.1)
     });
 
@@ -77,11 +77,13 @@ export const generateCollectivePdf = async (req, res) => {
     // We will dynamically create the Index and prepend it. We must track page offsets.
     const indexData = []; // { topic: "...", startPage: X }
     
-    // Group questions by Topic to allow dynamic Header injections
+    // Group questions by the first matching inner Tag (to act like a Topic) or just a generic block
     const groupedByTopic = {};
     for (const q of questionsResponse) {
-        if (!groupedByTopic[q.topic]) groupedByTopic[q.topic] = [];
-        groupedByTopic[q.topic].push(q);
+        // Find a tag that isn't the main filterTag to use as a section header
+        const secTag = q.tags && q.tags.find(t => t !== filterTag) ? q.tags.find(t => t !== filterTag) : filterTag;
+        if (!groupedByTopic[secTag]) groupedByTopic[secTag] = [];
+        groupedByTopic[secTag].push(q);
     }
 
     // 3. Document Building
@@ -289,7 +291,7 @@ export const generateCollectivePdf = async (req, res) => {
     // 5. Finalize and Send
     const pdfBytes = await pdfDoc.save();
 
-    res.setHeader('Content-Disposition', `attachment; filename="Formal_UPSC_Book_${subject.replace(/[^a-z0-9]/gi, '_')}.pdf"`);
+    res.setHeader('Content-Disposition', `attachment; filename="Formal_UPSC_Book_${filterTag.replace(/[^a-z0-9]/gi, '_')}.pdf"`);
     res.setHeader('Content-Type', 'application/pdf');
     res.send(Buffer.from(pdfBytes));
 

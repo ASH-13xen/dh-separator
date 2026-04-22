@@ -1,0 +1,187 @@
+export const optionalSubHistory = [
+  {
+    section: "Ancient India",
+    topics: [
+      {
+        title: "Sources and Pre-history",
+        subtopics: [
+          "Archaeological sources: Exploration, excavation, epigraphy, numismatics, monuments.",
+          "Literary sources: Indigenous: Primary and secondary; poetry, scientific literature, literature in regional languages, religious literature.",
+          "Foreign account: Greek, Chinese and Arab writers.",
+          "Pre-history and Proto-history: Geographical factors; hunting and gathering (paleolithic and mesolithic); Beginning of agriculture (neolithic and chalcolithic)."
+        ]
+      },
+      {
+        title: "Early Civilizations",
+        subtopics: [
+          "Indus Valley Civilization: Origin, date, extent, characteristics-decline, survival and significance, art and architecture.",
+          "Megalithic Cultures: Distribution of pastoral and farming cultures outside the Indus, Development of community life, Settlements, Development of agriculture, Crafts, Pottery, and Iron industry."
+        ]
+      },
+      {
+        title: "Vedic Period and Mahajanapadas",
+        subtopics: [
+          "Aryans and Vedic Period: Expansions of Aryans in India; Vedic Period: Religious and philosophic literature; Transformation from Rig Vedic period to the later Vedic period; Political, social, and economical life; Significance of the Vedic Age; Evolution of Monarchy and Varna system.",
+          "Period of Mahajanapadas: Formation of States (Mahajanapada): Republics and monarchies; Rise of urban centres; Trade routes; Economic growth; Introduction of coinage; Spread of Jainism and Buddism; Rise of Magadha and Nandas; Iranian and Macedonian invasions and their impact."
+        ]
+      },
+      {
+        title: "Mauryan and Post-Mauryan Period",
+        subtopics: [
+          "Mauryan Empire: Foundation of the Mauryan Empire, Chandragupta, Kautilya, and Arthashastra; Ashoka; Concept of Dharma; Edicts; Polity, Administration, Economy; Art, architecture, and sculpture; External contacts; Religion; Spread of religion; Literature; Disintegration of the empire; Sungas and Kanvas.",
+          "Post-Mauryan Period (Indo-Greeks, Sakas, Kushanas, Western Kshatrapas): Contact with outside world; growth of urban centres, economy, coinage, development of religions, Mahayana, social conditions, art, architecture, culture, literature, and science."
+        ]
+      },
+      {
+        title: "Early States, Guptas, and Regional Powers",
+        subtopics: [
+          "Early State and Society in Eastern India, Deccan, and South India: Kharavela, The Satavahanas, Tamil States of the Sangam Age; Administration, Economy, land grants, coinage, trade guilds, and urban centres; Buddhist centres; Sangam literature and culture; Art and architecture.",
+          "Guptas, Vakatakas and Vardhanas: Polity and administration, Economic conditions, Coinage of the Guptas, Land grants, Decline of urban centres, Indian feudalism, Caste system, Position of women, Education and educational institutions; Nalanda, Vikramshila and Vallabhi, Literature, scientific literature, art, and architecture.",
+          "Regional States during Gupta Era: The Kadambas, Pallavas, Chalukyas of Badami; Polity and Administration, Trade guilds, Literature; growth of Vaishnava and Saiva religions. Tamil Bhakti movement, Shankaracharya; Vedanta; Institutions of temple and temple architecture.",
+          "Palas, Senas, Rashtrakutas, Paramaras: Polity, and administration; Cultural aspects.",
+          "Arab conquest of Sind; Alberuni.",
+          "The Chalukyas of Kalyana, Cholas, Hoysalas, Pandyas: Polity and Administration; Local Government; Growth of art and architecture, religious sects, Institution of temple and Mathas, Agraharas, education and literature, economy and society.",
+          "Themes in Early Indian Cultural History: Languages and texts, major stages in the evolution of art and architecture, major philosophical thinkers and schools, ideas in Science and Mathematics."
+        ]
+      }
+    ]
+  },
+  {
+    section: "Medieval India",
+    topics: [
+      {
+        title: "Early Medieval India (750-1200)",
+        subtopics: [
+          "Polity: Major political developments in Northern India and the peninsula, origin, and the rise of Rajputs.",
+          "The Cholas: administration, village economy and society “Indian Feudalism”.",
+          "Agrarian economy and urban settlements; Trade and commerce.",
+          "Society: the status of the Brahman and the new social order; Condition of women.",
+          "Indian science and technology.",
+          "Cultural Traditions in India: Philosophy (Skankaracharya and Vedanta, Ramanuja and Vishishtadvaita, Madhva and Brahma Mimansa).",
+          "Religion: Forms and features of religion, Tamil devotional cult, growth of Bhakti, Islam and its arrival in India, Sufism.",
+          "Literature: Literature in Sanskrit, growth of Tamil literature, literature in the newly developing languages, Kalhan's Rajtarangini, Alberuni's India.",
+          "Art and Architecture: Temple architecture, sculpture, painting."
+        ]
+      },
+      {
+        title: "The Delhi Sultanate (13th & 14th Centuries)",
+        subtopics: [
+          "The Thirteenth Century: Establishment of the Delhi Sultanate (Ghurian invasions - factors behind Ghurian success); Economic, Social and cultural consequences; Foundation of Delhi Sultanate and early Turkish Sultans; Consolidation (The rule of Iltutmish and Balban).",
+          "The Fourteenth Century: “The Khalji Revolution”; Alauddin Khalji (Conquests and territorial expansion, agrarian and economic measure); Muhammad Tughluq (Major projects, agrarian measures, bureaucracy); Firuz Tugluq (Agrarian measures, achievements in civil engineering and public works, decline of the Sultanate, foreign contacts and Ibn Battuta's account).",
+          "Society, Culture and Economy: Society (composition of rural society, ruling classes, town dwellers, women, religious classes, caste and slavery, Bhakti movement, Sufi movement).",
+          "Culture: Persian literature, regional languages literature, Sultanate architecture, painting, composite culture.",
+          "Economy: Agricultural Production, rise of urban economy, non-agricultural production, trade, and commerce."
+        ]
+      },
+      {
+        title: "The 15th and Early 16th Century",
+        subtopics: [
+          "Political Developments and Economy: Rise of Provincial Dynasties (Bengal, Kashmir, Gujarat, Malwa, Bahmanids); The Vijayanagara Empire; Lodis.",
+          "Mughal Empire, First phase: Babur, Humayun.",
+          "The Sur Empire: Sher Shah’s administration.",
+          "Portuguese colonial enterprise, Bhakti, and Sufi Movements.",
+          "Society and culture: Regional cultures specificities; Literary traditions; Provincial architectural; Society, culture, literature, and the arts in Vijayanagara Empire."
+        ]
+      },
+      {
+        title: "The Mughal Empire",
+        subtopics: [
+          "Akbar: Conquests and consolidation of empire; Establishment of jagir and mansab systems; Rajput policy; Evolution of religious and social outlook (Theory of Sulh-i-kul and religious policy); Court patronage of art and technology.",
+          "Mughal Empire in the Seventeenth Century: Major administrative policies of Jahangir, Shahjahan, and Aurangzeb; The Empire and the Zamindars; Religious policies; Nature of the Mughal State; Late Seventeenth-Century crisis and the revolts; The Ahom kingdom; Shivaji and the early Maratha Kingdom.",
+          "Economy and society: Population, Agricultural and craft production; Towns, commerce with Europe through Dutch, English and French companies; Indian mercantile classes, Banking, insurance, credit systems; Conditions of peasants and Women; Evolution of the Sikh community and the Khalsa Panth.",
+          "Culture: Persian histories and other literature; Hindi and religious literatures; Mughal architecture; Mughal painting; Provincial architecture and painting; Classical music; Science and technology."
+        ]
+      },
+      {
+        title: "The Eighteenth Century",
+        subtopics: [
+          "Factors for the decline of the Mughal Empire.",
+          "The regional principalities: Nizam’s Deccan, Bengal, Awadh.",
+          "Maratha ascendancy under the Peshwas; The Maratha fiscal and financial system.",
+          "Emergence of Afghan power, Battle of Panipat, 1761.",
+          "State of, political, cultural, and economic, on eve of the British conquest."
+        ]
+      }
+    ]
+  },
+  {
+    section: "Modern India",
+    topics: [
+      {
+        title: "British Conquest and Its Impact",
+        subtopics: [
+          "European Penetration into India: The Early European Settlements; The Portuguese and the Dutch; The English and the French East India Companies; Their struggle for supremacy; Carnatic Wars; Bengal-The conflict between the English and the Nawabs of Bengal; Siraj and the English; The Battle of Plassey; Significance of Plassey.",
+          "British Expansion in India: Bengal-Mir Jafar and Mir Kasim; The Battle of Buxar; Mysore; The Marathas; The three Anglo Maratha Wars; The Punjab.",
+          "Early Structure of the British Raj: The Early administrative structure; From diarchy to direct control; The Regulating Act (1773); The Pitt’s India Act (1784); The Charter Act (1833); The Voice of free trade and the changing character of British colonial rule; The English utilitarian and India.",
+          "Economic Impact of British Colonial Rule: Land revenue settlements in British India (Permanent, Ryotwari, Mahalwari); Economic impact of the revenue arrangements; Commercialization of agriculture; Rise of landless agrarian labourers; Impoverishment of the rural society.",
+          "Dislocation of traditional trade and commerce; De-industrialisation; Decline of traditional crafts; Drain of wealth; Economic transformation of India; Railroad and communication network including telegraph and postal services; Famine and poverty; European business enterprise and its limitations."
+        ]
+      },
+      {
+        title: "Social, Cultural and Religious Developments",
+        subtopics: [
+          "Social and Cultural Developments: The state of indigenous education, its dislocation; Orientalist-Anglicist controversy; The introduction of western education in India; The rise of press, literature, and public opinion; Progress of science; Christian missionary activities in India.",
+          "Social and Religious Reform Movements: Ram Mohan Roy, The Brahmo Movement; Devendranath Tagore; Iswarchandra Vidyasagar; The Young Bengal Movement; Dayanada Saraswati.",
+          "Social reform movements in India including Sati, widow remarriage, child marriage, etc.; The contribution of Indian renaissance to the growth of modern India.",
+          "Islamic revivalism: the Feraizi and Wahabi Movements."
+        ]
+      },
+      {
+        title: "Indian Nationalism and Freedom Struggle",
+        subtopics: [
+          "Indian Response to British Rule: Peasant movement and tribal uprisings in the 18th and 19th centuries (Rangpur Dhing, Kol Rebellion, Mopla Rebellion, Santal Hul, Indigo Rebellion, Deccan Uprising, Munda Ulgulan).",
+          "The Great Revolt of 1857: Origin, character, causes of failure, the consequences; The shift in the character of peasant uprisings in the post-1857 period; the peasant movements of the 1920s and 1930s.",
+          "Factors leading to the birth of Indian Nationalism; Politics of Association; The Foundation of the Indian National Congress; The Safety-valve thesis; Programme and objectives of Early Congress; the social composition of early Congress leadership; the Moderates and Extremists; The Partition of Bengal (1905); The Swadeshi Movement; The beginning of revolutionary extremism in India.",
+          "Rise of Gandhi; Character of Gandhian nationalism; Gandhi’s popular appeal; Rowlatt Satyagraha; the Khilafat Movement; the Non-cooperation Movement; National politics from the end of the Noncooperation movement to the beginning of the Civil Disobedience Movement.",
+          "Simon Commission; The Nehru Report; the Round Table Conferences; Nationalism and the Peasant/Working-class movements; Women and Indian youth/students in Indian politics; the election of 1937 and the formation of ministries.",
+          "Cripps Mission; the Quit India Movement; the Wavell Plan; The Cabinet Mission.",
+          "Other strands in the National Movement: The Revolutionaries (Bengal, Punjab, Maharashtra, U.P., Madras, Outside India); The Left within the Congress (Jawaharlal Nehru, Subhas Chandra Bose, Congress Socialist Party); the Communist Party of India.",
+          "Politics of Separatism; the Muslim League; the Hindu Mahasabha; Communalism and the politics of partition; Transfer of power; Independence.",
+          "Constitutional Developments in the Colonial India between 1858 and 1935."
+        ]
+      },
+      {
+        title: "Post-Independence India",
+        subtopics: [
+          "Consolidation as a Nation; Nehru’s Foreign Policy; India and her neighbours (1947-1964); The linguistic reorganisation of States (1935-1947).",
+          "Regionalism and regional inequality; Integration of Princely States; Princes in electoral politics; the Question of National Language.",
+          "Caste and Ethnicity after 1947; Backward Castes and Tribes in post-colonial electoral politics; Dalit movements.",
+          "Economic development and political change; Land reforms; the politics of planning and rural reconstruction.",
+          "Ecology and environmental policy in post-colonial India; Progress of Science."
+        ]
+      }
+    ]
+  },
+  {
+    section: "World History",
+    topics: [
+      {
+        title: "Enlightenment, Revolutions and Modern Politics",
+        subtopics: [
+          "Enlightenment and Modern ideas: Major Ideas of Enlightenment (Kant, Rousseau); Spread of Enlightenment in the colonies; Rise of socialist ideas (up to Marx); spread of Marxian Socialism.",
+          "Origins of Modern Politics: European States System; American Revolution and the Constitution; French Revolution and Aftermath (1789-1815); American Civil War with reference to Abraham Lincoln and the abolition of slavery; British Democratic politics (1815-1850): Parliamentary Reformers, Free Traders, Chartists.",
+          "Industrialization: English Industrial Revolution (Causes and Impact on Society); Industrialization in other countries (USA, Germany, Russia, Japan); Industrialization and Globalization."
+        ]
+      },
+      {
+        title: "Nationalism, Imperialism and World Wars",
+        subtopics: [
+          "Nation-State System: Rise of Nationalism in 19th century; Nationalism: State-building in Germany and Italy; Disintegration of Empires in the face of the emergence of nationalities across the World.",
+          "Imperialism and Colonialism: South and South-East Asia; Latin America and South Africa; Australia; Imperialism and free trade: Rise of neo-imperialism.",
+          "Revolution and Counter-Revolution: 19th Century European revolutions; The Russian Revolution of 1917-1921; Fascist Counter-Revolution, Italy and Germany; The Chinese Revolution of 1949.",
+          "World Wars: 1st and 2nd World Wars as Total Wars (Societal implications); World War I: Causes and Consequences; World War II: Causes and Consequences."
+        ]
+      },
+      {
+        title: "Post-World War II and Global Developments",
+        subtopics: [
+          "The World after World War II: Emergence of Two power blocs; Emergence of Third World and non-alignment; UNO and the global disputes.",
+          "Liberation from Colonial Rule: Latin America-Bolivar; Arab World-Egypt; Africa-Apartheid to Democracy; South-East Asia-Vietnam.",
+          "Decolonization and Underdevelopment: Factors constraining development; Latin America, Africa.",
+          "Unification of Europe: Post War Foundations; NATO and European Community; Consolidation and Expansion of European Community; European Union.",
+          "Disintegration of Soviet Union and the Rise of the Unipolar World: Factors leading to the collapse of Soviet Communism and Soviet Union (1985-1991); Political Changes in East Europe (1989-2001); End of the Cold War and US Ascendancy in the World as the lone superpower."
+        ]
+      }
+    ]
+  }
+];

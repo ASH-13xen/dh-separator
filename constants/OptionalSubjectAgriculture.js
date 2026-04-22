@@ -1,0 +1,262 @@
+export const optionalSubAgriculture = [
+  {
+    section: "Ecology, Environment & Agronomy",
+    topics: [
+      {
+        title: "Ecology & Climate Change",
+        subtopics: [
+          "Ecology and its relevance to man, natural resources, their sustainable management and conservation.",
+          "Physical and social environment as factors of crop distribution and production.",
+          "Agro ecology; cropping pattern as indicators of environments.",
+          "Environmental pollution and associated hazards to crops, animals and humans.",
+          "Climate change—International conventions and global initiatives.",
+          "Greenhouse effect and global warming.",
+          "Advance tools for ecosystem analysis—Remote Sensing (RS) and Geographic Information Systems (GIS)."
+        ]
+      },
+      {
+        title: "Cropping & Farming Systems",
+        subtopics: [
+          "Cropping patterns in different agro-climatic zones of the country.",
+          "Impact of high-yielding and short-duration varieties on shifts in cropping patterns.",
+          "Concepts of various cropping, and farming systems.",
+          "Organic and Precision farming.",
+          "Package of practices for production of important cereals, pulses, oil seeds, fibers, sugar, commercial and fodder crops."
+        ]
+      },
+      {
+        title: "Weed Management",
+        subtopics: [
+          "Weeds, their characteristics, dissemination and association with various crops; their multiplications.",
+          "Cultural, biological, and chemical control of weeds."
+        ]
+      }
+    ]
+  },
+  {
+    section: "Soil Science & Nutrient Management",
+    topics: [
+      {
+        title: "Soil Properties & Formation",
+        subtopics: [
+          "Soil—physical, chemical and biological properties.",
+          "Processes and factors of soil formation; soils of India.",
+          "Mineral and organic constituents of soils and their role in maintaining soil productivity."
+        ]
+      },
+      {
+        title: "Plant Nutrients & Soil Fertility",
+        subtopics: [
+          "Essential plant nutrients and other beneficial elements in soils and plants.",
+          "Principles of soil fertility, soil testing and fertiliser recommendations.",
+          "Integrated nutrient management; Biofertilizers.",
+          "Losses of nitrogen in soil, nitrogen-use efficiency in submerged rice soils, nitrogen fixation in soils.",
+          "Efficient phosphorus and potassium use.",
+          "Problem soils and their reclamation.",
+          "Soil factors affecting greenhouse gas emission."
+        ]
+      },
+      {
+        title: "Soil & Water Conservation",
+        subtopics: [
+          "Soil conservation, integrated watershed management.",
+          "Soil erosion and its management.",
+          "Dry land agriculture and its problems.",
+          "Technology for stabilizing agriculture production in rainfed areas."
+        ]
+      }
+    ]
+  },
+  {
+    section: "Water Management & Irrigation",
+    topics: [
+      {
+        title: "Irrigation Systems & Practices",
+        subtopics: [
+          "Water-use efficiency in relation to crop production.",
+          "Criteria for scheduling irrigations.",
+          "Ways and means of reducing run-off losses of irrigation water.",
+          "Rainwater harvesting.",
+          "Drip and sprinkler irrigation.",
+          "Irrigation projects in India."
+        ]
+      },
+      {
+        title: "Drainage & Water Quality",
+        subtopics: [
+          "Drainage of waterlogged soils.",
+          "Quality of irrigation water.",
+          "Effect of industrial effluents on soil and water pollution."
+        ]
+      }
+    ]
+  },
+  {
+    section: "Forestry & Horticulture",
+    topics: [
+      {
+        title: "Forestry & Plantations",
+        subtopics: [
+          "Important features, and scope of various types of forestry plantations such as social forestry, agro-forestry, and natural forests.",
+          "Propagation of forest plants.",
+          "Forest products.",
+          "Agro-forestry and value addition.",
+          "Conservation of forest flora and fauna."
+        ]
+      },
+      {
+        title: "Horticulture & Post-Harvest Technology",
+        subtopics: [
+          "Major fruits, plantation crops, vegetables, spices and flower crops.",
+          "Package practices of major horticultural crops.",
+          "Protected cultivation and high-tech horticulture.",
+          "Post-harvest technology and value addition of fruits and vegetables.",
+          "Landscaping and commercial floriculture.",
+          "Medicinal and aromatic plants.",
+          "Role of fruits and vegetables in human nutrition."
+        ]
+      }
+    ]
+  },
+  {
+    section: "Agricultural Economics, Extension & Rural Development",
+    topics: [
+      {
+        title: "Farm Management & Economics",
+        subtopics: [
+          "Farm management, scope, importance and characteristics, farm planning.",
+          "Optimum resource use and budgeting.",
+          "Economics of different types of farming systems.",
+          "Types and systems of farming and factors affecting them."
+        ]
+      },
+      {
+        title: "Agricultural Marketing & Policies",
+        subtopics: [
+          "Marketing management strategies for development, market intelligence.",
+          "Price fluctuations and their cost.",
+          "Role of co-operatives in agricultural economy.",
+          "Agricultural price policy.",
+          "Crop Insurance."
+        ]
+      },
+      {
+        title: "Agricultural Extension & Rural Development",
+        subtopics: [
+          "Agricultural extension, its importance and role.",
+          "Methods of evaluation of extension programmes.",
+          "Socio-economic survey and status of big, small and marginal farmers and landless agricultural labourers.",
+          "Training programmes for extension workers.",
+          "Role of Krishi Vigyan Kendra’s (KVK) in dissemination of Agricultural technologies.",
+          "Non-Government Organisation (NGO) and self-help group approach for rural development."
+        ]
+      }
+    ]
+  },
+  {
+    section: "Genetics, Plant Breeding & Seed Technology",
+    topics: [
+      {
+        title: "Cell Biology & Genetics",
+        subtopics: [
+          "Cell structure, function and cell cycle.",
+          "Synthesis, structure and function of genetic material.",
+          "Laws of heredity.",
+          "Chromosome structure, chromosomal aberrations, linkage and cross-over, and their significance in recombination breeding.",
+          "Polyploidy, euploids and aneuploids.",
+          "Mutation—and their role in crop improvement.",
+          "Heritability, sterility and incompatibility, classification and their application in crop improvement.",
+          "Cytoplasmic inheritance, sex-linked, sex-influenced and sex-limited characters."
+        ]
+      },
+      {
+        title: "Plant Breeding & Biotechnology",
+        subtopics: [
+          "History of plant breeding.",
+          "Modes of reproduction, selfing and crossing techniques.",
+          "Origin, evolution and domestication of crop plants, center of origin, law of homologous series.",
+          "Crop genetic resources— conservation and utilization.",
+          "Application of principles of plant breeding, improvement of crop plants.",
+          "Molecular markers and their application in plant improvement.",
+          "Pure-line selection, pedigree, mass and recurrent selections.",
+          "Combining ability, its significance in plant breeding.",
+          "Heterosis and its exploitation.",
+          "Somatic hybridization.",
+          "Breeding for disease and pest resistance.",
+          "Role of interspecific and intergeneric hybridization.",
+          "Role of genetic engineering and biotechnology in crop improvement; Genetically modified crop plants."
+        ]
+      },
+      {
+        title: "Seed Technology & IPR",
+        subtopics: [
+          "Seed production and processing technologies.",
+          "Seed certification, Seed testing and storage.",
+          "DNA finger printing and seed registration.",
+          "Role of public and private sectors in seed production, and marketing.",
+          "Intellectual Property Rights (IPR) issues, WTO issues and its impact on Agriculture."
+        ]
+      }
+    ]
+  },
+  {
+    section: "Plant Physiology & Crop Protection",
+    topics: [
+      {
+        title: "Plant Physiology",
+        subtopics: [
+          "Principles of Plant Physiology with reference to plant nutrition, absorption, translocation and metabolism of nutrients.",
+          "Soil-water-plant relationship.",
+          "Enzymes and plant pigments.",
+          "Photosynthesis—modern concepts and factors affecting the process, aerobic and anaerobic respiration; C3, C4 and CAM mechanisms.",
+          "Carbohydrate, protein and fat metabolism.",
+          "Growth and development; photoperiodism and vernalization.",
+          "Plant growth substances and their role in crop production.",
+          "Physiology of seed development and germination; dormancy.",
+          "Stress physiology—draught, salt and water stress."
+        ]
+      },
+      {
+        title: "Crop Protection (Entomology & Pathology)",
+        subtopics: [
+          "Diagnosis of pests and diseases of field crops, vegetables, orchard and plantation crops and their economic importance.",
+          "Classification of pests and diseases and their management.",
+          "Integrated pest and diseases management.",
+          "Storage pests and their management.",
+          "Biological control of pests and diseases.",
+          "Epidemiology and forecasting of major crop pests and diseases.",
+          "Plant quarantine measures.",
+          "Pesticides, their formulation and modes of action."
+        ]
+      }
+    ]
+  },
+  {
+    section: "Food Security, Nutrition & Policies",
+    topics: [
+      {
+        title: "Food Security & PDS",
+        subtopics: [
+          "Food production and consumption trends in India.",
+          "Food security and growing population—vision 2020.",
+          "Reasons for grain surplus; National and International food policies.",
+          "Production, procurement, distribution constraints.",
+          "Availability of food grains, per capita expenditure on food.",
+          "Trends in poverty, Public Distribution System and Below Poverty Line population.",
+          "Targeted Public Distribution System (PDS), policy implementation in context to globalization.",
+          "Processing constraints."
+        ]
+      },
+      {
+        title: "Nutrition & Dietary Guidelines",
+        subtopics: [
+          "Relation of food production to National Dietary Guidelines and food consumption pattern.",
+          "Food based dietary approaches to eliminate hunger.",
+          "Nutrient deficiency—Micro nutrient deficiency: Protein Energy Malnutrition or Protein Calorie Malnutrition (PEM or PCM).",
+          "Micro nutrient deficiency and HRD in context of work capacity of women and children.",
+          "Food grain productivity and food security."
+        ]
+      }
+    ]
+  }
+];

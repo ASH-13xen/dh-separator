@@ -1,0 +1,133 @@
+export const optionalSubEconomics = [
+  {
+    section: "Advanced Economic Theory",
+    topics: [
+      {
+        title: "Advance Micro Economics",
+        subtopics: [
+          "Marshallian and Walrasian Approaches to Price determination.",
+          "Alternative Distribution Theories: Ricardo, Kaldor, Kalecki.",
+          "Markets Structure: Monopolistic Competition, Duopoly, Oligopoly.",
+          "Modern Welfare Criteria: Pareto Hicks and Scitovsky, Arrow’s Impossibility Theorem, A.K. Sen’s Social Welfare Function."
+        ]
+      },
+      {
+        title: "Advance Macro Economics",
+        subtopics: [
+          "Approaches to Employment Income and Interest Rate determination: Classical, Keynes (IS-LM) curve, Neo-classical synthesis and New classical.",
+          "Theories of Interest Rate determination and Interest Rate Structure."
+        ]
+      }
+    ]
+  },
+  {
+    section: "Money, Banking, Finance and International Economics",
+    topics: [
+      {
+        title: "Money-Banking and Finance",
+        subtopics: [
+          "Demand for and Supply of Money: Money Multiplier, Quantity Theory of Money (Fisher, Pigou and Friedman) and Keynes’ Theory on Demand for Money.",
+          "Goals and Instruments of Monetary Management in Closed and Open Economies. Relation between the Central Bank and the Treasury. Proposal for ceiling on growth rate of money.",
+          "Public Finance and its Role in market economy: in stabilization of supply, allocation of resources and in distribution and development.",
+          "Sources of Government revenue, forms of Taxes and Subsidies, their incidence and effects.",
+          "Limits to taxation, loans, crowding-out effects and limits to borrowings. Public expenditure and its effects."
+        ]
+      },
+      {
+        title: "International Economics: Trade Theories & Protection",
+        subtopics: [
+          "Old and New theories of International Trade: Comparative advantage, Terms of Trade and offer curve, Product cycle and Strategic trade theories.",
+          "Trade as an engine of growth and theories of underdevelopment in an open economy.",
+          "Forms of protection: Tariff and quota."
+        ]
+      },
+      {
+        title: "International Economics: Balance of Payments & Global Institutions",
+        subtopics: [
+          "Balance of Payments Adjustments: Price versus income, income adjustments under fixed exchange rates, Theories of Policy mix.",
+          "Exchange rate adjustments under capital mobility; Floating Rates and their implications for developing Countries: Currency Boards.",
+          "Trade Policy and Developing Countries; BOP, adjustments and Policy Coordination in open economy macro-model; Speculative attacks.",
+          "Trade Blocks and Monetary Unions.",
+          "WTO: Trims, TRIPS, Domestic Measures, Different Rounds of WTO talks."
+        ]
+      }
+    ]
+  },
+  {
+    section: "Growth, Development and Environmental Sustainability",
+    topics: [
+      {
+        title: "Theories of Growth and Development",
+        subtopics: [
+          "Theories of growth: Harrod’s model.",
+          "Lewis model of development with surplus labour.",
+          "Balanced and Unbalanced Growth.",
+          "Human capitals and Economic Growth.",
+          "Research and Development and Economic Growth."
+        ]
+      },
+      {
+        title: "Process and Planning of Economic Development",
+        subtopics: [
+          "Process of Economic Development of less developed countries: Myrdal and Kuznets on economic development and structural change; Role of Agriculture in Economic Development of less developed countries.",
+          "Economic Development and International Trade and Investment, Role of Multinationals.",
+          "Planning and economic Development: changing role of Markets and Planning, Private-Public Partnership.",
+          "Welfare indicators and measures of growth—Human development indices. The basic needs approach.",
+          "Development and Environmental Sustainability—Renewable and Non-Renewable Resources, Environmental Degradation, Intergenerational equity development."
+        ]
+      }
+    ]
+  },
+  {
+    section: "Indian Economy: Pre-Independence and Pre-Liberalization",
+    topics: [
+      {
+        title: "Indian Economy in Pre-Independence Era",
+        subtopics: [
+          "Land System and its changes, Commercialization of agriculture.",
+          "Drain theory, Laissez faire theory and critique.",
+          "Manufacture and Transport: Jute, Cotton, Railways, Money and Credit."
+        ]
+      },
+      {
+        title: "Indian Economy after Independence: The Pre-Liberalization Era",
+        subtopics: [
+          "Contribution of Vakil, Gadgil and V.K.R.V. Rao.",
+          "Agriculture: Land Reforms and land tenure system, Green Revolution and capital formation in agriculture.",
+          "Industry: Trends in composition and growth, Role of public and private sector, Small scale and cottage industries.",
+          "National and Per capita income: patterns, trends, aggregate and Sectoral composition and changes therein.",
+          "Broad factors determining National Income and distribution, Measures of poverty, Trends in poverty and inequality."
+        ]
+      }
+    ]
+  },
+  {
+    section: "Indian Economy: The Post-Liberalization Era",
+    topics: [
+      {
+        title: "New Economic Reforms: Agriculture, Industry and Trade",
+        subtopics: [
+          "New Economic Reform and Agriculture: Agriculture and WTO, Food processing, subsidies, Agricultural prices and public distribution system, Impact of public expenditure on agricultural growth.",
+          "New Economic Policy and Industry: Strategy of industrialization, Privatization, Disinvestments, Role of foreign direct investment and multinationals.",
+          "New Economic Policy and Trade: Intellectual property rights: Implications of TRIPS, TRIMS, GATS and new EXIM policy."
+        ]
+      },
+      {
+        title: "Financial, Monetary, and Planning Reforms",
+        subtopics: [
+          "New Exchange Rate Regime: Partial and full convertibility, Capital account convertibility.",
+          "New Economic Policy and Public Finance: Fiscal Responsibility Act, Twelfth Finance Commission and Fiscal Federalism and Fiscal Consolidation.",
+          "New Economic Policy and Monetary system: Role of RBI under the new regime.",
+          "Planning: From central Planning to indicative planning, Relation between planning and markets for growth and decentralized planning: 73rd and 74th Constitutional amendments."
+        ]
+      },
+      {
+        title: "Employment and Poverty Alleviation",
+        subtopics: [
+          "New Economic Policy and Employment: Employment and poverty, Rural wages, Employment Generation.",
+          "Poverty alleviation schemes, New Rural Employment Guarantee Scheme."
+        ]
+      }
+    ]
+  }
+];

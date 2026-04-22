@@ -1,0 +1,236 @@
+export const optionalSubChemistry = [
+  {
+    section: "Physical Chemistry: Structure, Bonding, and States of Matter",
+    topics: [
+      {
+        title: "Atomic Structure",
+        subtopics: [
+          "Heisenberg’s uncertainty principle.",
+          "Schrodinger wave equation (time independent); Interpretation of wave function, particle in one dimensional box, quantum numbers, hydrogen atom wave functions.",
+          "Shapes of s, p and d orbitals."
+        ]
+      },
+      {
+        title: "Chemical Bonding",
+        subtopics: [
+          "Ionic bond, characteristics of ionic compounds, lattice energy, Born-Haber cycle.",
+          "Covalent bond and its general characteristics, polarities of bonds in molecules and their dipole moments.",
+          "Valence bond theory, concept of resonance and resonance energy.",
+          "Molecular orbital theory (LCAO method); bonding H2+, H2, He2+ to Ne2, NO, CO, HF, CN–.",
+          "Comparison of valence bond and molecular orbital theories, bond order, bond strength and bond length."
+        ]
+      },
+      {
+        title: "Solid State",
+        subtopics: [
+          "Crystal systems; Designation of crystal faces, lattice structures and unit cell.",
+          "Bragg’s law; X-ray diffraction by crystals; Close packing, radius ratio rules, calculation of some limiting radius ratio values.",
+          "Structures of NaCl, ZnS, CsCl, CaF2.",
+          "Stoichiometric and nonstoichiometric defects, impurity defects, semi-conductors."
+        ]
+      },
+      {
+        title: "Gaseous State and Transport Phenomenon",
+        subtopics: [
+          "Equation of state for real gases, intermolecular interactions, critical phenomena and liquefaction of gases.",
+          "Maxwell’s distribution of speeds, intermolecular collisions, collisions on the wall and effusion.",
+          "Thermal conductivity and viscosity of ideal gases."
+        ]
+      },
+      {
+        title: "Liquid State",
+        subtopics: [
+          "Kelvin equation.",
+          "Surface tension and surface energy, wetting and contact angle, interfacial tension and capillary action."
+        ]
+      }
+    ]
+  },
+  {
+    section: "Physical Chemistry: Thermodynamics, Equilibria, and Kinetics",
+    topics: [
+      {
+        title: "Thermodynamics",
+        subtopics: [
+          "Work, heat and internal energy; first law of thermodynamics.",
+          "Second law of thermodynamics; entropy as a state function, entropy changes in various processes, entropy-reversibility and irreversibility.",
+          "Free energy functions; Thermodynamic equation of state; Maxwell relations.",
+          "Temperature, volume and pressure dependence of U, H, A, G, Cp and Cv; J-T effect and inversion temperature.",
+          "Criteria for equilibrium, relation between equilibrium constant and thermodynamic quantities.",
+          "Nernst heat theorem, introductory idea of third law of thermodynamics."
+        ]
+      },
+      {
+        title: "Phase Equilibria and Solutions",
+        subtopics: [
+          "Clausius-Clapeyron equation; phase diagram for a pure substance.",
+          "Phase equilibria in binary systems, partially miscible liquids—upper and lower critical solution temperatures.",
+          "Partial molar quantities, their significance and determination.",
+          "Excess thermodynamic functions and their determination."
+        ]
+      },
+      {
+        title: "Electrochemistry",
+        subtopics: [
+          "Debye-Huckel theory of strong electrolytes and Debye-Huckel limiting Law for various equilibrium and transport properties.",
+          "Galvanic cells, concentration cells; electrochemical series, measurement of e.m.f. of cells and its applications; fuel cells and batteries.",
+          "Processes at electrodes; double layer at the interface; rate of charge transfer, current density; overpotential.",
+          "Electroanalytical techniques: amperometry, ion selective electrodes and their use."
+        ]
+      },
+      {
+        title: "Chemical Kinetics",
+        subtopics: [
+          "Differential and integral rate equations for zeroth, first, second and fractional order reactions.",
+          "Rate equations involving reverse, parallel, consecutive and chain reactions; Branching chain and explosions.",
+          "Effect of temperature and pressure on rate constant.",
+          "Study of fast reactions by stop-flow and relaxation methods.",
+          "Collisions and transition state theories."
+        ]
+      }
+    ]
+  },
+  {
+    section: "Physical Chemistry: Surface Chemistry and Photochemistry",
+    topics: [
+      {
+        title: "Surface Phenomena and Catalysis",
+        subtopics: [
+          "Adsorption from gases and solutions on solid adsorbents.",
+          "Langmuir and B.E.T. adsorption isotherms; determination of surface area.",
+          "Characteristics and mechanism of reaction on heterogeneous catalysts."
+        ]
+      },
+      {
+        title: "Photochemistry (Physical)",
+        subtopics: [
+          "Absorption of light; decay of excited state by different routes.",
+          "Photochemical reactions between hydrogen and halogens and their quantum yields."
+        ]
+      }
+    ]
+  },
+  {
+    section: "Inorganic Chemistry",
+    topics: [
+      {
+        title: "Bio-Inorganic Chemistry",
+        subtopics: [
+          "Metal ions in biological systems and their role in ion-transport across the membranes (molecular mechanism).",
+          "Oxygen-uptake proteins, cytochromes and ferrodoxins."
+        ]
+      },
+      {
+        title: "Coordination Chemistry",
+        subtopics: [
+          "Bonding in transition metal complexes: Valence bond theory, crystal field theory and its modifications; applications of theories in the explanation of magnetism and electronic spectra of metal complexes.",
+          "Isomerism in coordination compounds; IUPAC nomenclature; stereochemistry of complexes with 4 and 6 coordination numbers; chelate effect and polynuclear complexes; trans effect and its theories.",
+          "Kinetics of substitution reactions in square-planar complexes; thermodynamic and kinetic stability of complexes.",
+          "EAN rule, Synthesis structure and reactivity of metal carbonyls; carboxylate anions, carbonyl hydrides and metal nitrosyl compounds.",
+          "Complexes with aromatic systems, synthesis, structure and bonding in metal olefin complexes, alkyne complexes and cyclopentadienyl complexes.",
+          "Coordinative unsaturation, oxidative addition reactions, insertion reactions, fluxional molecules and their characterization.",
+          "Compound with metal—metal bonds and metal atom clusters."
+        ]
+      },
+      {
+        title: "Main Group Chemistry",
+        subtopics: [
+          "Boranes, borazines, phosphazenes and cyclic phosphazene.",
+          "Silicates and silicones.",
+          "Interhalogen compounds; Sulphur—nitrogen compounds, noble gas compounds."
+        ]
+      },
+      {
+        title: "General Chemistry of ‘f’ Block Elements",
+        subtopics: [
+          "Lanthanides and actinides: separation, oxidation states, magnetic and spectral properties.",
+          "Lanthanide contraction."
+        ]
+      }
+    ]
+  },
+  {
+    section: "Organic Chemistry: Principles, Mechanisms, and Reactions",
+    topics: [
+      {
+        title: "Delocalised Covalent Bonding",
+        subtopics: [
+          "Aromaticity, anti-aromaticity; annulenes, azulenes, tropolones, fulvenes, sydnones."
+        ]
+      },
+      {
+        title: "Reaction Mechanisms & Reactive Intermediates",
+        subtopics: [
+          "General methods (both kinetic and non-kinetic) of study of mechanisms or organic reactions: isotopies, method cross-over experiment, intermediate trapping, stereochemistry.",
+          "Energy of activation; thermodynamic control and kinetic control of reactions.",
+          "Generation, geometry, stability and reactions of carbonium ions and carbanions, free radicals, carbenes, benzynes and nitrenes."
+        ]
+      },
+      {
+        title: "Organic Reactions",
+        subtopics: [
+          "Substitution reactions: SN1, SN2, and SNi mechanisms; neighbouring group participation; electrophilic and nucleophilic reactions of aromatic compounds including heterocyclic compounds (pyrrole, furan, thiophene and indole).",
+          "Elimination reactions: E1, E2 and E1cb mechanisms; orientation in E2 reactions (Saytzeff and Hoffmann); pyrolytic syn elimination (acetate pyrolysis, Chugaev and Cope eliminations).",
+          "Addition reactions: Electrophilic addition to C=C and C≡C; nucleophilic addition to C=O, C≡N, conjugated olefins and carbonyls."
+        ]
+      },
+      {
+        title: "Reactions and Rearrangements",
+        subtopics: [
+          "Rearrangements: Pinacol-pinacolone, Hoffmann, Beckmann, Baeyer-Villiger, Favorskii, Fries, Claisen, Cope, Stevens and Wagner-Meerwein rearrangements.",
+          "Condensations and Syntheses: Aldol, Claisen, Dieckmann, Perkin, Knoevenagel, Witting, Clemmensen, Wolff-Kishner, Cannizzaro and von Richter reactions.",
+          "Stobbe, benzoin and acyloin condensations; Fischer indole synthesis, Skraup synthesis, Bischler-Napieralski, Sandmeyer, Reimer-Tiemann and Reformatsky reactions."
+        ]
+      },
+      {
+        title: "Pericyclic Reactions",
+        subtopics: [
+          "Classification and examples; Woodward-Hoffmann rules.",
+          "Electrocyclic reactions, cycloaddition reactions [2+2 and 4+2].",
+          "Sigmatropic shifts [1, 3; 3, 3 and 1, 5], FMO approach."
+        ]
+      }
+    ]
+  },
+  {
+    section: "Organic Chemistry: Reagents, Polymers, and Photochemistry",
+    topics: [
+      {
+        title: "Preparation and Properties of Polymers",
+        subtopics: [
+          "Organic polymers: Polyethylene, polystyrene, polyvinyl chloride, teflon, nylon, terylene, synthetic and natural rubber.",
+          "Biopolymers: Structure of proteins, DNA and RNA."
+        ]
+      },
+      {
+        title: "Synthetic Uses of Reagents",
+        subtopics: [
+          "OsO4, HlO4, CrO3, Pb(OAc)4, SeO2, NBS, B2H6, Na-Liquid NH3, LiAIH4, NaBH4, n-BuLi, MCPBA."
+        ]
+      },
+      {
+        title: "Photochemistry (Organic)",
+        subtopics: [
+          "Photochemical reactions of simple organic compounds.",
+          "Excited and ground states, singlet and triplet states.",
+          "Norrish-Type I and Type II reactions."
+        ]
+      }
+    ]
+  },
+  {
+    section: "Spectroscopy",
+    topics: [
+      {
+        title: "Principle and Applications in Structure Elucidation",
+        subtopics: [
+          "Rotational Spectroscopy: Diatomic molecules; isotopic substitution and rotational constants.",
+          "Vibrational Spectroscopy: Diatomic molecules, linear triatomic molecules, specific frequencies of functional groups in polyatomic molecules.",
+          "Electronic Spectroscopy: Singlet and triplet states. n to pi* and pi to pi* transitions; application to conjugated double bonds and conjugated carbonyls Woodward-Fieser rules; Charge transfer spectra.",
+          "Nuclear Magnetic Resonance (1HNMR): Basic principle; chemical shift and spin-spin interaction and coupling constants.",
+          "Mass Spectrometry: Parent peak, base peak, metastable peak, McLafferty rearrangement."
+        ]
+      }
+    ]
+  }
+];

@@ -1,0 +1,119 @@
+export const optionalSubMechanicalEngineering = [
+  {
+    section: "Mechanics, Materials and Theory of Machines",
+    topics: [
+      {
+        title: "Mechanics of Rigid Bodies",
+        subtopics: [
+          "Equations of equilibrium in space and its application; first and second moments of area.",
+          "Simple problems on friction; kinematics of particles for plane motion; elementary particle dynamics."
+        ]
+      },
+      {
+        title: "Mechanics of Deformable Bodies",
+        subtopics: [
+          "Generalized Hooke’s law and its application; design problems on axial stress, shear stress and bearing stress; material properties for dynamic loading.",
+          "Bending shear and stresses in beams; determination of principle stresses and strains-analytical and graphical.",
+          "Compound and combined stresses; bi-axial stresses-thin walled pressure vessel.",
+          "Material behaviour and design factors for dynamic load; design of circular shafts for bending and torsional load only.",
+          "Deflection of beam for statically determinate problems; theories of failure."
+        ]
+      },
+      {
+        title: "Engineering Materials",
+        subtopics: [
+          "Basic concepts on structure of solids, common ferrous and non-ferrous materials and their applications.",
+          "Heat-treatment of steels; non-metals, plastics, ceramics, composite materials and nano-materials."
+        ]
+      },
+      {
+        title: "Theory of Machines",
+        subtopics: [
+          "Kinematic and dynamic analysis of plane mechanisms.",
+          "Cams, Gears and epicyclic gear trains, flywheels, governors.",
+          "Balancing of rigid rotors, balancing of single and multicylinder engines.",
+          "Linear vibration analysis of mechanical systems (single degree of freedom), Critical speeds and whirling of shafts."
+        ]
+      }
+    ]
+  },
+  {
+    section: "Manufacturing Science and Management",
+    topics: [
+      {
+        title: "Manufacturing Process",
+        subtopics: [
+          "Machine tool engineering: Merchant’s force analysis; Taylor’s tool life equation; conventional machining; NC and CNC machining process; jigs and fixtures.",
+          "Non-conventional machining: EDM, ECM, ultrasonic, water jet machining etc.; application of lasers and plasmas; energy rate calculations.",
+          "Forming and welding processes: standard processes.",
+          "Metrology: concept of fits and tolerances; tools and gauges; comparators; inspection of length; position; profile and surface finish."
+        ]
+      },
+      {
+        title: "Manufacturing Management",
+        subtopics: [
+          "System design: factory location—simple OR models; plant layout-methods based; applications of engineering economic analysis and break-even analysis for product selection, process selection and capacity planning; predetermined time standards.",
+          "System planning: forecasting methods based on regression and decomposition, design and balancing of multi-model and stochastic assembly lines; inventory management-probabilistic inventory models for order time and order quantity determination; JIT systems; strategic sourcing; managing inter-plant logistics.",
+          "System operations and control: Scheduling algorithms for job shops; applications of statistical methods for product and process quality control applications of control charts for mean, range, percent defective, number of defectives and defects per unit; quality cost systems; management of resources, organizations and risks in projects.",
+          "System improvement: Implementation of systems, such as total quality management, developing and managing flexible, lean and agile Organizations."
+        ]
+      }
+    ]
+  },
+  {
+    section: "Thermodynamics, Gas Dynamics and Heat Transfer",
+    topics: [
+      {
+        title: "Thermodynamics, Gas Dynamics and Turbines",
+        subtopics: [
+          "Basic concept of First-law and Second law of Thermodynamics; concept of entropy and reversibility; availability and unavailability and irreversibility.",
+          "Classification and properties of fluids; incompressible and compressible fluids flows; effect of Mach number and compressibility.",
+          "Continuity momentum and energy equations; normal and oblique shocks; one dimensional isentropic flow; flow of fluids in duct with frictions that transfer.",
+          "Flow through fans, blowers and compressors; axial and centrifugal flow configuration; design of fans and compressors.",
+          "Simple problems, compressors and turbine cascade; open and closed cycle gas turbines; work done in the gas turbine; reheat and regenerators."
+        ]
+      },
+      {
+        title: "Heat Transfer",
+        subtopics: [
+          "Conduction heat transfer: general conduction equation-Laplace, Poisson and Fourier equations; Fourier law of conduction; one dimensional steady state heat conduction applied to simple wall, solid and hollow cylinder and spheres.",
+          "Convection heat transfer: Newton’s law of convection; free and forced convection; heat transfer during laminar and turbulent flow of an incompressible fluid over a flat plate.",
+          "Concepts of Nusselt number, hydrodynamic and thermal boundary layer their thickness; Prandtl number; analogy between heat and momentum transfer—Reynolds, Colburn, Prandtl analogies; heat transfer during laminar and turbulent flow through horizontal tubes; free convection from horizontal and vertical plates.",
+          "Black body radiation: basic radiation laws such as Stefan-Boltzmann, Planck distribution, Wien’s displacement etc.",
+          "Basic heat exchanger analysis; classification of heat exchangers."
+        ]
+      }
+    ]
+  },
+  {
+    section: "Power Generation, Engines and Refrigeration",
+    topics: [
+      {
+        title: "IC Engines",
+        subtopics: [
+          "Classification, thermodynamic cycles of operation; determination of brake power, indicated power, mechanical efficiency, heat balance sheet, interpretation of performance characteristics, petrol, gas and diesel engines.",
+          "Combustion in SI and CI engines, normal and abnormal combustion; effect of working parameters on knocking, reduction of knocking; Forms of combustion chamber for SI and CI engines; rating of fuels; additives; emission.",
+          "Different systems of IC engines-fuels; lubricating; cooling and transmission systems. Alternate fuels in IC engines."
+        ]
+      },
+      {
+        title: "Steam Engineering",
+        subtopics: [
+          "Steam generation: modified Rankine cycle analysis; Modern steam boilers; steam at critical and supercritical pressures; draught equipment; natural and artificial draught; boiler fuels solid, liquid and gaseous fuels.",
+          "Steam turbines: Principle; types; compounding; impulse and reaction turbines; axial thrust.",
+          "Steam nozzles: flow of steam in convergent and divergent nozzle pressure at throat for maximum discharge with different initial steam conditions such as wet, saturated and superheated, effect of variation of back pressure; supersaturated flow of steam in nozzles, Wilson line.",
+          "Rankine cycle with internal and external irreversibility; reheat factor; reheating and regeneration, methods of governing; back pressure and pass out turbines.",
+          "Steam power plants: combined cycle power generation; heat recovery steam generators (HRSG) fired and unfired, co-generation plants."
+        ]
+      },
+      {
+        title: "Refrigeration and Air-conditioning",
+        subtopics: [
+          "Vapour compression refrigeration cycle: cycle on p-H & T-s diagrams; ecofriendly refrigerants—R 134a, R 123.",
+          "Systems like evaporators, condensers, compressor, expansion devices. Simple vapour absorption systems.",
+          "Psychrometry: properties; processes; charts; sensible heating and cooling; humidification and dehumidification effective temperature; air-conditioning load calculation; simple duct design."
+        ]
+      }
+    ]
+  }
+];

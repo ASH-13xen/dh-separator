@@ -1,0 +1,156 @@
+export const optionalSubElectricalEngineering = [
+  {
+    section: "Circuits, Signals and Systems",
+    topics: [
+      {
+        title: "Circuits—Theory",
+        subtopics: [
+          "Circuit components; network graphs; KCL, KVL; Circuit analysis methods: nodal analysis, mesh analysis; basic network theorems and applications.",
+          "Transient analysis: RL, RC and RLC circuits; sinusoidal steady state analysis; resonant circuits; coupled circuits; balanced 3-phase circuits. Two-port networks."
+        ]
+      },
+      {
+        title: "Signals and Systems",
+        subtopics: [
+          "Representation of continuous-time and discrete-time signals and systems; LTI systems; convolution; impulse response.",
+          "Time-domain analysis of LTI systems based on convolution and differential/difference equations.",
+          "Fourier transform, Laplace transform, Z-transform, Transfer function.",
+          "Sampling and recovery of signals, DFT, FFT, Processing of analog signals through discrete-time systems."
+        ]
+      }
+    ]
+  },
+  {
+    section: "Electromagnetic Theory and Analog Electronics",
+    topics: [
+      {
+        title: "E.M. Theory",
+        subtopics: [
+          "Maxwell’s equations, wave propagation in bounded media.",
+          "Boundary conditions, reflection and refraction of plane waves.",
+          "Transmission lines: travelling and standing waves, impedance matching, Smith chart."
+        ]
+      },
+      {
+        title: "Analog Electronics",
+        subtopics: [
+          "Characteristics and equivalent circuits (large and small-signal) of Diode, BJT, JFET and MOSFET.",
+          "Diode circuits: Clipping, clamping, rectifier. Biasing and bias stability. FET amplifiers. Current mirror.",
+          "Amplifiers: single and multi-stage, differential, operational feedback and power. Analysis of amplifiers; frequency-response of amplifiers. OPAMP circuits.",
+          "Filters; sinusoidal oscillators: criterion for oscillation; single-transistor and OPAMP configurations.",
+          "Function generators and wave-shaping circuits. Linear and switching power supplies."
+        ]
+      }
+    ]
+  },
+  {
+    section: "Digital Electronics and Microprocessors",
+    topics: [
+      {
+        title: "Digital Electronics",
+        subtopics: [
+          "Boolean algebra; minimisation of Boolean functions; logic gates; digital IC families (DTL, TTL, ECL, MOS, CMOS).",
+          "Combinational circuits: arithmetic circuits, code converters, multiplexers and decoders.",
+          "Sequential circuits: latches and flip-flops, counters and shift-registers. Comparators, timers, multivibrators.",
+          "Sample and hold circuits, ADCs and DACs. Semiconductor memories. Logic implementation using programmable devices (ROM, PLA, FPGA)."
+        ]
+      },
+      {
+        title: "Microprocessors and Microcomputers",
+        subtopics: [
+          "PC organisation; CPU, instruction set, register settiming diagram, programming, interrupts.",
+          "Memory interfacing, I/O interfacing, programmable peripheral devices."
+        ]
+      }
+    ]
+  },
+  {
+    section: "Energy Conversion, Power Electronics and Drives",
+    topics: [
+      {
+        title: "Energy Conversion",
+        subtopics: [
+          "Principles of electromechanical energy conversion: Torque and emf in rotating machines.",
+          "DC machines: characteristics and performance analysis; starting and speed control of motors.",
+          "Transformers: principles of operation and analysis; regulation, efficiency; 3-phase transformers.",
+          "3-phase induction machines and synchronous machines: characteristics and performance analysis; speed control."
+        ]
+      },
+      {
+        title: "Power Electronics and Electric Drives",
+        subtopics: [
+          "Semi-conductor power devices: diode, transistor, thyristor, triac, GTO and MOSFET-static characteristics and principles of operation; triggering circuits.",
+          "Phase control rectifiers; bridge converters: fully-controlled and half-controlled; principles of thyristor choppers and inverters; DC-DC converters; Switch mode inverter.",
+          "Basic concepts of speed control of dc and ac motor drives, applications of variable-speed drives."
+        ]
+      }
+    ]
+  },
+  {
+    section: "Power Systems and Protection",
+    topics: [
+      {
+        title: "Power Systems: Analysis and Control",
+        subtopics: [
+          "Steady-state performance of overhead transmission lines and cables; principles of active and reactive power transfer and distribution; per-unit quantities.",
+          "Bus admittance and impedance matrices; load flow; voltage control and power factor correction; economic operation.",
+          "Symmetrical components, analysis of symmetrical and unsymmetrical faults.",
+          "Concepts of system stability: swing curves and equal area criterion. Static VAR system. Basic concepts of HVDC transmission."
+        ]
+      },
+      {
+        title: "Power System Protection",
+        subtopics: [
+          "Principles of overcurrent, differential and distance protection. Concept of solid state relays. Circuit brakers.",
+          "Computer aided protection: introduction; line, bus, generator, transformer protection; numeric relays and application of DSP to protection."
+        ]
+      }
+    ]
+  },
+  {
+    section: "Communications",
+    topics: [
+      {
+        title: "Analog Communication",
+        subtopics: [
+          "Random variables: continuous, discrete; probability, probability functions. Statistical averages; probability models.",
+          "Random signals and noise: white noise, noise equivalent bandwidth; signal transmission with noise; signal to noise ratio.",
+          "Linear CW modulation: Amplitude modulation: DSB, DSB-SC and SSB. Modulators and Demodulators.",
+          "Phase and Frequency modulation: PM & FM signals; narrow band FM; generation & detection of FM and PM, Deemphasis, Preemphasis.",
+          "CW modulation system: Superhetrodyne receivers, AM receivers, communication receivers, FM receivers, phase locked loop, SSB receiver. Signal to noise ratio calculation for AM and FM receivers."
+        ]
+      },
+      {
+        title: "Digital Communication",
+        subtopics: [
+          "Pulse code modulation (PCM), differential pulse code modulation (DPCM), delta modulation (DM).",
+          "Digital modulation and demodulation schemes: amplitude, phase and frequency keying schemes (ASK, PSK, FSK).",
+          "Error control coding: error detection and correction, linear block codes, convolution codes.",
+          "Information measure and source coding. Data networks, 7-layer architecture."
+        ]
+      }
+    ]
+  },
+  {
+    section: "Control Systems and Instrumentation",
+    topics: [
+      {
+        title: "Control Systems",
+        subtopics: [
+          "Elements of control systems; block-diagram representations; open-loop & closed-loop systems; principles and applications of feed-back. Control system components.",
+          "LTI systems: time-domain and transform-domain analysis.",
+          "Stability: Routh Hurwitz criterion, root-loci, Bode-plots and polar plots, Nyquist’s criterion; Design of lead-lag compensators.",
+          "Proportional, PI, PID controllers. State-variable representation and analysis of control systems."
+        ]
+      },
+      {
+        title: "Measurement and Instrumentation",
+        subtopics: [
+          "Error analysis; measurement of current, voltage, power, energy, power-factor, resistance, inductance, capacitance and frequency; bridge measurements.",
+          "Signal conditioning circuit; Electronic measuring instruments: multimeter, CRO, digital voltmeter, frequency counter, Q-meter, spectrum-analyser, distortion-meter.",
+          "Transducers: thermocouple, thermistor, LVDT, strain-guage, piezo-electric crystal."
+        ]
+      }
+    ]
+  }
+];

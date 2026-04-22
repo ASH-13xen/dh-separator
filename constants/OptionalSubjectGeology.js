@@ -1,0 +1,154 @@
+export const optionalSubGeology = [
+  {
+    section: "General Geology, Geomorphology and Remote Sensing",
+    topics: [
+      {
+        title: "General Geology",
+        subtopics: [
+          "The Solar System, meteorites, origin and interior of the earth and age of earth.",
+          "Volcanoes—causes and products, Volcanic belts.",
+          "Earthquakes—causes, effects, seismic of zone of India.",
+          "Island arcs, trenches and mid-ocean ridges; Continental drift; Seafloor spreading, plate tectonics.",
+          "Isostasy."
+        ]
+      },
+      {
+        title: "Geomorphology",
+        subtopics: [
+          "Basic concepts of geomorphology. Weathering and soil formations; Landforms, slopes and drainage.",
+          "Geomorphic cycles and their interpretation.",
+          "Morphology and its relation to structures and lithology; Coastal geomorphology.",
+          "Applications of geomorphology in mineral prospecting, civil engineering; hydrology and environmental studies.",
+          "Geomorphology of Indian sub-continent."
+        ]
+      },
+      {
+        title: "Remote Sensing",
+        subtopics: [
+          "Aerial photographs and their interpretation—merits and limitations; The Electromagnetic spectrum.",
+          "Orbiting Satellites and Sensor Systems. Indian Remote Sensing Satellites. Satellite data products.",
+          "Applications of remote sensing in geology.",
+          "The Geographic Information System (GIS) and Global Positioning System (GPS)—its applications."
+        ]
+      }
+    ]
+  },
+  {
+    section: "Structural Geology, Paleontology and Indian Stratigraphy",
+    topics: [
+      {
+        title: "Structural Geology",
+        subtopics: [
+          "Principles of geologic mapping and map reading, projection diagrams.",
+          "Stress and strain ellipsoid and stress-strain relationships of elastic, plastic and viscous materials; Strain markers in deformed rocks.",
+          "Behaviour of minerals and rocks under deformation conditions.",
+          "Folds and faults classification and mechanics; Structural analysis of folds, foliations, lineations, joints and faults, unconformities.",
+          "Time-relationship between crystallization and deformation."
+        ]
+      },
+      {
+        title: "Paleontology",
+        subtopics: [
+          "Species—definition and nomenclature; Megafossils and Microfossils.",
+          "Modes of preservation of fossils; Different kinds of microfossils.",
+          "Application of microfossils in correlation, petroleum exploration, paleoclimatic and paleoceanographic studies.",
+          "Evolutionary trend in Hominidae, Equidae and Proboscidae. Siwalik fauna.",
+          "Gondwana flora and fauna and its importance; Index fossils and their significance."
+        ]
+      },
+      {
+        title: "Indian Stratigraphy",
+        subtopics: [
+          "Classification of stratigraphic sequences: lithostratigraphic, biostratigraphic, chronostratigraphic and magnetostratigraphic and their interrelationships.",
+          "Distribution and classification of Precambrian rocks of India.",
+          "Study of stratigraphic distribution and lithology of Phanerozoic rocks of India with reference to fauna, flora and economic importance.",
+          "Major boundary problems—Cambrian/Precambrian, Permian/Triassic, Cretaceous/Tertiary and Pliocene/Pleistocene.",
+          "Study of climatic conditions, paleogeography and igneous activity in the Indian sub-continent in the geological past.",
+          "Tectonic framework of India. Evolution of the Himalayas."
+        ]
+      }
+    ]
+  },
+  {
+    section: "Hydrogeology, Engineering Geology and Mineralogy",
+    topics: [
+      {
+        title: "Hydrogeology",
+        subtopics: [
+          "Hydrologic cycle and genetic classification of water; Movement of subsurface water; Springs.",
+          "Porosity, permeability, hydraulic conductivity, transmissivity and storage coefficient, classification of aquifers.",
+          "Water-bearing characteristics of rocks; Groundwater chemistry. Salt water intrusion. Types of wells.",
+          "Drainage basin morphometry; Exploration for groundwater; Groundwater recharge.",
+          "Problems and management of groundwater; Rainwater harvesting."
+        ]
+      },
+      {
+        title: "Engineering Geology",
+        subtopics: [
+          "Engineering properties of rocks; Geological investigations for dams, tunnels highways, railway and bridges.",
+          "Rock as construction material.",
+          "Landslides causes, prevention and rehabilitation; Earthquake-resistant structures."
+        ]
+      },
+      {
+        title: "Mineralogy",
+        subtopics: [
+          "Classification of crystals into systems and classes of symmetry; International system of crystallographic notation.",
+          "Use of projection diagrams to represent crystal symmetry; Elements of X-ray crystallography.",
+          "Physical and chemical characters of rock forming silicate mineral groups; Structural classification of silicates.",
+          "Common minerals of igneous and metamorphic rocks; Minerals of the carbonate, phosphate, sulphide and halide groups; Clay minerals.",
+          "Optical properties of common rock forming minerals; Pleochroism, extinction angle, double refraction, birefringence, twinning and dispersion in minerals."
+        ]
+      }
+    ]
+  },
+  {
+    section: "Petrology, Economic Geology and Environmental Geology",
+    topics: [
+      {
+        title: "Igneous and Metamorphic Petrology",
+        subtopics: [
+          "Generation and crystallisation of magmas. Crystallisation of albite—anorthite, diopside—anorthite and diopside—wollastonite—silica systems.",
+          "Bowen’s Reaction Principle; Magmatic differentiation and assimilation.",
+          "Petrogenetic significance of the textures and structures of igneous rocks.",
+          "Petrography and petrogenesis of granite, syenite, diorite, basic and ultrabasic groups, charnockite, anorthosite and alkaline rocks. Carbonatites. Deccan volcanic province.",
+          "Types and agents of metamorphism. Metamorphic grades and zones; Phase rule.",
+          "Facies of regional and contact metamorphism; ACF and AKF diagrams; Textures and structures of metamorphic rocks.",
+          "Metamorphism of arenaceous, argillaceous and basic rocks; Minerals assemblages.",
+          "Retrograde metamorphism; Metasomatism and granitisation, migmatites. Granulite terrains of India."
+        ]
+      },
+      {
+        title: "Sedimentary Petrology",
+        subtopics: [
+          "Sedimentas and Sedimentary rocks: Processes of formation; digenesis and lithification.",
+          "Clastic and non-clastic rocks-their classification, petrography and depositional environment.",
+          "Sedimentary facies and provenance. Sedimentary structures and their significance.",
+          "Heavy minerals and their significance. Sedimentary basins of India."
+        ]
+      },
+      {
+        title: "Economic and Mining Geology",
+        subtopics: [
+          "Ore, ore mineral and gangue, tenor of ore. Classification of ore deposits; Processes of formation of mineral deposits; Controls of ore localisation; Ore textures and structures; Metallogenic epochs and provinces.",
+          "Geology of the important Indian deposits of aluminium, chromium, copper, gold, iron, lead, zinc, manganese, titanium, uranium and thorium and industrial minerals.",
+          "Deposits of coal and petroleum in India, National Mineral Policy; Conservation and utilization of mineral resources. Marine mineral resources and Law of Sea.",
+          "Methods of prospecting—geological, geophysical, geochemical and geobotanical; Techniques of sampling.",
+          "Estimation of reserves of ore; Methods of exploration and mining-metallic ores, industrial minerals, marine mineral resources and building stones.",
+          "Mineral beneficiation and ore dressing."
+        ]
+      },
+      {
+        title: "Geochemistry and Environmental Geology",
+        subtopics: [
+          "Cosmic abundance of elements. Composition of the planets and meteorites. Structure and composition of earth and distribution of elements. Trace elements.",
+          "Elements of crystal chemistry-types of chemical bonds, coordination number. Isomorphism and polymorphism. Elementary thermodynamics.",
+          "Natural hazards—floods, mass wasting, costal hazards, earthquakes and volcanic activity and mitigation.",
+          "Environmental impact of urbanization, mining, industrial and radioactive waste disposal, use of fertilizers, dumping of mine waste and fly-ash.",
+          "Pollution of ground and surface water, marine pollution.",
+          "Environment protection—legislative measures in India; Sea level changes: causes and impact."
+        ]
+      }
+    ]
+  }
+];
