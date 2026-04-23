@@ -19,11 +19,11 @@ export const getAllQuestions = async (req, res) => {
 export const updateQuestion = async (req, res) => {
   try {
     const { id } = req.params;
-    const { tags } = req.body;
+    const { tags, file_urls } = req.body;
 
     const updatedQuestion = await UPSCQA.findByIdAndUpdate(
       id,
-      { tags },
+      { tags, ...(file_urls && { file_urls }) },
       { new: true, runValidators: true }
     );
 

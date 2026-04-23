@@ -1,6 +1,6 @@
 import express from 'express';
 import multer from 'multer';
-import { handlePdfUpload } from '../controllers/uploadController.js';
+import { handlePdfUpload, handleManualUpload } from '../controllers/uploadController.js';
 
 const router = express.Router();
 
@@ -13,5 +13,8 @@ const upload = multer({
 
 // POST /api/upload route
 router.post('/upload', upload.single('pdf'), handlePdfUpload);
+
+// POST /api/upload/manual route
+router.post('/manual', upload.single('pdf'), handleManualUpload);
 
 export default router;

@@ -1,4 +1,20 @@
 import { processPdf } from '../services/pdfProcessingService.js';
+import { UPSCQA } from '../models/UPSCQA.js';
+import streamifier from 'streamifier';
+import { v2 as cloudinary } from 'cloudinary';
+
+const uploadToCloudinary = (buffer, fileName) => {
+  return new Promise((resolve, reject) => {
+    const stream = cloudinary.uploader.upload_stream(
+      { resource_type: 'raw', folder: 'upsc_answers', public_id: fileName },
+      (error, result) => {
+        if (result) resolve(result.secure_url);
+        else reject(error);
+      }
+    );
+    streamifier.createReadStream(buffer).pipe(stream);
+  });
+};
 
 export const handlePdfUpload = async (req, res) => {
   try {
@@ -36,5 +52,59 @@ export const handlePdfUpload = async (req, res) => {
   } catch (error) {
     console.error("[UploadController] Upload controller error:", error);
     res.status(500).json({ error: 'Failed to process the uploaded PDF document.', details: error.message });
+  }
+};
+
+export const handleManualUpload = async (req, res) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({ error: 'No PDF file uploaded.' });
+    }
+
+    const { question_text, topper_name, tags } = req.body;
+    if (!question_text) {
+      return res.status(400).json({ error: 'Question text is required.' });
+    }
+
+    let parsedTags = [];
+    if (tags) {
+      try {
+        parsedTags = JSON.parse(tags);
+      } catch (e) {
+        // fallback
+      }
+    }
+
+    const fileNameObj = `Manual_${Date.now()}`; 
+    const file_url = await uploadToCloudinary(req.file.buffer, fileNameObj);
+
+    const result = await UPSCQA.findOneAndUpdate(
+      { question_text },
+      {
+        $setOnInsert: {
+          tags: parsedTags,
+          start_page: 1,
+          end_page: 1
+        },
+        $push: {
+          file_urls: {
+            url: file_url,
+            topper_name: topper_name || 'Unknown Topper',
+            topper_year: '',
+            topper_rank: '',
+            topper_marks: ''
+          }
+        }
+      },
+      { upsert: true, new: true }
+    );
+
+    res.status(200).json({
+      message: 'Manual question uploaded successfully.',
+      data: result
+    });
+  } catch (error) {
+    console.error("[UploadController] Manual upload error:", error);
+    res.status(500).json({ error: 'Failed to upload manual question.', details: error.message });
   }
 };
