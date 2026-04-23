@@ -1,54 +1,129 @@
 import { UPSCQA } from '../models/UPSCQA.js';
 import { PDFDocument, rgb, StandardFonts } from 'pdf-lib';
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+async function loadModuleHierarchy(moduleName) {
+    const constantsDir = path.join(__dirname, '../constants');
+    const filePath = path.join(constantsDir, `${moduleName}.js`);
+    if (!fs.existsSync(filePath)) {
+        throw new Error(`Module ${moduleName} not found.`);
+    }
+    const modulePath = 'file:///' + filePath.replace(/\\/g, '/');
+    const imported = await import(modulePath);
+    
+    const keys = Object.keys(imported);
+    for (const k of keys) {
+        if (Array.isArray(imported[k])) {
+            return imported[k];
+        }
+    }
+    return [];
+}
 
 export const previewSubjectData = async (req, res) => {
   try {
-    const { tag, subject } = req.query;
-    const filterTag = tag || subject;
+    const { moduleName } = req.query; // e.g., 'GS-1'
 
-    if (!filterTag) {
-      return res.status(400).json({ error: 'Tag is required.' });
+    if (!moduleName) {
+      return res.status(400).json({ error: 'Module name is required.' });
     }
 
-    const questions = await UPSCQA.find({ 
-       tags: filterTag 
-    }).sort({ start_page: 1 });
+    const hierarchy = await loadModuleHierarchy(moduleName);
+    const questions = await UPSCQA.find({ tags: moduleName }).sort({ start_page: 1 });
 
     if (!questions || questions.length === 0) {
-      return res.status(404).json({ error: 'No questions found.' });
+      return res.status(404).json({ error: 'No questions found for this module.' });
     }
 
-    res.json(questions);
+    // Process hierarchy
+    const resultData = [];
+    for (const sec of hierarchy) {
+        if (!sec.section) continue;
+        
+        const secObj = {
+            section: sec.section,
+            topics: []
+        };
+        
+        if (sec.topics && Array.isArray(sec.topics)) {
+            for (const top of sec.topics) {
+                if (!top.title) continue;
+                
+                const topObj = {
+                    title: top.title,
+                    questions: []
+                };
+                
+                // Find matching questions. 
+                // We enforce that the question has exactly this topic tag.
+                const matchedQ = questions.filter(q => q.tags && q.tags.includes(top.title));
+                topObj.questions = matchedQ;
+                
+                if (matchedQ.length > 0) secObj.topics.push(topObj);
+            }
+        }
+        
+        if (secObj.topics.length > 0) resultData.push(secObj);
+    }
+
+    // In case there are questions strictly mapped to the module but not matching any specific inner topic
+    // we could collect them into 'Uncategorized'. But per prompt, "everything should be section and then topic wise done sequentially".
+    // Missing topic mappings are dropped to enforce strict hierarchy.
+
+    res.json(resultData);
   } catch (err) {
     console.error(err);
-    res.status(500).json({ error: 'Failed to fetch preview data.' });
+    res.status(500).json({ error: 'Failed to fetch hierarchical preview data.' });
   }
 }
 
 export const generateCollectivePdf = async (req, res) => {
   try {
-    const { tag, subject, selections, includedQuestionIds } = req.body;
-    const filterTag = tag || subject;
+    const { moduleName, selections, includedQuestionIds } = req.body;
 
-    if (!filterTag) {
-      return res.status(400).json({ error: 'Tag is required to generate collective PDF.' });
+    if (!moduleName) {
+      return res.status(400).json({ error: 'Module name is required to generate collective PDF.' });
     }
 
-    let query = { tags: filterTag };
+    const hierarchy = await loadModuleHierarchy(moduleName);
+
+    let query = { tags: moduleName };
     if (includedQuestionIds && Array.isArray(includedQuestionIds)) {
       query._id = { $in: includedQuestionIds };
     }
 
-    let questionsResponse = await UPSCQA.find(query).sort({ start_page: 1 });
+    const questionsResponse = await UPSCQA.find(query).sort({ start_page: 1 });
 
     if (!questionsResponse || questionsResponse.length === 0) {
       return res.status(404).json({ error: 'No matched/selected questions found.' });
     }
 
+    // Group into hierarchy
+    const docData = [];
+    for (const sec of hierarchy) {
+        if (!sec.section) continue;
+        const mappedTopics = [];
+        if (sec.topics && Array.isArray(sec.topics)) {
+            for (const top of sec.topics) {
+                if (!top.title) continue;
+                const matchedQ = questionsResponse.filter(q => q.tags && q.tags.includes(top.title));
+                if (matchedQ.length > 0) {
+                    mappedTopics.push({ title: top.title, questions: matchedQ });
+                }
+            }
+        }
+        if (mappedTopics.length > 0) {
+            docData.push({ section: sec.section, topics: mappedTopics });
+        }
+    }
+
     // 1. Initialize Master PDF Document
     const pdfDoc = await PDFDocument.create();
-    
-    // Embed Standard Fonts
     const fontNormal = await pdfDoc.embedFont(StandardFonts.Helvetica);
     const fontBold = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
 
@@ -56,7 +131,6 @@ export const generateCollectivePdf = async (req, res) => {
     const titlePage = pdfDoc.addPage();
     const { width: tw, height: th } = titlePage.getSize();
     
-    // Draw thick colored header bar
     titlePage.drawRectangle({
         x: 0, y: th - 100, width: tw, height: 100, color: rgb(0.14, 0.16, 0.28)
     });
@@ -65,156 +139,138 @@ export const generateCollectivePdf = async (req, res) => {
       x: 50, y: th - 60, size: 28, font: fontBold, color: rgb(1, 1, 1)
     });
 
-    const subTextWidth = fontBold.widthOfTextAtSize(filterTag.toUpperCase(), 36);
-    titlePage.drawText(filterTag.toUpperCase(), {
+    const moduleText = `${moduleName.replace(/([a-z])([A-Z])/g, '$1 $2').toUpperCase()} MODULE`;
+    const subTextWidth = fontBold.widthOfTextAtSize(moduleText, 36);
+    titlePage.drawText(moduleText, {
       x: (tw - subTextWidth)/2, y: th / 2, size: 36, font: fontBold, color: rgb(0.1, 0.1, 0.1)
     });
 
-    titlePage.drawText(`Formal Extract Report`, {
-      x: tw/2 - 70, y: th/2 - 40, size: 16, font: fontNormal, color: rgb(0.5, 0.5, 0.5)
+    titlePage.drawText(`Formal Sequence Extract`, {
+      x: tw/2 - 90, y: th/2 - 40, size: 16, font: fontNormal, color: rgb(0.5, 0.5, 0.5)
     });
 
-    // We will dynamically create the Index and prepend it. We must track page offsets.
-    const indexData = []; // { topic: "...", startPage: X }
-    
-    // Group questions by the first matching inner Tag (to act like a Topic) or just a generic block
-    const groupedByTopic = {};
-    for (const q of questionsResponse) {
-        // Find a tag that isn't the main filterTag to use as a section header
-        const secTag = q.tags && q.tags.find(t => t !== filterTag) ? q.tags.find(t => t !== filterTag) : filterTag;
-        if (!groupedByTopic[secTag]) groupedByTopic[secTag] = [];
-        groupedByTopic[secTag].push(q);
-    }
+    const indexData = []; // { type: 'section'|'topic', text: "...", targetPageInternal: X }
 
     // 3. Document Building
-    for (const topic of Object.keys(groupedByTopic)) {
-        const topicQuestions = groupedByTopic[topic];
-        
-        // Track for index
+    for (const secNode of docData) {
+        // Record Section in Index
         indexData.push({
-            topic: topic,
+            type: 'section',
+            text: secNode.section,
             targetPageInternal: pdfDoc.getPageCount()
         });
 
-        // Insert Topic Divider Page
-        const tPage = pdfDoc.addPage();
-        tPage.drawRectangle({
-            x: 0, y: 0, width: tw, height: th, color: rgb(0.16, 0.2, 0.3) // Dark blue background
+        // Add Section Divider Page
+        const sPage = pdfDoc.addPage();
+        sPage.drawRectangle({
+            x: 0, y: 0, width: tw, height: th, color: rgb(0.12, 0.14, 0.22) // Very dark blue bg
         });
 
-        const topicText1 = "TOPIC";
-        const topicText2 = topic.toUpperCase();
-        
-        tPage.drawText(topicText1, {
+        sPage.drawText("SECTION", {
             x: 50, y: th - 150, size: 24, font: fontNormal, color: rgb(0.6, 0.7, 0.9)
         });
 
-        // Wrap Text for long topics
-        let tY = th - 200;
-        const words = topicText2.split(' ');
-        let line = '';
-        for (const word of words) {
-            const testLine = line + word + ' ';
-            if (fontBold.widthOfTextAtSize(testLine, 36) > tw - 100) {
-                tPage.drawText(line, { x: 50, y: tY, size: 36, font: fontBold, color: rgb(1, 1, 1) });
-                line = word + ' ';
-                tY -= 45;
+        let sY = th - 200;
+        const sWords = secNode.section.toUpperCase().split(' ');
+        let sLine = '';
+        for (const word of sWords) {
+            const testLine = sLine + word + ' ';
+            if (fontBold.widthOfTextAtSize(testLine, 42) > tw - 100) {
+                sPage.drawText(sLine, { x: 50, y: sY, size: 42, font: fontBold, color: rgb(1, 1, 1) });
+                sLine = word + ' ';
+                sY -= 55;
             } else {
-                line = testLine;
+                sLine = testLine;
             }
         }
-        tPage.drawText(line, { x: 50, y: tY, size: 36, font: fontBold, color: rgb(1, 1, 1) });
+        sPage.drawText(sLine, { x: 50, y: sY, size: 42, font: fontBold, color: rgb(1, 1, 1) });
 
-        // Now append the questions for this Topic
-        for (let qIdx = 0; qIdx < topicQuestions.length; qIdx++) {
-            const item = topicQuestions[qIdx];
-            
-            // Determine which URL to use based on frontend selections
-            let activeFileObj = null;
-            if (item.file_urls && item.file_urls.length > 0) {
-                 if (selections && selections[item._id]) {
-                     activeFileObj = item.file_urls.find(f => f.url === selections[item._id]);
-                 }
-                 // Default to first if somehow no selection made
-                 if (!activeFileObj && item.file_urls.length > 0) {
-                     activeFileObj = item.file_urls[0];
-                 }
-            }
+        // Iterate over Topics under this Section
+        for (const topNode of secNode.topics) {
+            // Record Topic in Index
+            indexData.push({
+                type: 'topic',
+                text: topNode.title,
+                targetPageInternal: pdfDoc.getPageCount()
+            });
 
-            // Append the actual physical PDF for the *selected* topper
-            if (activeFileObj) {
-                // Add a helper replacer incase of Malformed Database String
-                const cloudUrl = activeFileObj.url.replace('https//', 'https://').replace('http//', 'http://');
+            // Iterate over questions
+            for (let qIdx = 0; qIdx < topNode.questions.length; qIdx++) {
+                const item = topNode.questions[qIdx];
+                
+                let activeFileObj = null;
+                if (item.file_urls && item.file_urls.length > 0) {
+                     if (selections && selections[item._id]) {
+                         activeFileObj = item.file_urls.find(f => f.url === selections[item._id]);
+                     }
+                     if (!activeFileObj && item.file_urls.length > 0) {
+                         activeFileObj = item.file_urls[0];
+                     }
+                }
 
-                try {
-                    // Fetch the file remotely from Cloudinary over the network
-                    const response = await fetch(cloudUrl);
-                    if (!response.ok) throw new Error(`Failed to fetch from ${cloudUrl}`);
-                    
-                    const arrayBuffer = await response.arrayBuffer();
-                    const sourcePdfDoc = await PDFDocument.load(arrayBuffer);
-                    const sourcePages = await pdfDoc.copyPages(sourcePdfDoc, sourcePdfDoc.getPageIndices());
+                if (activeFileObj) {
+                    const cloudUrl = activeFileObj.url.replace('https//', 'https://').replace('http//', 'http://');
+
+                    try {
+                        const response = await fetch(cloudUrl);
+                        if (!response.ok) throw new Error(`Failed to fetch from ${cloudUrl}`);
                         
+                        const arrayBuffer = await response.arrayBuffer();
+                        const sourcePdfDoc = await PDFDocument.load(arrayBuffer);
+                        const sourcePages = await pdfDoc.copyPages(sourcePdfDoc, sourcePdfDoc.getPageIndices());
+                            
                         if (sourcePages.length > 0) {
                             const p0 = sourcePages[0];
                             const { width: p0w, height: p0h } = p0.getSize();
 
-                            // The space to take is roughly 10% -> Using max available space tightly (~60-80 units)
-                            const barHeight = 25;
+                            // Use a solid top header bar to occlude the original page details
+                            const barHeight = 40;
                             const barY = p0h - barHeight;
 
-                            // Draw full-width horizontal box covering original top pixels
                             p0.drawRectangle({
                                 x: 0, y: barY, width: p0w, height: barHeight, color: rgb(0.92, 0.95, 0.98)
                             });
 
-                            // Build Topper Detail String
-                            const tName = activeFileObj.topper_name || 'Unknown Name';
-                            const tYear = activeFileObj.topper_year ? ` | Year: ${activeFileObj.topper_year}` : '';
-                            const tRank = activeFileObj.topper_rank ? ` | Rank: ${activeFileObj.topper_rank}` : '';
-                            const tMarks = activeFileObj.topper_marks ? ` | Marks: ${activeFileObj.topper_marks}` : '';
-                            
-                            const dString = `[Q${qIdx + 1}] TOPPER: ${tName}${tYear}${tRank}${tMarks}`;
-
-                            // Center align the text natively over the bar
-                            const textWidth = fontBold.widthOfTextAtSize(dString.toUpperCase(), 9);
-                            p0.drawText(dString.toUpperCase(), {
-                                x: (p0w - textWidth) / 2, y: barY + 8, size: 9, font: fontBold, color: rgb(0.1, 0.2, 0.4)
+                            // Subheader bar for context
+                            p0.drawRectangle({
+                                x: 0, y: barY - 14, width: p0w, height: 14, color: rgb(0.2, 0.25, 0.4)
                             });
 
-                            // Draw Question Text below the bar natively over the writing space
-                            let qY = barY - 14;
+                            const tName = activeFileObj.topper_name || 'Unknown Name';
+                            const docHeader = `[TOPIC: ${topNode.title}] | TOPPER: ${tName.toUpperCase()}`;
+
+                            const textWidth = fontBold.widthOfTextAtSize(docHeader, 9);
+                            p0.drawText(docHeader, {
+                                x: (p0w - textWidth) / 2, y: barY - 10, size: 9, font: fontBold, color: rgb(1, 1, 1)
+                            });
+
+                            let qY = barY + 20;
                             const qWords = item.question_text.split(' ');
                             let qLine = '';
                             
-                            // Using smaller font-size 10 for Question to ensure it fits tightly
                             for (const word of qWords) {
                                 const testLine = qLine + word + ' ';
                                 if (fontBold.widthOfTextAtSize(testLine, 10) > p0w - 30) {
-                                    // Use a subtle white backdrop to ensure question text is readable if there's overlap
-                                    p0.drawRectangle({ x: 13, y: qY - 2, width: p0w - 26, height: 14, color: rgb(1,1,1), opacity: 0.85 });
-                                    p0.drawText(qLine, { x: 15, y: qY, size: 10, font: fontBold, color: rgb(0.25, 0.1, 0.1) });
+                                    p0.drawText(qLine, { x: 15, y: qY, size: 10, font: fontBold, color: rgb(0.1, 0.1, 0.3) });
                                     qLine = word + ' ';
                                     qY -= 12;
                                 } else {
                                     qLine = testLine;
                                 }
                             }
-                            p0.drawRectangle({ x: 13, y: qY - 2, width: p0w - 26, height: 14, color: rgb(1,1,1), opacity: 0.85 });
-                            p0.drawText(qLine, { x: 15, y: qY, size: 10, font: fontBold, color: rgb(0.25, 0.1, 0.1) });
+                            p0.drawText(qLine, { x: 15, y: qY, size: 10, font: fontBold, color: rgb(0.1, 0.1, 0.3) });
                         }
 
-                        // Append all mapped pages directly
                         sourcePages.forEach(p => pdfDoc.addPage(p));
-                } catch (pdfErr) {
-                    // FIXED: Now properly logs the cloudUrl instead of crashing on the undefined localPdfPath
-                    console.error(`Error appending PDF ${cloudUrl}:`, pdfErr);
+                    } catch (pdfErr) {
+                        console.error(`Error appending PDF ${cloudUrl}:`, pdfErr);
+                    }
                 }
             }
         }
     }
 
-    // 4. Generate Formal Index / Table of Contents
+    // 4. Generate Formal Hierarchical Index
     const indexPdfDoc = await PDFDocument.create();
     let idxPage = indexPdfDoc.addPage();
     let idxY = idxPage.getSize().height - 80;
@@ -222,15 +278,13 @@ export const generateCollectivePdf = async (req, res) => {
     idxPage.drawText(`TABLE OF CONTENTS`, { x: 50, y: idxY, size: 28, font: fontBold, color: rgb(0.1, 0.1, 0.3) });
     idxY -= 50;
 
-    // Table settings
     const tableX = 50;
     const tableW = idxPage.getSize().width - 100;
-    const rowH = 35;
+    const rowH = 30;
     
-    // Draw Header Row
     idxPage.drawRectangle({ x: tableX, y: idxY, width: tableW, height: rowH, color: rgb(0.9, 0.9, 0.95) });
-    idxPage.drawText(`Topic Layout Segment`, { x: tableX + 15, y: idxY + 12, size: 12, font: fontBold });
-    idxPage.drawText(`PG`, { x: tableX + tableW - 40, y: idxY + 12, size: 12, font: fontBold });
+    idxPage.drawText(`Module Layout`, { x: tableX + 15, y: idxY + 10, size: 12, font: fontBold });
+    idxPage.drawText(`PG`, { x: tableX + tableW - 40, y: idxY + 10, size: 12, font: fontBold });
     idxY -= rowH;
 
     for (let j = 0; j < indexData.length; j++) {
@@ -239,26 +293,34 @@ export const generateCollectivePdf = async (req, res) => {
         if (idxY < 50) {
              idxPage = indexPdfDoc.addPage();
              idxY = idxPage.getSize().height - 80;
-             // Recreate Header
              idxPage.drawRectangle({ x: tableX, y: idxY, width: tableW, height: rowH, color: rgb(0.9, 0.9, 0.95) });
-             idxPage.drawText(`Topic Layout Segment`, { x: tableX + 15, y: idxY + 12, size: 12, font: fontBold });
+             idxPage.drawText(`Module Layout (Cont.)`, { x: tableX + 15, y: idxY + 10, size: 12, font: fontBold });
+             idxPage.drawText(`PG`, { x: tableX + tableW - 40, y: idxY + 10, size: 12, font: fontBold });
              idxY -= rowH;
         }
 
-        // Draw Row borders
-        idxPage.drawRectangle({ x: tableX, y: idxY, width: tableW, height: rowH, borderColor: rgb(0.8, 0.8, 0.8), borderWidth: 1 });
+        const isSection = row.type === 'section';
+        const indentX = isSection ? 10 : 30;
+        const fontSize = isSection ? 12 : 10;
+        const curFont = isSection ? fontBold : fontNormal;
         
+        if (!isSection) {
+            // Draw lighter row border for topics
+            idxPage.drawRectangle({ x: tableX, y: idxY, width: tableW, height: rowH, borderColor: rgb(0.85, 0.85, 0.85), borderWidth: 1 });
+        } else {
+            // Darker border and bg for Sections
+            idxPage.drawRectangle({ x: tableX, y: idxY, width: tableW, height: rowH, color: rgb(0.95, 0.97, 1.0), borderColor: rgb(0.7, 0.7, 0.8), borderWidth: 1 });
+        }
+
         // Truncate logic
-        let dText = row.topic;
-        if (dText.length > 70) dText = dText.substring(0, 67) + '...';
+        let dText = row.text;
+        const maxLen = isSection ? 60 : 65;
+        if (dText.length > maxLen) dText = dText.substring(0, maxLen - 3) + '...';
         
-        idxPage.drawText(dText, { x: tableX + 15, y: idxY + 12, size: 11, font: fontNormal, color: rgb(0.2, 0.2, 0.2) });
-        // The Page string placeholder! We will write the page number physically. We know indexData holds the theoretical offset.
-        
+        idxPage.drawText(dText, { x: tableX + indentX, y: idxY + 10, size: fontSize, font: curFont, color: rgb(0.1, 0.1, 0.2) });
         idxY -= rowH;
     }
 
-    // Now copy index pages into the master layout at position 1
     const indexPages = await pdfDoc.copyPages(indexPdfDoc, indexPdfDoc.getPageIndices());
     const totalIndexPages = indexPages.length;
     
@@ -266,37 +328,38 @@ export const generateCollectivePdf = async (req, res) => {
         pdfDoc.insertPage(1 + k, indexPages[k]);
     }
 
-    // Perform second pass on the embedded Index Pages to stamp the EXACT dynamic numbers
+    // Numbering pass
     let currentDataRow = 0;
-    
     for (let k = 0; k < totalIndexPages; k++) {
         const injectedIdxPage = pdfDoc.getPage(1 + k);
-        // Recalculate Y alignment bounds precisely matching pass 1
         let drawY = k === 0 
            ? (injectedIdxPage.getSize().height - 130 - rowH) 
            : (injectedIdxPage.getSize().height - 80 - rowH);
         
         while (currentDataRow < indexData.length && drawY >= 50) {
              const truePageNum = 1 + totalIndexPages + indexData[currentDataRow].targetPageInternal;
+             const isSec = indexData[currentDataRow].type === 'section';
+             
              injectedIdxPage.drawText(`${truePageNum}`, { 
                  x: tableX + tableW - 40, 
-                 y: drawY + 12, 
-                 size: 11, font: fontBold, color: rgb(0.1, 0.1, 0.1) 
+                 y: drawY + 10, 
+                 size: isSec ? 12 : 10, 
+                 font: isSec ? fontBold : fontNormal, 
+                 color: rgb(0.1, 0.1, 0.1) 
              });
              drawY -= rowH;
              currentDataRow++;
         }
     }
 
-    // 5. Finalize and Send
     const pdfBytes = await pdfDoc.save();
 
-    res.setHeader('Content-Disposition', `attachment; filename="Formal_UPSC_Book_${filterTag.replace(/[^a-z0-9]/gi, '_')}.pdf"`);
+    res.setHeader('Content-Disposition', `attachment; filename="Formal_UPSC_Book_${moduleName.replace(/[^a-z0-9]/gi, '_')}.pdf"`);
     res.setHeader('Content-Type', 'application/pdf');
     res.send(Buffer.from(pdfBytes));
 
   } catch (error) {
     console.error(`[CollectiveController] Error generating collective PDF:`, error);
-    res.status(500).json({ error: 'Failed to generate collective PDF book.' });
+    res.status(500).json({ error: 'Failed to generate collective PDF book.', details: error.message });
   }
 };

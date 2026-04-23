@@ -80,3 +80,45 @@ export const getValidTags = async (req, res) => {
     res.status(500).json({ error: 'Failed to retrieve tags from the server.' });
   }
 };
+
+export const getHierarchy = async (req, res) => {
+  try {
+    const constantsDir = path.join(__dirname, '../constants');
+    const files = fs.readdirSync(constantsDir).filter(f => f.endsWith('.js'));
+    
+    const hierarchyData = {
+      gsModules: {},
+      optionalSubjects: []
+    };
+    
+    for (const file of files) {
+      const filePath = path.join(constantsDir, file);
+      const modulePath = 'file:///' + filePath.replace(/\\/g, '/');
+      const module = await import(modulePath);
+      
+      let structure = [];
+      const exportKeys = Object.keys(module);
+      for (const key of exportKeys) {
+        const data = module[key];
+        if (Array.isArray(data)) {
+           structure = data;
+           break;
+        }
+      }
+      
+      if (file.startsWith('GS-')) {
+         const moduleName = file.replace('.js', '');
+         hierarchyData.gsModules[moduleName] = structure;
+      } else if (file.startsWith('OptionalSubject')) {
+         hierarchyData.optionalSubjects.push(file.replace('.js', ''));
+      }
+    }
+    
+    hierarchyData.optionalSubjects.sort();
+    
+    res.status(200).json(hierarchyData);
+  } catch (error) {
+    console.error("[DataController] Error fetching hierarchy:", error);
+    res.status(500).json({ error: 'Failed to retrieve hierarchy.' });
+  }
+};
