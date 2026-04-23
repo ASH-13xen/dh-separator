@@ -61,7 +61,7 @@ export const handleManualUpload = async (req, res) => {
       return res.status(400).json({ error: 'No PDF file uploaded.' });
     }
 
-    const { question_text, topper_name, tags } = req.body;
+    const { question_text, topper_name, topper_year, topper_rank, topper_marks, tags } = req.body;
     if (!question_text) {
       return res.status(400).json({ error: 'Question text is required.' });
     }
@@ -90,9 +90,9 @@ export const handleManualUpload = async (req, res) => {
           file_urls: {
             url: file_url,
             topper_name: topper_name || 'Unknown Topper',
-            topper_year: '',
-            topper_rank: '',
-            topper_marks: ''
+            topper_year: topper_year || '',
+            topper_rank: topper_rank || '',
+            topper_marks: topper_marks || ''
           }
         }
       },

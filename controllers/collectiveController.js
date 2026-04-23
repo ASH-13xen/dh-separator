@@ -237,7 +237,11 @@ export const generateCollectivePdf = async (req, res) => {
                             });
 
                             const tName = activeFileObj.topper_name || 'Unknown Name';
-                            const docHeader = `[TOPIC: ${topNode.title}] | TOPPER: ${tName.toUpperCase()}`;
+                            let details = [tName.toUpperCase()];
+                            if (activeFileObj.topper_year) details.push(`YEAR: ${activeFileObj.topper_year}`);
+                            if (activeFileObj.topper_rank) details.push(`RANK: ${activeFileObj.topper_rank}`);
+                            if (activeFileObj.topper_marks) details.push(`MARKS: ${activeFileObj.topper_marks}`);
+                            const docHeader = `[TOPIC: ${topNode.title}] | TOPPER: ${details.join(' | ')}`;
 
                             const textWidth = fontBold.widthOfTextAtSize(docHeader, 9);
                             p0.drawText(docHeader, {
