@@ -15,6 +15,6 @@ const upload = multer({
 router.post('/upload', upload.single('pdf'), handlePdfUpload);
 
 // POST /api/upload/manual route
-router.post('/manual', upload.single('pdf'), handleManualUpload);
+router.post('/upload/manual', upload.single('pdf'), handleManualUpload);
 
 export default router;
