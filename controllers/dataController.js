@@ -88,7 +88,7 @@ export const getHierarchy = async (req, res) => {
     
     const hierarchyData = {
       gsModules: {},
-      optionalSubjects: []
+      optionalSubjects: {}
     };
     
     for (const file of files) {
@@ -110,11 +110,10 @@ export const getHierarchy = async (req, res) => {
          const moduleName = file.replace('.js', '');
          hierarchyData.gsModules[moduleName] = structure;
       } else if (file.startsWith('OptionalSubject')) {
-         hierarchyData.optionalSubjects.push(file.replace('.js', ''));
+         const moduleName = file.replace('.js', '');
+         hierarchyData.optionalSubjects[moduleName] = structure;
       }
     }
-    
-    hierarchyData.optionalSubjects.sort();
     
     res.status(200).json(hierarchyData);
   } catch (error) {

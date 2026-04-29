@@ -49,6 +49,26 @@ export const processPdf = async (fileBuffer, metadataList) => {
     // 3. Loop and split
     for (let i = 0; i < indexArray.length; i++) {
         const item = indexArray[i];
+
+        // Sanitize tags: keep at most 1 GS tag and 1 Optional tag
+        if (item.tags && Array.isArray(item.tags)) {
+            let gsFound = false;
+            let optFound = false;
+            item.tags = item.tags.filter(tag => {
+                if (tag.startsWith('GS-')) {
+                    if (gsFound) return false;
+                    gsFound = true;
+                    return true;
+                }
+                if (tag.startsWith('OptionalSubject')) {
+                    if (optFound) return false;
+                    optFound = true;
+                    return true;
+                }
+                return true;
+            });
+        }
+        
         const startIdx = Math.max(0, item.start_page - 1);
         const endIdx = Math.min(totalPages - 1, item.end_page - 1);
 

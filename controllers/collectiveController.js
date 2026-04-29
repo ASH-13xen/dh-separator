@@ -40,40 +40,58 @@ export const previewSubjectData = async (req, res) => {
       return res.status(404).json({ error: 'No questions found for this module.' });
     }
 
+    const matchedQuestionIds = new Set();
+
+    const isOptional = moduleName.startsWith('OptionalSubject');
+    
     // Process hierarchy
     const resultData = [];
-    for (const sec of hierarchy) {
-        if (!sec.section) continue;
-        
-        const secObj = {
-            section: sec.section,
-            topics: []
-        };
-        
-        if (sec.topics && Array.isArray(sec.topics)) {
-            for (const top of sec.topics) {
-                if (!top.title) continue;
-                
-                const topObj = {
-                    title: top.title,
-                    questions: []
-                };
-                
-                // Find matching questions. 
-                // We enforce that the question has exactly this topic tag.
-                const matchedQ = questions.filter(q => q.tags && q.tags.includes(top.title));
-                topObj.questions = matchedQ;
-                
-                if (matchedQ.length > 0) secObj.topics.push(topObj);
+    const processHierarchy = (paperFilter) => {
+        for (const sec of hierarchy) {
+            if (!sec.section) continue;
+            
+            const secObj = {
+                section: paperFilter ? `${paperFilter}: ${sec.section}` : sec.section,
+                topics: []
+            };
+            
+            if (sec.topics && Array.isArray(sec.topics)) {
+                for (const top of sec.topics) {
+                    if (!top.title) continue;
+                    
+                    let matchedQ = questions.filter(q => q.tags && q.tags.includes(top.title));
+                    if (paperFilter) {
+                        matchedQ = matchedQ.filter(q => q.tags.includes(paperFilter));
+                    }
+                    
+                    if (matchedQ.length > 0) {
+                        matchedQ.forEach(q => matchedQuestionIds.add(q._id.toString()));
+                        secObj.topics.push({ title: top.title, questions: matchedQ });
+                    }
+                }
             }
+            if (secObj.topics.length > 0) resultData.push(secObj);
         }
-        
-        if (secObj.topics.length > 0) resultData.push(secObj);
+    };
+
+    if (isOptional) {
+        processHierarchy("Paper 1");
+        processHierarchy("Paper 2");
+    } else {
+        processHierarchy(null);
     }
 
-    // In case there are questions strictly mapped to the module but not matching any specific inner topic
-    // we could collect them into 'Uncategorized'. But per prompt, "everything should be section and then topic wise done sequentially".
-    // Missing topic mappings are dropped to enforce strict hierarchy.
+    // Collect questions that are mapped to the module but lack specific inner topic tags
+    const unmatchedQuestions = questions.filter(q => !matchedQuestionIds.has(q._id.toString()));
+    if (unmatchedQuestions.length > 0) {
+        resultData.push({
+            section: "Uncategorized Topics",
+            topics: [{
+                title: "General Questions",
+                questions: unmatchedQuestions
+            }]
+        });
+    }
 
     res.json(resultData);
   } catch (err) {
@@ -103,23 +121,49 @@ export const generateCollectivePdf = async (req, res) => {
       return res.status(404).json({ error: 'No matched/selected questions found.' });
     }
 
-    // Group into hierarchy
+    const isOptional = moduleName.startsWith('OptionalSubject');
+    const matchedQuestionIds = new Set();
     const docData = [];
-    for (const sec of hierarchy) {
-        if (!sec.section) continue;
-        const mappedTopics = [];
-        if (sec.topics && Array.isArray(sec.topics)) {
-            for (const top of sec.topics) {
-                if (!top.title) continue;
-                const matchedQ = questionsResponse.filter(q => q.tags && q.tags.includes(top.title));
-                if (matchedQ.length > 0) {
-                    mappedTopics.push({ title: top.title, questions: matchedQ });
+
+    const processHierarchy = (paperFilter) => {
+        for (const sec of hierarchy) {
+            if (!sec.section) continue;
+            const mappedTopics = [];
+            if (sec.topics && Array.isArray(sec.topics)) {
+                for (const top of sec.topics) {
+                    if (!top.title) continue;
+                    let matchedQ = questionsResponse.filter(q => q.tags && q.tags.includes(top.title));
+                    if (paperFilter) {
+                        matchedQ = matchedQ.filter(q => q.tags.includes(paperFilter));
+                    }
+                    if (matchedQ.length > 0) {
+                        matchedQ.forEach(q => matchedQuestionIds.add(q._id.toString()));
+                        mappedTopics.push({ title: top.title, questions: matchedQ });
+                    }
                 }
             }
+            if (mappedTopics.length > 0) {
+                docData.push({ 
+                    section: paperFilter ? `${paperFilter}: ${sec.section}` : sec.section, 
+                    topics: mappedTopics 
+                });
+            }
         }
-        if (mappedTopics.length > 0) {
-            docData.push({ section: sec.section, topics: mappedTopics });
-        }
+    };
+
+    if (isOptional) {
+        processHierarchy("Paper 1");
+        processHierarchy("Paper 2");
+    } else {
+        processHierarchy(null);
+    }
+
+    const unmatchedQuestions = questionsResponse.filter(q => !matchedQuestionIds.has(q._id.toString()));
+    if (unmatchedQuestions.length > 0) {
+        docData.push({
+            section: "Uncategorized Topics",
+            topics: [{ title: "General Questions", questions: unmatchedQuestions }]
+        });
     }
 
     // 1. Initialize Master PDF Document
@@ -127,26 +171,79 @@ export const generateCollectivePdf = async (req, res) => {
     const fontNormal = await pdfDoc.embedFont(StandardFonts.Helvetica);
     const fontBold = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
 
-    // 2. Create Formal Cover Page
+    // 2. Create Premium & Energetic Cover Page
     const titlePage = pdfDoc.addPage();
     const { width: tw, height: th } = titlePage.getSize();
     
+    // Background
     titlePage.drawRectangle({
-        x: 0, y: th - 100, width: tw, height: 100, color: rgb(0.14, 0.16, 0.28)
+        x: 0, y: 0, width: tw, height: th, color: rgb(0.98, 0.98, 0.99)
+    });
+
+    // Energetic Top Accent blocks
+    titlePage.drawRectangle({
+        x: 0, y: th - 180, width: tw, height: 180, color: rgb(0.14, 0.16, 0.28) // Deep Blue
+    });
+    titlePage.drawRectangle({
+        x: 0, y: th - 180, width: tw * 0.6, height: 10, color: rgb(0.96, 0.35, 0.14) // Vibrant Orange
+    });
+    titlePage.drawRectangle({
+        x: tw * 0.6, y: th - 180, width: tw * 0.4, height: 10, color: rgb(0.25, 0.51, 0.96) // Vibrant Blue
     });
     
     titlePage.drawText(`UPSC DOCUMENT LIBRARY`, {
-      x: 50, y: th - 60, size: 28, font: fontBold, color: rgb(1, 1, 1)
+      x: 50, y: th - 80, size: 36, font: fontBold, color: rgb(1, 1, 1)
+    });
+    
+    titlePage.drawText(`Comprehensive Question Bank & Extracted Answers`, {
+      x: 50, y: th - 120, size: 16, font: fontNormal, color: rgb(0.7, 0.7, 0.8)
     });
 
-    const moduleText = `${moduleName.replace(/([a-z])([A-Z])/g, '$1 $2').toUpperCase()} MODULE`;
-    const subTextWidth = fontBold.widthOfTextAtSize(moduleText, 36);
-    titlePage.drawText(moduleText, {
-      x: (tw - subTextWidth)/2, y: th / 2, size: 36, font: fontBold, color: rgb(0.1, 0.1, 0.1)
-    });
+    // Module Name Processing (with dynamic sizing / word wrap)
+    const moduleText = `${moduleName.replace(/([a-z])([A-Z])/g, '$1 $2').replace('OptionalSubject', 'Optional Subject: ').toUpperCase()} MODULE`;
+    
+    let fontSize = 48;
+    let textWidth = fontBold.widthOfTextAtSize(moduleText, fontSize);
+    
+    // Auto-scale down if it's too wide
+    while (textWidth > tw - 100 && fontSize > 24) {
+        fontSize -= 2;
+        textWidth = fontBold.widthOfTextAtSize(moduleText, fontSize);
+    }
+    
+    // If still too wide, we split it into two lines
+    if (textWidth > tw - 100) {
+        const words = moduleText.split(' ');
+        let line1 = '';
+        let line2 = '';
+        for (let i = 0; i < words.length; i++) {
+            if (i < words.length / 2) line1 += words[i] + ' ';
+            else line2 += words[i] + ' ';
+        }
+        const lw1 = fontBold.widthOfTextAtSize(line1.trim(), 28);
+        const lw2 = fontBold.widthOfTextAtSize(line2.trim(), 28);
+        
+        titlePage.drawText(line1.trim(), {
+          x: (tw - lw1)/2, y: th / 2 + 20, size: 28, font: fontBold, color: rgb(0.1, 0.1, 0.1)
+        });
+        titlePage.drawText(line2.trim(), {
+          x: (tw - lw2)/2, y: th / 2 - 20, size: 28, font: fontBold, color: rgb(0.1, 0.1, 0.1)
+        });
+    } else {
+        titlePage.drawText(moduleText, {
+          x: (tw - textWidth)/2, y: th / 2, size: fontSize, font: fontBold, color: rgb(0.1, 0.1, 0.1)
+        });
+    }
 
-    titlePage.drawText(`Formal Sequence Extract`, {
-      x: tw/2 - 90, y: th/2 - 40, size: 16, font: fontNormal, color: rgb(0.5, 0.5, 0.5)
+    // Energetic Bottom Accent
+    titlePage.drawRectangle({
+        x: 50, y: 150, width: tw - 100, height: 2, color: rgb(0.8, 0.8, 0.8)
+    });
+    titlePage.drawText(`AI-Generated Knowledge Repository`, {
+      x: tw/2 - 130, y: 110, size: 16, font: fontNormal, color: rgb(0.4, 0.4, 0.4)
+    });
+    titlePage.drawText(`${new Date().getFullYear()} Edition`, {
+      x: tw/2 - 35, y: 80, size: 14, font: fontBold, color: rgb(0.14, 0.16, 0.28)
     });
 
     const indexData = []; // { type: 'section'|'topic', text: "...", targetPageInternal: X }
@@ -175,15 +272,15 @@ export const generateCollectivePdf = async (req, res) => {
         let sLine = '';
         for (const word of sWords) {
             const testLine = sLine + word + ' ';
-            if (fontBold.widthOfTextAtSize(testLine, 42) > tw - 100) {
-                sPage.drawText(sLine, { x: 50, y: sY, size: 42, font: fontBold, color: rgb(1, 1, 1) });
+            if (fontBold.widthOfTextAtSize(testLine, 18) > tw - 100) {
+                sPage.drawText(sLine, { x: 50, y: sY, size: 18, font: fontBold, color: rgb(1, 1, 1) });
                 sLine = word + ' ';
-                sY -= 55;
+                sY -= 25;
             } else {
                 sLine = testLine;
             }
         }
-        sPage.drawText(sLine, { x: 50, y: sY, size: 42, font: fontBold, color: rgb(1, 1, 1) });
+        sPage.drawText(sLine, { x: 50, y: sY, size: 18, font: fontBold, color: rgb(1, 1, 1) });
 
         // Iterate over Topics under this Section
         for (const topNode of secNode.topics) {
@@ -223,17 +320,24 @@ export const generateCollectivePdf = async (req, res) => {
                             const p0 = sourcePages[0];
                             const { width: p0w, height: p0h } = p0.getSize();
 
-                            // Use a solid top header bar to occlude the original page details
-                            const barHeight = 40;
+                            // Premium Top Header Banner - Question Bank Style
+                            const barHeight = 120;
                             const barY = p0h - barHeight;
+                            const boxMargin = 30;
+                            const boxWidth = p0w - (boxMargin * 2);
 
+                            // Subtle gray background for the question box
                             p0.drawRectangle({
-                                x: 0, y: barY, width: p0w, height: barHeight, color: rgb(0.92, 0.95, 0.98)
+                                x: boxMargin, y: barY + 10, width: boxWidth, height: barHeight - 20, 
+                                color: rgb(0.96, 0.97, 0.98),
+                                borderColor: rgb(0.8, 0.8, 0.8),
+                                borderWidth: 1
                             });
-
-                            // Subheader bar for context
+                            
+                            // Add a small colored accent bar on the left of the box
                             p0.drawRectangle({
-                                x: 0, y: barY - 14, width: p0w, height: 14, color: rgb(0.2, 0.25, 0.4)
+                                x: boxMargin, y: barY + 10, width: 4, height: barHeight - 20, 
+                                color: rgb(0.2, 0.4, 0.6)
                             });
 
                             const tName = activeFileObj.topper_name || 'Unknown Name';
@@ -241,28 +345,45 @@ export const generateCollectivePdf = async (req, res) => {
                             if (activeFileObj.topper_year) details.push(`YEAR: ${activeFileObj.topper_year}`);
                             if (activeFileObj.topper_rank) details.push(`RANK: ${activeFileObj.topper_rank}`);
                             if (activeFileObj.topper_marks) details.push(`MARKS: ${activeFileObj.topper_marks}`);
-                            const docHeader = `[TOPIC: ${topNode.title}] | TOPPER: ${details.join(' | ')}`;
+                            const docHeader = `[TOPIC: ${topNode.title}]  |  TOPPER: ${details.join(' | ')}`;
 
-                            const textWidth = fontBold.widthOfTextAtSize(docHeader, 9);
+                            // Draw topper details subtly at the top
                             p0.drawText(docHeader, {
-                                x: (p0w - textWidth) / 2, y: barY - 10, size: 9, font: fontBold, color: rgb(1, 1, 1)
+                                x: boxMargin + 15, y: p0h - 25, size: 8, font: fontNormal, color: rgb(0.5, 0.5, 0.5)
                             });
 
-                            let qY = barY + 20;
-                            const qWords = item.question_text.split(' ');
+                            let qY = p0h - 45;
+                            const rawText = item.question_text || "Question text unavailable.";
+                            const prefixMatch = rawText.match(/^(Q\d+|Q\.\d+|Question\s*\d+)/i);
+                            let cleanText = rawText;
+                            let questionLabel = "Q.";
+                            
+                            if (prefixMatch) {
+                                questionLabel = prefixMatch[0].toUpperCase();
+                                cleanText = rawText.substring(prefixMatch[0].length).trim();
+                            } else {
+                                questionLabel = "Q.";
+                            }
+
+                            // Draw the 'Q.' Label
+                            p0.drawText(questionLabel, { x: boxMargin + 15, y: qY, size: 14, font: fontBold, color: rgb(0.1, 0.3, 0.5) });
+
+                            // Wrap and draw the rest of the question text
+                            const textStartX = boxMargin + 15 + fontBold.widthOfTextAtSize(questionLabel + " ", 14);
+                            const qWords = cleanText.replace(/\n/g, ' ').split(' ');
                             let qLine = '';
                             
                             for (const word of qWords) {
                                 const testLine = qLine + word + ' ';
-                                if (fontBold.widthOfTextAtSize(testLine, 10) > p0w - 30) {
-                                    p0.drawText(qLine, { x: 15, y: qY, size: 10, font: fontBold, color: rgb(0.1, 0.1, 0.3) });
+                                if (fontBold.widthOfTextAtSize(testLine, 12) > boxWidth - (textStartX - boxMargin) - 15) {
+                                    p0.drawText(qLine, { x: qLine === '' ? textStartX : boxMargin + 15, y: qY, size: 12, font: fontBold, color: rgb(0.15, 0.15, 0.15) });
                                     qLine = word + ' ';
-                                    qY -= 12;
+                                    qY -= 16;
                                 } else {
                                     qLine = testLine;
                                 }
                             }
-                            p0.drawText(qLine, { x: 15, y: qY, size: 10, font: fontBold, color: rgb(0.1, 0.1, 0.3) });
+                            p0.drawText(qLine, { x: qLine === '' ? textStartX : boxMargin + 15, y: qY, size: 12, font: fontBold, color: rgb(0.15, 0.15, 0.15) });
                         }
 
                         sourcePages.forEach(p => pdfDoc.addPage(p));

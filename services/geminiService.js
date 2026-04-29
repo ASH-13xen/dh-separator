@@ -18,6 +18,24 @@ const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
 
 let parsedSyllabusText = '';
 
+const withRetry = async (fn, retries = 3, delayMs = 5000) => {
+  let attempt = 0;
+  while (attempt < retries) {
+    try {
+      return await fn();
+    } catch (error) {
+      attempt++;
+      console.warn(`[GeminiService] Attempt ${attempt} failed: ${error.message}`);
+      if (attempt >= retries) {
+        throw error;
+      }
+      console.log(`[GeminiService] Waiting ${delayMs}ms before retrying...`);
+      await new Promise(resolve => setTimeout(resolve, delayMs));
+      delayMs *= 2; // Exponential backoff
+    }
+  }
+};
+
 const loadSyllabus = async () => {
     try {
         const constantsDir = path.join(__dirname, '../constants');
@@ -88,6 +106,12 @@ export const processEntirePdfWithGemini = async (pdfBuffer) => {
     const prompt = `You are an expert UPSC document classifier. 
 Scan the attached document and identify every explicitly marked question. 
 The PDF contains multiple distinct answer sheets merged together. Each sheet belongs to a different candidate. The start of a new sheet is denoted by a title or separator page.
+
+CRITICAL INSTRUCTIONS FOR PDF READING:
+- IGNORE any title pages, instruction pages, or pages that only contain the topper's name or metadata at the beginning of the sheet. Only identify legit UPSC questions.
+- The questions are typically printed in TEXT format (not handwritten) and start with indicators like "Q1", "Q.1", "Question 1", etc. Use these text indicators to confidently find the start of a question.
+- For the 'end_page' of a question, it MUST include all pages until the exact page where the NEXT printed question (e.g., "Q2") starts (or until the end of the current answer sheet). Take everything in between as the solution.
+
 Classify them STRICTLY according to the official UPSC syllabus provided below.
 
 --- OFFICIAL UPSC SYLLABUS ---
@@ -97,16 +121,24 @@ ${parsedSyllabusText}
 For every question found, provide:
 1. 'question_text': The exact full text of the question.
 2. 'tags': A list of EXACT match string tags from the syllabus. Follow this strict hierarchy:
-   - Exactly one GS paper tag (e.g., 'GS-1', 'GS-2', 'GS-3', 'GS-4').
-   - Exactly one Section tag matching that GS paper.
-   - Exactly one Topic Title tag matching that Section.
-   - (Optional) Exactly one Optional Subject tag (e.g., 'OptionalSubjectHistory') if the question strongly indicates it.
-3. 'start_page': The exact physical page number where it starts (Page 1 is the first page).
-4. 'end_page': The exact physical page number where the answer ends.
+   If the question is from a Compulsory Paper (GS):
+   - Exactly ONE GS paper tag (e.g., 'GS-1', 'GS-2', 'GS-3', 'GS-4').
+   - Exactly ONE Section tag matching that GS paper.
+   - Exactly ONE Topic Title tag matching that Section.
+   If the question is from an Optional Subject:
+   - Exactly ONE Optional Subject tag (e.g., 'OptionalSubjectHistory').
+   - Exactly ONE paper tag, which MUST be either "Paper 1" or "Paper 2".
+   - Exactly ONE Section tag matching that Optional Subject.
+   - Exactly ONE Topic Title tag matching that Section.
+   Note: A question can have both GS tags and Optional Subject tags if relevant.
+3. 'start_page': The exact physical page number where the question starts (Page 1 is the first page).
+4. 'end_page': The exact physical page number where the solution ends (which is just before the next question starts).
 5. 'answer_sheet_index': The 1-based index indicating which topper's answer sheet this question belongs to. The first answer sheet in the PDF is 1. When you see a title page for a new topper, increment this index for subsequent questions.
 
 RULES:
 - The 'tags' array must ONLY contain strings exactly matching the exact Section names, Topic titles, GS names, or OptionalSubject names defined in the syllabus context above. DO NOT invent tags.
+- NEVER return more than one GS tag or more than one Optional Subject tag for a single question.
+- A question should ideally be classified under either a GS Paper or an Optional Subject, with its corresponding Section and Topic.
 - Return ONLY a JSON array.`;
 
     const responseSchema = {
@@ -133,7 +165,7 @@ RULES:
     };
 
     console.log(`[GeminiService] Initializing AI analysis...`);
-    const result = await model.generateContent({
+    const result = await withRetry(() => model.generateContent({
       contents: [{ 
         role: 'user', 
         parts: [
@@ -146,7 +178,7 @@ RULES:
         responseSchema: responseSchema, 
         temperature: 0.0 // Keep this at 0.0 for maximum consistency
       }
-    });
+    }), 4, 5000); // 4 retries, starting with 5 seconds
     
     const responseText = result.response.text();
     const jsonArray = JSON.parse(responseText);

@@ -1,0 +1,142 @@
+export const optionalSubStatistics = [
+  {
+    section: "Probability and Statistical Inference",
+    topics: [
+      {
+        title: "Probability",
+        subtopics: [
+          "Sample space and events, probability measure and probability space, random variable as a measurable function.",
+          "Distribution function of a random variable, discrete and continuous-type random variable, probability mass function, probability density function, vector-valued random variable, marginal and conditional distributions.",
+          "Stochastic independence of events and of random variables, expectation and moments of a random variable, conditional expectation.",
+          "Convergence of a sequence of random variable in distribution, in probability, in path mean and almost everywhere, their criteria and inter-relations.",
+          "Chebyshev’s inequality and Khintchine’s weak law of large numbers, strong law of large numbers and Kolmogorov's theorems.",
+          "Probability generating function, moment generating function, characteristic function, inversion theorem.",
+          "Lindeberg and Levy forms of central limit theorem, standard discrete and continuous probability distributions."
+        ]
+      },
+      {
+        title: "Statistical Inference: Estimation",
+        subtopics: [
+          "Consistency, unbiasedness, efficiency, sufficiency, completeness, ancillary statistics, factorization theorem, exponential family of distribution and its properties.",
+          "Uniformly minimum variance unbiased (UMVU) estimation, Rao-Blackwell and Lehmann-Scheffe theorems, Cramer-Rao inequality for single parameter.",
+          "Estimation by methods of moments, maximum likelihood, least squares, minimum chi-square and modified minimum chi-square, properties of maximum likelihood and other estimators, asymptotic efficiency.",
+          "Prior and posterior distributions, loss function, risk function, and minimax estimator. Bayes estimators."
+        ]
+      },
+      {
+        title: "Statistical Inference: Hypothesis Testing",
+        subtopics: [
+          "Non-randomised and randomised tests, critical function, MP tests, Neyman-Pearson lemma, UMP tests.",
+          "Monotone likelihood ratio: similar and unbiased tests, UMPU tests for single parameter, likelihood ratio test and its asymptotic distribution. Confidence bounds and its relation with tests.",
+          "Kolmogorov’s test for goodness of fit and its consistency, sign test and its optimality. Wilcoxon signed-ranks test and its consistency.",
+          "Kolmogorov-Smirnov two-sample test, run test, Wilcoxon-Mann-Whitney test and median test, their consistency and asymptotic normality.",
+          "Wald’s SPRT and its properties, OC and ASN functions for tests regarding parameters for Bernoulli, Poisson, normal and exponential distributions. Wald’s fundamental identity."
+        ]
+      }
+    ]
+  },
+  {
+    section: "Linear Inference, Multivariate Analysis and Design of Experiments",
+    topics: [
+      {
+        title: "Linear Inference and Multivariate Analysis",
+        subtopics: [
+          "Linear statistical models, theory of least squares and analysis of variance, Gauss-Markoff theory, normal equations, least squares estimates and their precision.",
+          "Test of significance and interval estimates based on least squares theory in one-way, two-way and three-way classified data.",
+          "Regression analysis, linear regression, curvilinear regression and orthogonal polynomials, multiple regression, multiple and partial correlations, estimation of variance and covariance components.",
+          "Multivariate normal distribution, Mahalanobis’s D² and Hotelling’s T² statistics and their applications and properties.",
+          "Discriminant analysis, canonical correlations, principal component analysis."
+        ]
+      },
+      {
+        title: "Sampling Theory",
+        subtopics: [
+          "An outline of fixed-population and super-population approaches, distinctive features of finite population sampling, probability sampling designs.",
+          "Simple random sampling with and without replacement, stratified random sampling, systematic sampling and its efficacy.",
+          "Cluster sampling, two-stage and multi-stage sampling, ratio and regression methods of estimation involving one or more auxiliary variables.",
+          "Two-phase sampling, probability proportional to size sampling with and without replacement.",
+          "The Hansen-Hurwitz and the Horvitz-Thompson estimators, non-negative variance estimation with reference to the Horvitz-Thompson estimator, non-sampling errors."
+        ]
+      },
+      {
+        title: "Design of Experiments",
+        subtopics: [
+          "Fixed effects model (two-way classification), random and mixed effects models (two-way classification with equal observation per cell).",
+          "CRD, RBD, LSD and their analyses, incomplete block designs, concepts of orthogonality and balance, BIBD, missing plot technique.",
+          "Factorial experiments and 2^4 and 3^2, confounding in factorial experiments, split-plot and simple lattice designs, transformation of data, Duncan’s multiple range test."
+        ]
+      }
+    ]
+  },
+  {
+    section: "Industrial Statistics and Optimization Techniques",
+    topics: [
+      {
+        title: "Quality Control and Reliability",
+        subtopics: [
+          "Process and product control, general theory of control charts, different types of control charts for variables and attributes, X, R, s, p, np and c charts, cumulative sum chart.",
+          "Single, double, multiple and sequential sampling plans for attributes, OC, ASN, AOQ and ATI curves, concepts of producer’s and consumer’s risks, AQL, LTPD and AOQL.",
+          "Sampling plans for variables, Use of Dodge-Romig tables.",
+          "Concept of reliability, failure rate and reliability functions, reliability of series and parallel systems and other simple configurations, renewal density and renewal function.",
+          "Failure models: exponential, Weibull, normal, lognormal. Problems in life testing, censored and truncated experiments for exponential models."
+        ]
+      },
+      {
+        title: "Operations Research and Optimization",
+        subtopics: [
+          "Different types of models in Operations Research, their construction and general methods of solution, simulation and Monte-Carlo methods.",
+          "Formulation of Linear Programming (LP) problem, simple LP model and its graphical solution, the simplex procedure, the two-phase method and the M-technique with artificial variables.",
+          "The duality theory of LP and its economic interpretation, sensitivity analysis, transportation and assignment problems.",
+          "Rectangular games, two-person zero-sum games, methods of solution (graphical and algebraic).",
+          "Replacement of failing or deteriorating items, group and individual replacement policies.",
+          "Concept of scientific inventory management and analytical structure of inventory problems, simple models with deterministic and stochastic demand with and without lead time, storage models with particular reference to dam type."
+        ]
+      },
+      {
+        title: "Stochastic Processes and Computing",
+        subtopics: [
+          "Homogeneous discrete-time Markov chains, transition probability matrix, classification of states and ergodic theorems, homogeneous continuous-time Markov chains, Poisson process.",
+          "Elements of queuing theory, M/M/1, M/M/K, G/M/1 and M/G/1 queues.",
+          "Solution of statistical problems on computers using well-known statistical software packages like SPSS."
+        ]
+      }
+    ]
+  },
+  {
+    section: "Quantitative Economics, Demography and Psychometry",
+    topics: [
+      {
+        title: "Quantitative Economics",
+        subtopics: [
+          "Determination of trend, seasonal and cyclical components, Box-Jenkins method, tests for stationary series.",
+          "ARIMA models and determination of orders of autoregressive and moving average components, forecasting.",
+          "Commonly used index numbers - Laspeyres, Paasche's and Fisher's ideal index numbers, chain-base index number, uses and limitations of index numbers.",
+          "Index number of wholesale prices, consumer price, agricultural production and industrial production, tests for index numbers - proportionality, time-reversal, factor-reversal and circular.",
+          "General linear model, ordinary least square and generalized least squares methods of estimation.",
+          "Problem of multicollinearity, consequences and solutions of multicollinearity, autocorrelation and its consequences, heteroscedasticity of disturbances and its testing, test for independence of disturbances.",
+          "Concept of structure and model for simultaneous equations, problem of identification-rank and order conditions of identifiability, two-stage least square method of estimation."
+        ]
+      },
+      {
+        title: "Official Statistics",
+        subtopics: [
+          "Present official statistical system in India relating to population, agriculture, industrial production, trade and prices.",
+          "Methods of collection of official statistics, their reliability and limitations.",
+          "Principal publications containing such statistics, various official agencies responsible for data collection and their main functions."
+        ]
+      },
+      {
+        title: "Demography and Psychometry",
+        subtopics: [
+          "Demographic data from census, registration, NSS and other surveys, their limitations and uses.",
+          "Definition, construction and uses of vital rates and ratios, measures of fertility, reproduction rates, morbidity rate, standardized death rate.",
+          "Complete and abridged life tables, construction of life tables from vital statistics and census returns, uses of life tables.",
+          "Logistic and other population growth curves, fitting a logistic curve, population projection, stable population, quasi-stable population.",
+          "Techniques in estimation of demographic parameters, standard classification by cause of death, health surveys and use of hospital statistics.",
+          "Methods of standardisation of scales and tests, Z-scores, standard scores, T-scores, percentile scores.",
+          "Intelligence quotient and its measurement and uses, validity and reliability of test scores and its determination, use of factor analysis and path analysis in psychometry."
+        ]
+      }
+    ]
+  }
+];
