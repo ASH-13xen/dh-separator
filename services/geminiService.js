@@ -108,7 +108,13 @@ Scan the attached document and identify every explicitly marked question.
 The PDF contains multiple distinct answer sheets merged together. Each sheet belongs to a different candidate. The start of a new sheet is denoted by a title or separator page.
 
 CRITICAL INSTRUCTIONS FOR PDF READING:
-- IGNORE any title pages, instruction pages, or pages that only contain the topper's name or metadata at the beginning of the sheet. Only identify legit UPSC questions.
+- The PDF is an answer sheet with handwritten answers and computer text questions.
+- Read the PDF page by page.
+- Whenever you find a question type text, ONLY then consider it as a question.
+- Create the answer starting from that question page until the next question comes.
+- Include the question page as well in the answer range.
+- The questions can be a little blurry, so take that into consideration and try your best to read them.
+- The PDF may contain a topper's name and details pages; IGNORE these pages.
 - The questions are typically printed in TEXT format (not handwritten) and start with indicators like "Q1", "Q.1", "Question 1", etc. Use these text indicators to confidently find the start of a question.
 - For the 'end_page' of a question, it MUST include all pages until the exact page where the NEXT printed question (e.g., "Q2") starts (or until the end of the current answer sheet). Take everything in between as the solution.
 
