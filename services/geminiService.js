@@ -84,10 +84,14 @@ const loadSyllabus = async () => {
 
 loadSyllabus();
 
-export const processEntirePdfWithGemini = async (filePath) => {
+export const processEntirePdfWithGemini = async (pdfBuffer) => {
+  const tempFilePath = path.join(os.tmpdir(), `full-doc-${Date.now()}.pdf`);
+
   try {
-    console.log(`[GeminiService] Uploading file to Google AI from ${filePath}...`);
-    const uploadResult = await fileManager.uploadFile(filePath, {
+    fs.writeFileSync(tempFilePath, pdfBuffer);
+    
+    console.log(`[GeminiService] Uploading file to Google AI...`);
+    const uploadResult = await fileManager.uploadFile(tempFilePath, {
       mimeType: 'application/pdf',
       displayName: `UPSC Complete Document`,
     });
@@ -193,5 +197,7 @@ RULES:
   } catch (error) {
     console.error("[GeminiService] Error:", error);
     throw error;
+  } finally {
+    if (fs.existsSync(tempFilePath)) fs.unlinkSync(tempFilePath);
   }
 };

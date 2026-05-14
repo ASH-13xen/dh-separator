@@ -4,8 +4,6 @@ import { PDFDocument } from 'pdf-lib';
 import streamifier from 'streamifier';
 import { v2 as cloudinary } from 'cloudinary';
 
-import fs from 'fs';
-
 // Cloudinary Configuration mappings
 cloudinary.config({ 
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME, 
@@ -13,23 +11,19 @@ cloudinary.config({
   api_secret: process.env.CLOUDINARY_API_SECRET 
 });
 
-export const processPdf = async (filePath, metadataList) => {
-  let fileBuffer = null;
-  let mainPdfDoc = null;
-
+export const processPdf = async (fileBuffer, metadataList) => {
   try {
     console.log(`[PdfProcessingService] Processing single-upload PDF...`);
     
     // 1. Get the Index from Gemini (Single Call)
-    const indexArray = await processEntirePdfWithGemini(filePath);
+    const indexArray = await processEntirePdfWithGemini(fileBuffer);
     
     if (!indexArray || indexArray.length === 0) {
       throw new Error("No questions detected in document.");
     }
 
     // 2. Load PDF to split
-    fileBuffer = fs.readFileSync(filePath);
-    mainPdfDoc = await PDFDocument.load(fileBuffer);
+    const mainPdfDoc = await PDFDocument.load(fileBuffer);
     const totalPages = mainPdfDoc.getPageCount();
 
     const finalRecords = [];
@@ -151,9 +145,5 @@ export const processPdf = async (filePath, metadataList) => {
   } catch (error) {
     console.error("[PdfProcessingService] Error:", error);
     throw error;
-  } finally {
-    // Free up large PDF objects
-    fileBuffer = null;
-    mainPdfDoc = null;
   }
 };
