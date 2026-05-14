@@ -4,11 +4,21 @@ import { handlePdfUpload, handleManualUpload } from '../controllers/uploadContro
 
 const router = express.Router();
 
-// Setup Multer to store uploaded file buffer in memory
-const storage = multer.memoryStorage();
+import os from 'os';
+
+// Setup Multer to store uploaded file on disk instead of memory
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, os.tmpdir());
+  },
+  filename: function (req, file, cb) {
+    cb(null, `upload-${Date.now()}-${Math.round(Math.random() * 1E9)}.pdf`);
+  }
+});
+
 const upload = multer({
   storage: storage,
-  // limits: { fileSize: 50 * 1024 * 1024 } // Optional: enforce a 50MB file size limit
+  // limits: { fileSize: 50 * 1024 * 1024 } 
 });
 
 // POST /api/upload route

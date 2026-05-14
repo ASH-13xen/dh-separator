@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dev": "nodemon index.js"
+    "dev": "nodemon --expose-gc index.js",
+    "start": "node --expose-gc index.js"
   },
   "keywords": [],
   "author": "",

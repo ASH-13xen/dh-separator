@@ -2,6 +2,8 @@ import { processPdf } from '../services/pdfProcessingService.js';
 import { UPSCQA } from '../models/UPSCQA.js';
 import streamifier from 'streamifier';
 import { v2 as cloudinary } from 'cloudinary';
+import { compressPdf } from '../utils/pdfCompressor.js';
+import fs from 'fs';
 
 const uploadToCloudinary = (buffer, fileName) => {
   return new Promise((resolve, reject) => {
@@ -17,6 +19,9 @@ const uploadToCloudinary = (buffer, fileName) => {
 };
 
 export const handlePdfUpload = async (req, res) => {
+  let uploadedFilePath = null;
+  let compressedFilePath = null;
+
   try {
     if (!req.file) {
       return res.status(400).json({ error: 'No PDF file uploaded.' });
@@ -25,6 +30,12 @@ export const handlePdfUpload = async (req, res) => {
     if (req.file.mimetype !== 'application/pdf') {
       return res.status(400).json({ error: 'Please upload a valid PDF file.' });
     }
+
+    uploadedFilePath = req.file.path;
+    
+    // Compress the PDF using Ghostscript (outside Node.js memory)
+    console.log(`[UploadController] Compressing uploaded file: ${uploadedFilePath}`);
+    compressedFilePath = await compressPdf(uploadedFilePath);
 
     let parsedMetadataList = [{ topperName: 'Unknown Topper' }];
     if (req.body.metadataList) {
@@ -35,11 +46,8 @@ export const handlePdfUpload = async (req, res) => {
       }
     }
 
-    console.log(`[UploadController] Received file: ${req.file.originalname}, Sheets specified: ${parsedMetadataList.length}, Size: ${req.file.size} bytes`);
-    console.log(`[UploadController] Initiating processPdf...`);
-    
-    // Pass the memory buffer and metadata array to the service layer
-    const results = await processPdf(req.file.buffer, parsedMetadataList);
+    console.log(`[UploadController] Received file, starting processing...`);
+    const results = await processPdf(compressedFilePath, parsedMetadataList);
 
     console.log(`[UploadController] processPdf completed successfully. Total records generated: ${results.length}`);
 
@@ -52,6 +60,21 @@ export const handlePdfUpload = async (req, res) => {
   } catch (error) {
     console.error("[UploadController] Upload controller error:", error);
     res.status(500).json({ error: 'Failed to process the uploaded PDF document.', details: error.message });
+  } finally {
+    // Explicit Garbage Collection and Disk Cleanup
+    try {
+      if (uploadedFilePath && fs.existsSync(uploadedFilePath)) fs.unlinkSync(uploadedFilePath);
+      if (compressedFilePath && fs.existsSync(compressedFilePath) && compressedFilePath !== uploadedFilePath) fs.unlinkSync(compressedFilePath);
+    } catch (e) {
+      console.error("[UploadController] Error cleaning up temp files:", e);
+    }
+
+    if (global.gc) {
+      console.log(`[UploadController] Forcing Garbage Collection...`);
+      global.gc();
+    } else {
+      console.log(`[UploadController] Garbage Collection not exposed. Use --expose-gc flag.`);
+    }
   }
 };
 
