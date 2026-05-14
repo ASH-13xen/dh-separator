@@ -113,3 +113,36 @@ export const handleManualUpload = async (req, res) => {
     res.status(500).json({ error: 'Failed to upload manual question.', details: error.message });
   }
 };
+
+export const updateTopperDetails = async (req, res) => {
+  try {
+    const { updates } = req.body;
+    if (!updates || !Array.isArray(updates)) {
+      return res.status(400).json({ error: 'Updates array is required.' });
+    }
+
+    const bulkOps = updates.map(update => ({
+      updateMany: {
+        filter: { 'file_urls.url': update.file_url },
+        update: {
+          $set: {
+            'file_urls.$[elem].topper_name': update.topper_name || 'Unknown Topper',
+            'file_urls.$[elem].topper_year': update.topper_year || '',
+            'file_urls.$[elem].topper_rank': update.topper_rank || '',
+            'file_urls.$[elem].topper_marks': update.topper_marks || ''
+          }
+        },
+        arrayFilters: [{ 'elem.url': update.file_url }]
+      }
+    }));
+
+    if (bulkOps.length > 0) {
+      await UPSCQA.bulkWrite(bulkOps);
+    }
+
+    res.status(200).json({ message: 'Topper details updated successfully.' });
+  } catch (error) {
+    console.error("[UploadController] Error updating topper details:", error);
+    res.status(500).json({ error: 'Failed to update topper details.' });
+  }
+};

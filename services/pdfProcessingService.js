@@ -134,11 +134,13 @@ export const processPdf = async (fileBuffer, metadataList) => {
     console.log(`[PdfProcessingService] Successfully merged to DB. Matched: ${bulkResult.matchedCount}, Inserted: ${bulkResult.upsertedCount}, Modified: ${bulkResult.modifiedCount}`);
     
     const savedRecords = await UPSCQA.find({
-      question_text: { $in: finalRecords.map(r => r.question_text) }
+      'file_urls.url': { $in: finalRecords.map(r => r.file_url) }
     }).lean();
 
     return finalRecords.map(record => {
-      const saved = savedRecords.find(r => r.question_text === record.question_text);
+      const saved = savedRecords.find(r => 
+        r.file_urls && r.file_urls.some(f => f.url === record.file_url)
+      );
       return { ...record, _id: saved?._id?.toString() };
     });
 
