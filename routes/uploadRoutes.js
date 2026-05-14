@@ -17,8 +17,4 @@ router.post('/upload', upload.single('pdf'), handlePdfUpload);
 // POST /api/upload/manual route
 router.post('/upload/manual', upload.single('pdf'), handleManualUpload);
 
-// POST /api/upload/update-toppers route
-import { updateTopperDetails } from '../controllers/uploadController.js';
-router.post('/upload/update-toppers', updateTopperDetails);
-
 export default router;
