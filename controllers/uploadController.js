@@ -51,6 +51,13 @@ export const handlePdfUpload = async (req, res) => {
 
   } catch (error) {
     console.error("[UploadController] Upload controller error:", error);
+    
+    if (error.message === 'LOCATION_NOT_SUPPORTED' || (error.message && error.message.includes('User location is not supported'))) {
+      return res.status(403).json({ 
+        error: 'Google Gemini API is restricted in the server\'s current location. Please deploy the server to a supported region (e.g. US Oregon) or use a proxy.' 
+      });
+    }
+
     res.status(500).json({ error: 'Failed to process the uploaded PDF document.', details: error.message });
   }
 };

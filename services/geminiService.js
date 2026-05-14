@@ -91,16 +91,29 @@ export const processEntirePdfWithGemini = async (pdfBuffer) => {
     fs.writeFileSync(tempFilePath, pdfBuffer);
     
     console.log(`[GeminiService] Uploading file to Google AI...`);
-    const uploadResult = await fileManager.uploadFile(tempFilePath, {
-      mimeType: 'application/pdf',
-      displayName: `UPSC Complete Document`,
-    });
+    
+    let uploadResult;
+    try {
+      uploadResult = await withRetry(() => fileManager.uploadFile(tempFilePath, {
+        mimeType: 'application/pdf',
+        displayName: `UPSC Complete Document`,
+      }), 3, 3000);
+    } catch (uploadError) {
+      if (uploadError.message && uploadError.message.includes('User location is not supported')) {
+        throw new Error('LOCATION_NOT_SUPPORTED');
+      }
+      throw uploadError;
+    }
 
     let fileInfo = await fileManager.getFile(uploadResult.file.name);
     while (fileInfo.state === 'PROCESSING') {
       console.log(`[GeminiService] File is processing... waiting 5 seconds.`);
       await new Promise((resolve) => setTimeout(resolve, 5000));
       fileInfo = await fileManager.getFile(uploadResult.file.name);
+    }
+
+    if (fileInfo.state === 'FAILED') {
+      throw new Error(`File processing failed on Gemini's servers for file: ${uploadResult.file.name}`);
     }
 
     const prompt = `You are an expert UPSC document classifier. 
