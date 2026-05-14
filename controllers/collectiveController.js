@@ -320,23 +320,21 @@ export const generateCollectivePdf = async (req, res) => {
                             const p0 = sourcePages[0];
                             const { width: p0w, height: p0h } = p0.getSize();
 
-                            // Premium Top Header Banner - Question Bank Style
-                            const barHeight = 120;
+                            // Professional Full-Width Header
+                            const barHeight = 110;
                             const barY = p0h - barHeight;
-                            const boxMargin = 30;
-                            const boxWidth = p0w - (boxMargin * 2);
 
-                            // Subtle gray background for the question box
+                            // Draw a clean background to cover existing top content and act as header background
                             p0.drawRectangle({
-                                x: boxMargin, y: barY + 10, width: boxWidth, height: barHeight - 20, 
-                                color: rgb(0.96, 0.97, 0.98),
-                                borderColor: rgb(0.8, 0.8, 0.8),
-                                borderWidth: 1
+                                x: 0, y: barY, width: p0w, height: barHeight, 
+                                color: rgb(0.97, 0.98, 0.99)
                             });
-                            
-                            // Add a small colored accent bar on the left of the box
-                            p0.drawRectangle({
-                                x: boxMargin, y: barY + 10, width: 4, height: barHeight - 20, 
+
+                            // Bottom border for the header
+                            p0.drawLine({
+                                start: { x: 0, y: barY },
+                                end: { x: p0w, y: barY },
+                                thickness: 2,
                                 color: rgb(0.2, 0.4, 0.6)
                             });
 
@@ -347,43 +345,44 @@ export const generateCollectivePdf = async (req, res) => {
                             if (activeFileObj.topper_marks) details.push(`MARKS: ${activeFileObj.topper_marks}`);
                             const docHeader = `[TOPIC: ${topNode.title}]  |  TOPPER: ${details.join(' | ')}`;
 
-                            // Draw topper details subtly at the top
+                            // Center alignment for topper details
+                            const docHeaderWidth = fontNormal.widthOfTextAtSize(docHeader, 9);
                             p0.drawText(docHeader, {
-                                x: boxMargin + 15, y: p0h - 25, size: 8, font: fontNormal, color: rgb(0.5, 0.5, 0.5)
+                                x: (p0w - docHeaderWidth) / 2, // Center aligned
+                                y: p0h - 20, 
+                                size: 9, 
+                                font: fontNormal, 
+                                color: rgb(0.4, 0.4, 0.4)
                             });
 
                             let qY = p0h - 45;
                             const rawText = item.question_text || "Question text unavailable.";
-                            const prefixMatch = rawText.match(/^(Q\d+|Q\.\d+|Question\s*\d+)/i);
+                            // Match Q1, Q.1, Question 1, etc., including optional punctuation and spaces
+                            const prefixMatch = rawText.match(/^(?:Q\s*\d+|Q\.\s*\d+|Question\s*\d+)[.)\s:-]*/i);
                             let cleanText = rawText;
-                            let questionLabel = "Q.";
                             
                             if (prefixMatch) {
-                                questionLabel = prefixMatch[0].toUpperCase();
                                 cleanText = rawText.substring(prefixMatch[0].length).trim();
-                            } else {
-                                questionLabel = "Q.";
                             }
 
-                            // Draw the 'Q.' Label
-                            p0.drawText(questionLabel, { x: boxMargin + 15, y: qY, size: 14, font: fontBold, color: rgb(0.1, 0.3, 0.5) });
-
-                            // Wrap and draw the rest of the question text
-                            const textStartX = boxMargin + 15 + fontBold.widthOfTextAtSize(questionLabel + " ", 14);
+                            // Wrap and draw the question text with full breadth
+                            const textMargin = 20; // Modest padding
+                            const maxTextWidth = p0w - (textMargin * 2);
+                            
                             const qWords = cleanText.replace(/\n/g, ' ').split(' ');
                             let qLine = '';
                             
                             for (const word of qWords) {
                                 const testLine = qLine + word + ' ';
-                                if (fontBold.widthOfTextAtSize(testLine, 12) > boxWidth - (textStartX - boxMargin) - 15) {
-                                    p0.drawText(qLine, { x: qLine === '' ? textStartX : boxMargin + 15, y: qY, size: 12, font: fontBold, color: rgb(0.15, 0.15, 0.15) });
+                                if (fontBold.widthOfTextAtSize(testLine, 12) > maxTextWidth) {
+                                    p0.drawText(qLine, { x: textMargin, y: qY, size: 12, font: fontBold, color: rgb(0.1, 0.1, 0.1) });
                                     qLine = word + ' ';
-                                    qY -= 16;
+                                    qY -= 18; // slightly more line height for readability
                                 } else {
                                     qLine = testLine;
                                 }
                             }
-                            p0.drawText(qLine, { x: qLine === '' ? textStartX : boxMargin + 15, y: qY, size: 12, font: fontBold, color: rgb(0.15, 0.15, 0.15) });
+                            p0.drawText(qLine, { x: textMargin, y: qY, size: 12, font: fontBold, color: rgb(0.1, 0.1, 0.1) });
                         }
 
                         sourcePages.forEach(p => pdfDoc.addPage(p));
