@@ -141,7 +141,17 @@ export const processPdf = async (fileBuffer, metadataList) => {
       const saved = savedRecords.find(r => 
         r.file_urls && r.file_urls.some(f => f.url === record.file_url)
       );
-      return { ...record, _id: saved?._id?.toString() };
+      return { 
+        ...record, 
+        _id: saved?._id?.toString(),
+        file_urls: [{
+          url: record.file_url,
+          topper_name: record.topper_name,
+          topper_year: record.topper_year,
+          topper_rank: record.topper_rank,
+          topper_marks: record.topper_marks
+        }]
+      };
     });
 
   } catch (error) {

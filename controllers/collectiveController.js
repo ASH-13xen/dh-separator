@@ -137,6 +137,14 @@ export const generateCollectivePdf = async (req, res) => {
                         matchedQ = matchedQ.filter(q => q.tags.includes(paperFilter));
                     }
                     if (matchedQ.length > 0) {
+                        if (includedQuestionIds && Array.isArray(includedQuestionIds)) {
+                            // Sort by the exact order provided in includedQuestionIds
+                            matchedQ.sort((a, b) => {
+                                const idxA = includedQuestionIds.indexOf(a._id.toString());
+                                const idxB = includedQuestionIds.indexOf(b._id.toString());
+                                return idxA - idxB;
+                            });
+                        }
                         matchedQ.forEach(q => matchedQuestionIds.add(q._id.toString()));
                         mappedTopics.push({ title: top.title, questions: matchedQ });
                     }
