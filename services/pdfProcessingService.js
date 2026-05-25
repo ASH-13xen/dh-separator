@@ -28,17 +28,16 @@ export const processPdf = async (fileBuffer, metadataList) => {
 
     const finalRecords = [];
 
-    // Helper syntax transforming Streamifier callback natively to Async pattern
+    // Helper syntax using Cloudinary chunked streams for larger chunk safety
     const uploadToCloudinary = (buffer, fileName) => {
       return new Promise((resolve, reject) => {
-        const stream = cloudinary.uploader.upload_stream(
-          // FIX 1: Changed resource_type back to 'raw' for proper PDF document handling
-          { resource_type: 'raw', folder: 'upsc_answers', public_id: fileName },
+        const stream = cloudinary.uploader.upload_chunked_stream(
+          { resource_type: 'raw', folder: 'upsc_answers', public_id: fileName, chunk_size: 6000000 },
           (error, result) => {
-            if (result) {
-              resolve(result.secure_url);
-            } else {
+            if (error) {
               reject(error);
+            } else if (result) {
+              resolve(result.secure_url);
             }
           }
         );

@@ -214,3 +214,97 @@ RULES:
     if (fs.existsSync(tempFilePath)) fs.unlinkSync(tempFilePath);
   }
 };
+
+export const processQuesPdfWithGemini = async (pdfBuffer) => {
+  const tempFilePath = path.join(os.tmpdir(), `ques-doc-${Date.now()}.pdf`);
+  try {
+    fs.writeFileSync(tempFilePath, pdfBuffer);
+    
+    console.log(`[GeminiService] Uploading file for QuesPDF to Google AI...`);
+    let uploadResult;
+    try {
+      uploadResult = await withRetry(() => fileManager.uploadFile(tempFilePath, {
+        mimeType: 'application/pdf',
+        displayName: `QuesPDF Document`,
+      }), 3, 3000);
+    } catch (uploadError) {
+      if (uploadError.message && uploadError.message.includes('User location is not supported')) {
+        throw new Error('LOCATION_NOT_SUPPORTED');
+      }
+      throw uploadError;
+    }
+
+    let fileInfo = await fileManager.getFile(uploadResult.file.name);
+    while (fileInfo.state === 'PROCESSING') {
+      console.log(`[GeminiService] QuesPDF File is processing... waiting 5 seconds.`);
+      await new Promise((resolve) => setTimeout(resolve, 5000));
+      fileInfo = await fileManager.getFile(uploadResult.file.name);
+    }
+
+    if (fileInfo.state === 'FAILED') {
+      throw new Error(`File processing failed on Gemini's servers for file: ${uploadResult.file.name}`);
+    }
+
+    const prompt = `You are an expert UPSC document analyzer.
+Scan the attached answer sheet PDF page-by-page.
+For each physical page (1-based index, starting from Page 1):
+1. Detect if there is a printed or written question on this page. Note that a question is typically at the top of the page.
+2. If a question is present on this page, extract the FULL text of the question exactly as written or printed.
+3. Return a JSON array where each item represents a question found on a page.
+
+CRITICAL RULES:
+- The PDF contains text questions and handwritten answers.
+- Scan every single page. Do not skip any page.
+- For each page, if there is a question, include it in the returned array with its "page_number" and "question_text".
+- If a page has NO question (only handwritten answer text continuing from a previous page, or blank), do NOT include an entry for that page in the JSON array.
+- Return ONLY the JSON array matching the schema.`;
+
+    const responseSchema = {
+      type: SchemaType.ARRAY,
+      description: "Array of extracted questions with page numbers",
+      items: {
+        type: SchemaType.OBJECT,
+        properties: {
+          page_number: { 
+            type: SchemaType.INTEGER,
+            description: "The 1-based page number where this question is found."
+          },
+          question_text: { 
+            type: SchemaType.STRING,
+            description: "The full exact text of the question extracted from the page."
+          }
+        },
+        required: ["page_number", "question_text"]
+      }
+    };
+
+    console.log(`[GeminiService] Initializing QuesPDF AI analysis...`);
+    const result = await withRetry(() => model.generateContent({
+      contents: [{ 
+        role: 'user', 
+        parts: [
+          { fileData: { mimeType: uploadResult.file.mimeType, fileUri: uploadResult.file.uri } },
+          { text: prompt }
+        ] 
+      }],
+      generationConfig: { 
+        responseMimeType: "application/json", 
+        responseSchema: responseSchema, 
+        temperature: 0.0 // Keep at 0 for maximum consistency
+      }
+    }), 4, 5000);
+    
+    const responseText = result.response.text();
+    const jsonArray = JSON.parse(responseText);
+    
+    // Clean up
+    try { await fileManager.deleteFile(uploadResult.file.name); } catch (e) {}
+    
+    return jsonArray;
+  } catch (error) {
+    console.error("[GeminiService] QuesPDF Error:", error);
+    throw error;
+  } finally {
+    if (fs.existsSync(tempFilePath)) fs.unlinkSync(tempFilePath);
+  }
+};
