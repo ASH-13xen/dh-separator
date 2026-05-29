@@ -1,0 +1,131 @@
+[
+  {
+    "section": "Economy",
+    "topics": [
+      {
+        "title": "Macroeconomic Issues & Growth",
+        "subtopics": [
+          "Indian Economy and issues relating to planning, mobilisation of resources, growth, development and employment",
+          "Inclusive growth and associated issues/challenges"
+        ]
+      },
+      {
+        "title": "Fiscal Policy & Investment",
+        "subtopics": [
+          "Government Budgeting",
+          "Investment models (PPP etc)"
+        ]
+      },
+      {
+        "title": "Industry & Infrastructure",
+        "subtopics": [
+          "Effects of liberalisation on the economy (post 1991 changes), changes in industrial policy and their effects on industrial growth",
+          "Infrastructure – Energy, Ports, Roads, Airports, Railways etc."
+        ]
+      }
+    ]
+  },
+  {
+    "section": "Agriculture",
+    "topics": [
+      {
+        "title": "Farming, Irrigation & Tech",
+        "subtopics": [
+          "Major cropping patterns in various parts of the country",
+          "Different types of irrigation and irrigation systems storage",
+          "e-technology in the aid of farmers",
+          "Technology missions",
+          "Land reforms in India"
+        ]
+      },
+      {
+        "title": "Food Security & Subsidies",
+        "subtopics": [
+          "Issues related to direct and indirect farm subsidies and minimum support prices",
+          "Public Distribution System objectives, functioning, limitations, revamping",
+          "Issues of buffer stocks and food security"
+        ]
+      },
+      {
+        "title": "Marketing, Processing & Allied Sectors",
+        "subtopics": [
+          "Transport and marketing of agricultural produce and issues and related constraints",
+          "Economics of animal rearing",
+          "Food processing and related industries in India – scope and significance, location, upstream and downstream requirements, supply chain management"
+        ]
+      }
+    ]
+  },
+  {
+    "section": "Science and Technology",
+    "topics": [
+      {
+        "title": "Developments & Indigenisation",
+        "subtopics": [
+          "Recent developments and their applications and effects in everyday life",
+          "Achievements of Indians in science & technology",
+          "Indigenisation of technology and developing new technology"
+        ]
+      },
+      {
+        "title": "IT, Awareness & IPR",
+        "subtopics": [
+          "General awareness in the fields of IT, Space, Computers, Robotics, Nanotechnology, biotechnology",
+          "Issues relating to intellectual property rights"
+        ]
+      }
+    ]
+  },
+  {
+    "section": "Environment",
+    "topics": [
+      {
+        "title": "Conservation & Impact Assessment",
+        "subtopics": [
+          "Conservation",
+          "Environmental pollution and degradation",
+          "Environmental impact assessment"
+        ]
+      }
+    ]
+  },
+  {
+    "section": "Disaster Management",
+    "topics": [
+      {
+        "title": "Framework & Implementation",
+        "subtopics": [
+          "Disaster Management (Laws, Acts etc.)"
+        ]
+      }
+    ]
+  },
+  {
+    "section": "Security",
+    "topics": [
+      {
+        "title": "Internal Security & Extremism",
+        "subtopics": [
+          "Challenges to internal security (external state and non-state actors)",
+          "Linkages between development and spread of extremism"
+        ]
+      },
+      {
+        "title": "Cyber, Media & Finance",
+        "subtopics": [
+          "Challenges to internal security through communication networks",
+          "Role of media and social networking sites in internal security challenges",
+          "Basics of cyber security; money-laundering and its prevention"
+        ]
+      },
+      {
+        "title": "Border Management & Agencies",
+        "subtopics": [
+          "Security challenges and their management in border areas",
+          "Linkages of organized crime with terrorism",
+          "Various Security forces and agencies and their mandates"
+        ]
+      }
+    ]
+  }
+]

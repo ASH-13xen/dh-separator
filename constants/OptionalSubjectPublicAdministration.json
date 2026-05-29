@@ -1,18 +1,18 @@
-export const optionalSubPublicAdministration = [
+[
   {
-    section: "Administration Theory and Thought",
-    topics: [
+    "section": "Administration Theory and Thought",
+    "topics": [
       {
-        title: "Introduction",
-        subtopics: [
+        "title": "Introduction",
+        "subtopics": [
           "Meaning, scope, and significance of Public Administration, Wilson’s vision of Public Administration, Evolution of the discipline, and its present status.",
           "New Public Administration, Public Choice approach; Challenges of liberalization, Privatisation, Globalisation.",
           "Good Governance: concept and application; New Public Management."
         ]
       },
       {
-        title: "Administrative Thought",
-        subtopics: [
+        "title": "Administrative Thought",
+        "subtopics": [
           "Scientific Management and Scientific Management movement; Classical Theory.",
           "Weber’s bureaucratic model its critique and post-Weberian Developments.",
           "Dynamic Administration (Mary Parker Follett); Human Relations School (Elton Mayo and others).",
@@ -21,8 +21,8 @@ export const optionalSubPublicAdministration = [
         ]
       },
       {
-        title: "Administrative Behaviour",
-        subtopics: [
+        "title": "Administrative Behaviour",
+        "subtopics": [
           "Process and techniques of decision-making; Communication; Morale.",
           "Motivation Theories content, process and contemporary.",
           "Theories of Leadership: Traditional and Modern."
@@ -31,27 +31,27 @@ export const optionalSubPublicAdministration = [
     ]
   },
   {
-    section: "Administrative Organization, Accountability and Law",
-    topics: [
+    "section": "Administrative Organization, Accountability and Law",
+    "topics": [
       {
-        title: "Organisations",
-        subtopics: [
+        "title": "Organisations",
+        "subtopics": [
           "Theories systems, contingency.",
           "Structure and forms: Ministries and Departments, Corporations, Companies; Boards and Commissions; Ad hoc, and advisory bodies.",
           "Headquarters and Field relationships; Regulatory Authorities; Public-Private Partnerships."
         ]
       },
       {
-        title: "Accountability and Control",
-        subtopics: [
+        "title": "Accountability and Control",
+        "subtopics": [
           "Concepts of accountability and control; Legislative, Executive, and Judicial control over administration.",
           "Citizen and Administration; Role of media, interest groups, voluntary organizations.",
           "Civil society; Citizen’s Charters; Right to Information; Social audit."
         ]
       },
       {
-        title: "Administrative Law and Improvement Techniques",
-        subtopics: [
+        "title": "Administrative Law and Improvement Techniques",
+        "subtopics": [
           "Administrative Law: Meaning, scope, and significance; Dicey on Administrative law; Delegated legislation; Administrative Tribunals.",
           "Techniques of Administrative Improvement: Organisation and methods, Work study and work management.",
           "e-governance and information technology; Management aid tools like network analysis, MIS, PERT, CPM."
@@ -60,26 +60,26 @@ export const optionalSubPublicAdministration = [
     ]
   },
   {
-    section: "Comparative, Development and Policy Dynamics",
-    topics: [
+    "section": "Comparative, Development and Policy Dynamics",
+    "topics": [
       {
-        title: "Comparative Public Administration",
-        subtopics: [
+        "title": "Comparative Public Administration",
+        "subtopics": [
           "Historical and sociological factors affecting administrative systems; Administration and politics in different countries.",
           "Current status of Comparative Public Administration; Ecology and administration; Riggsian models and their critique."
         ]
       },
       {
-        title: "Development Dynamics",
-        subtopics: [
+        "title": "Development Dynamics",
+        "subtopics": [
           "Concept of development; Changing profile of development administration; ‘Anti-development thesis’.",
           "Bureaucracy and development; Strong state versus the market debate.",
           "Impact of liberalisation on administration in developing countries; Women and development the self-help group movement."
         ]
       },
       {
-        title: "Public Policy",
-        subtopics: [
+        "title": "Public Policy",
+        "subtopics": [
           "Models of policy-making and their critique.",
           "Processes of conceptualisation, planning, implementation, monitoring, evaluation and review, and their limitations.",
           "State theories and public policy formulation."
@@ -88,11 +88,11 @@ export const optionalSubPublicAdministration = [
     ]
   },
   {
-    section: "Personnel and Financial Administration",
-    topics: [
+    "section": "Personnel and Financial Administration",
+    "topics": [
       {
-        title: "Personnel Administration and Civil Services",
-        subtopics: [
+        "title": "Personnel Administration and Civil Services",
+        "subtopics": [
           "Importance of human resource development; Recruitment, training, career advancement, position classification, discipline, performance appraisal, promotion, pay and service conditions; employer-employee relations.",
           "Grievance redressal mechanism; Code of conduct; Administrative ethics.",
           "Civil Services in India: Constitutional position; Structure, recruitment, training, and capacity building; Good governance initiatives.",
@@ -100,8 +100,8 @@ export const optionalSubPublicAdministration = [
         ]
       },
       {
-        title: "Financial Administration and Management",
-        subtopics: [
+        "title": "Financial Administration and Management",
+        "subtopics": [
           "Monetary and fiscal policies: Public borrowings and public debt; Budgets types and forms; Budgetary process; Financial accountability.",
           "Budget as a political instrument; Parliamentary control of public expenditure; Role of finance ministry in the monetary and fiscal area.",
           "Accounting techniques; Audit; Role of Controller General of Accounts and Comptroller and Auditor General of India."
@@ -110,19 +110,19 @@ export const optionalSubPublicAdministration = [
     ]
   },
   {
-    section: "Framework and Structure of Indian Government",
-    topics: [
+    "section": "Framework and Structure of Indian Government",
+    "topics": [
       {
-        title: "Evolution and Constitutional Framework",
-        subtopics: [
+        "title": "Evolution and Constitutional Framework",
+        "subtopics": [
           "Evolution of Indian Administration: Kautilya Arthashastra; Mughal administration; Legacy of British rule in politics and administration.",
           "Indianization of Public services, revenue administration, district Administration, local self Government.",
           "Philosophical and Constitutional framework: Salient features and value premises; Constitutionalism; Political culture; Bureaucracy and democracy; Bureaucracy and development."
         ]
       },
       {
-        title: "Union and State Administration",
-        subtopics: [
+        "title": "Union and State Administration",
+        "subtopics": [
           "Union Government: Executive, Parliament, Judiciary-structure, functions, work processes; Recent trends; Intragovernmental relations.",
           "Cabinet Secretariat; Prime Minister’s Office; Central Secretariat; Ministries and Departments; Boards; Commissions; Attached offices; Field organizations.",
           "State Government: Union-State administrative, legislative and financial relations; Role of the Finance Commission.",
@@ -130,8 +130,8 @@ export const optionalSubPublicAdministration = [
         ]
       },
       {
-        title: "District Administration since Independence",
-        subtopics: [
+        "title": "District Administration since Independence",
+        "subtopics": [
           "Changing role of the Collector; Union-State-local relations.",
           "Imperatives of development management and law and order administration.",
           "District administration and democratic decentralization."
@@ -140,19 +140,19 @@ export const optionalSubPublicAdministration = [
     ]
   },
   {
-    section: "Local Government, Planning and Public Sector",
-    topics: [
+    "section": "Local Government, Planning and Public Sector",
+    "topics": [
       {
-        title: "Plans, Priorities and Public Sector",
-        subtopics: [
+        "title": "Plans, Priorities and Public Sector",
+        "subtopics": [
           "Machinery of planning; Role, composition and functions of the Planning Commission and the National Development Council; ‘Indicative’ planning.",
           "Process of plan formulation at Union and State levels; Constitutional Amendments (1992) and decentralized planning for economic development and social justice.",
           "Public Sector Undertakings: Public sector in modern India; Forms of Public Sector Undertakings; Problems of autonomy, accountability and control; Impact of liberalization and privatization."
         ]
       },
       {
-        title: "Rural and Urban Local Government",
-        subtopics: [
+        "title": "Rural and Urban Local Government",
+        "subtopics": [
           "Rural Development: Institutions and agencies since independence; Rural development programmes: foci and strategies; Decentralization and Panchayati Raj; 73rd Constitutional amendment.",
           "Urban Local Government: Municipal governance: main features, structures, finance and problem areas; 74th Constitutional Amendment.",
           "Global-local debate; New localism; Development dynamics, politics and administration with special reference to city management."
@@ -161,26 +161,26 @@ export const optionalSubPublicAdministration = [
     ]
   },
   {
-    section: "Contemporary Issues, Reforms and Law & Order",
-    topics: [
+    "section": "Contemporary Issues, Reforms and Law & Order",
+    "topics": [
       {
-        title: "Administrative Reforms since Independence",
-        subtopics: [
+        "title": "Administrative Reforms since Independence",
+        "subtopics": [
           "Major concerns; Important Committees and Commissions.",
           "Reforms in financial management and human resource development; Problems of implementation."
         ]
       },
       {
-        title: "Law and Order Administration",
-        subtopics: [
+        "title": "Law and Order Administration",
+        "subtopics": [
           "British legacy; National Police Commission; Investigative agencies.",
           "Role of Central and State Agencies including paramilitary forces in maintenance of law and order and countering insurgency and terrorism.",
           "Criminalisation of politics and administration; Police-public relations; Reforms in Police."
         ]
       },
       {
-        title: "Significant Issues in Indian Administration",
-        subtopics: [
+        "title": "Significant Issues in Indian Administration",
+        "subtopics": [
           "Values in public service; Regulatory Commissions; National Human Rights Commission.",
           "Problems of administration in coalition regimes; Citizen administration interface.",
           "Corruption and administration; Disaster management."
@@ -188,4 +188,4 @@ export const optionalSubPublicAdministration = [
       }
     ]
   }
-];
+]

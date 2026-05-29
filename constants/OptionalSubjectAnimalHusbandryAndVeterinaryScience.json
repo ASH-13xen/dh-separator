@@ -1,10 +1,10 @@
-export const optionalSubAnimalHusbandry = [
+[
   {
-    section: "Animal Nutrition",
-    topics: [
+    "section": "Animal Nutrition",
+    "topics": [
       {
-        title: "Energy & Protein Nutrition",
-        subtopics: [
+        "title": "Energy & Protein Nutrition",
+        "subtopics": [
           "Partitioning of food energy within the animal. Direct and indirect calorimetry. Carbon—nitrogen balance and comparative slaughter methods.",
           "Systems for expressing energy value of foods in ruminants, pigs and poultry.",
           "Energy requirements for maintenance, growth, pregnancy, lactation, egg, wool, and meat production.",
@@ -13,8 +13,8 @@ export const optionalSubAnimalHusbandry = [
         ]
       },
       {
-        title: "Minerals, Vitamins & Feed Additives",
-        subtopics: [
+        "title": "Minerals, Vitamins & Feed Additives",
+        "subtopics": [
           "Major and trace minerals—Their sources, physiological functions and deficiency symptoms. Toxic minerals. Mineral interactions.",
           "Role of fat-soluble and water-soluble vitamins in the body, their sources and deficiency symptoms.",
           "Feed additives—methane inhibitors, probiotics, enzymes, antibiotics, hormones, oligosaccharides, antioxidants, emulsifiers, mould inhibitors, buffers etc.",
@@ -22,8 +22,8 @@ export const optionalSubAnimalHusbandry = [
         ]
       },
       {
-        title: "Feed Technology & Evaluation",
-        subtopics: [
+        "title": "Feed Technology & Evaluation",
+        "subtopics": [
           "Conservation of fodders. Storage of feeds and feed ingredients.",
           "Recent advances in feed technology and feed processing.",
           "Anti-nutritional and toxic factors present in livestock feeds. Feed analysis and quality control.",
@@ -31,8 +31,8 @@ export const optionalSubAnimalHusbandry = [
         ]
       },
       {
-        title: "Species-Specific Nutrition",
-        subtopics: [
+        "title": "Species-Specific Nutrition",
+        "subtopics": [
           "Advances in ruminant nutrition. Nutrient requirements. Balanced rations.",
           "Feeding of calves, pregnant, work animals and breeding bulls. Strategies for feeding milch animals during different stages of lactation cycle. Effect of feeding on milk composition.",
           "Feeding of goats for meat and milk production. Feeding of sheep for meat and wool production.",
@@ -43,11 +43,11 @@ export const optionalSubAnimalHusbandry = [
     ]
   },
   {
-    section: "Animal Physiology & Reproduction",
-    topics: [
+    "section": "Animal Physiology & Reproduction",
+    "topics": [
       {
-        title: "Blood, Circulation & Respiration",
-        subtopics: [
+        "title": "Blood, Circulation & Respiration",
+        "subtopics": [
           "Physiology of blood and its circulation, respiration; excretion. Endocrine glands in health and disease.",
           "Blood constituents—Properties and functions, blood cell formation, Hemoglobin synthesis and chemistry, plasma proteins production, classification and properties, coagulation of blood.",
           "Hemorrhagic disorders, anticoagulants, blood groups, Blood volume, Plasma expanders, Buffer systems in blood. Biochemical tests and their significance in disease diagnosis.",
@@ -56,16 +56,16 @@ export const optionalSubAnimalHusbandry = [
         ]
       },
       {
-        title: "Excretion, Endocrinology & Growth",
-        subtopics: [
+        "title": "Excretion, Endocrinology & Growth",
+        "subtopics": [
           "Excretion—Structure and function of kidney, formation of urine, methods of studying renal function, renal regulation of acid-base balance, physiological constituents of urine, renal failure, passive venous congestion, Urinary secretion in chicken, Sweat glands. Biochemical test for urinary dysfunction.",
           "Endocrine glands—Functional disorders, symptoms and diagnosis. Synthesis of hormones, mechanism and control of secretion, hormonal receptors-classification and function.",
           "Growth and Animal Production—Prenatal and postnatal growth, maturation, growth curves, measures of growth, factors affecting growth, conformation, body composition, meat quality."
         ]
       },
       {
-        title: "Reproduction, Digestion & Environmental Physiology",
-        subtopics: [
+        "title": "Reproduction, Digestion & Environmental Physiology",
+        "subtopics": [
           "Physiology of Milk Production, Reproduction and Digestion—Current status of hormonal control of mammary development, milk secretion and ejection. Male and Female reproductive organs, components and functions. Digestive organs and their functions.",
           "Environmental Physiology—Physiological relations and regulation; mechanisms of adaptation, environmental factors and regulatory mechanisms in animal behaviour, climatology. Animal ecology. Physiology of behaviour. Effect of stress on health and production.",
           "Animal Reproduction: Semen quality—Preservation and Artificial Insemination. Components of semen, composition of spermatozoa, chemical and physical properties of ejaculated semen, factors affecting semen in vivo and in vitro.",
@@ -76,11 +76,11 @@ export const optionalSubAnimalHusbandry = [
     ]
   },
   {
-    section: "Livestock Production, Management & Extension",
-    topics: [
+    "section": "Livestock Production, Management & Extension",
+    "topics": [
       {
-        title: "Commercial Farming & Management",
-        subtopics: [
+        "title": "Commercial Farming & Management",
+        "subtopics": [
           "Commercial Dairy Farming—Comparison of dairy farming in India with advanced countries. Dairying under mixed farming and specialized farming, economic dairy farming. Starting a dairy farm, Capital/land requirement, organization. Opportunities, factors determining efficiency. Herd recording, budgeting cost of milk production, pricing policy; Personnel Management.",
           "Developing Practical and Economic rations for dairy cattle; supply of greens, feed and fodder requirements. Feeding regimes for young stock, bulls, heifers and breeding animals; new trends in feeding; Feeding records.",
           "Commercial meat, egg and wool production—Development of practical and economic rations for sheep, goats, pigs, rabbits and poultry. Supply of greens, fodder, feeding regimes. New trends in enhancing production and management. Capital/land requirements and socio-economic concept.",
@@ -88,8 +88,8 @@ export const optionalSubAnimalHusbandry = [
         ]
       },
       {
-        title: "Extension",
-        subtopics: [
+        "title": "Extension",
+        "subtopics": [
           "Basic philosophy, objectives, concept and principles of extension.",
           "Different Methods adopted to educate farmers under rural conditions.",
           "Generation of technology, its transfer and feedback. Problems and constraints in transfer of technology.",
@@ -99,11 +99,11 @@ export const optionalSubAnimalHusbandry = [
     ]
   },
   {
-    section: "Genetics and Animal Breeding",
-    topics: [
+    "section": "Genetics and Animal Breeding",
+    "topics": [
       {
-        title: "Basic Genetics",
-        subtopics: [
+        "title": "Basic Genetics",
+        "subtopics": [
           "History of animal genetics. Mitosis and Meiosis: Mendelian inheritance; deviations to Mendelian genetics; Expression of genes; Linkage and crossing over.",
           "Sex determination, sex influenced and sex-limited characters; Blood groups and polymorphism; Chromosome aberrations; Cytoplasmic inheritance.",
           "Gene and its structure; DNA as a genetic material; Genetic code and protein synthesis; Recombinant DNA technology.",
@@ -111,8 +111,8 @@ export const optionalSubAnimalHusbandry = [
         ]
       },
       {
-        title: "Population Genetics",
-        subtopics: [
+        "title": "Population Genetics",
+        "subtopics": [
           "Population Genetics applied to Animal Breeding—Quantitative Vs. Qualitative traits; Hardy Weinberg Law; Population Vs. Individual; Gene and genotypic frequency.",
           "Forces changing gene frequency; Random drift and small populations; Theory of path coefficient.",
           "Inbreeding, methods of estimating inbreeding coefficient, systems of inbreeding; Effective population size.",
@@ -120,8 +120,8 @@ export const optionalSubAnimalHusbandry = [
         ]
       },
       {
-        title: "Breeding Systems",
-        subtopics: [
+        "title": "Breeding Systems",
+        "subtopics": [
           "Breeding Systems—Breeds of livestock and Poultry. Heritability, repeatability and genetic/phenotypic correlations, estimation methods and precision.",
           "Aids to selection and their relative merits; Individual, pedigree, family and within family selection; Pregnancy testing; Methods of selection.",
           "Construction of selection indices and uses; Comparative evaluation of genetic gains through selection methods; Indirect selection and correlated response.",
@@ -131,11 +131,11 @@ export const optionalSubAnimalHusbandry = [
     ]
   },
   {
-    section: "Anatomy, Pharmacology and Hygiene",
-    topics: [
+    "section": "Anatomy, Pharmacology and Hygiene",
+    "topics": [
       {
-        title: "Anatomy, Histology & Embryology",
-        subtopics: [
+        "title": "Anatomy, Histology & Embryology",
+        "subtopics": [
           "Histology and Histological Techniques: Paraffin embedding technique, H.E. staining, Freezing microtomy, Bright field/electron microscopy. Cytology, cell division, cell types. Tissues and classification (embryonic/adult). Comparative histology of organs (Vascular, Nervous, digestive, respiratory, Musculo-skeletal, urogenital, Endocrine, Integuments, sense organs).",
           "Embryology—Embryology of vertebrates (aves and domestic mammals), gametogenesis, fertilization, germ layers, fetal membranes/placentation, types of placenta, Teratology, twins/twinning, organogenesis, germ layer derivatives.",
           "Bovine Anatomy—Regional Anatomy: Paranasal sinuses, salivary glands. Regional anatomy of nerves (infraorbital, maxillary, mandi-buloalveolar, mental, cornnal, paravertebral, pudental, median, ulnar, radial, tibial, fibular, digital). Cranial nerves, epidural anesthesia structures, superficial lymph nodes, surface anatomy of visceral organs. Comparative biomechanics of locomotor apparatus.",
@@ -143,8 +143,8 @@ export const optionalSubAnimalHusbandry = [
         ]
       },
       {
-        title: "Pharmacology & Veterinary Hygiene",
-        subtopics: [
+        "title": "Pharmacology & Veterinary Hygiene",
+        "subtopics": [
           "Pharmacology and therapeutics drugs—Cellular level of pharmacodynamics and pharmacokinetics. Drugs acting on fluids/electrolyte balance, Autonomic nervous system. Anesthesia and dissociative anesthetics. Autocoids.",
           "Antimicrobials and principles of chemotherapy in microbial infections. Use of hormones in therapeutics, chemotherapy of parasitic infections. Drug/economic concerns in Edible tissues, chemotherapy of Neoplastic diseases. Toxicity (insecticides, plants, metals, non-metals, zootoxins, mycotoxins).",
           "Veterinary Hygiene—Assessment of pollution of water, air and soil. Importance of climate in animal health, effect of environment on performance, relationship between industrialization and animal agriculture.",
@@ -154,11 +154,11 @@ export const optionalSubAnimalHusbandry = [
     ]
   },
   {
-    section: "Animal Diseases & Public Health",
-    topics: [
+    "section": "Animal Diseases & Public Health",
+    "topics": [
       {
-        title: "Animal Diseases & Diagnostics",
-        subtopics: [
+        "title": "Animal Diseases & Diagnostics",
+        "subtopics": [
           "Etiology, epidemiology pathogenesis, symptoms, post-mortem lesions, diagnosis, and control of infectious diseases of cattle, sheep, goat, horses, pigs and poultry.",
           "Etiology, epidemiology, symptoms, diagnosis, treatment of production diseases of cattle, horse, pig and poultry.",
           "Deficiency diseases of domestic animals and birds.",
@@ -170,8 +170,8 @@ export const optionalSubAnimalHusbandry = [
         ]
       },
       {
-        title: "Veterinary Public Health",
-        subtopics: [
+        "title": "Veterinary Public Health",
+        "subtopics": [
           "Zoonoses—Classification, definition, role of animals and birds in prevalence and transmission of zoonotic diseases, occupational zoonotic diseases.",
           "Epidemiology—Principle, definition of epidemiological terms, application in study of diseases and control. Epidemiological features of air, water and food borne infections. OIE regulation, WTO, sanitary and phytosanitary measures.",
           "Veterinary Jurisprudence—Rules/Regulations for improvement of animal quality and prevention of diseases, State/Central Rules for prevention of animal/product borne diseases, S.P.C.A., Veterolegal cases, Certificates, Materials/Methods of sample collection for veterolegal investigation."
@@ -180,11 +180,11 @@ export const optionalSubAnimalHusbandry = [
     ]
   },
   {
-    section: "Animal Products Technology",
-    topics: [
+    "section": "Animal Products Technology",
+    "topics": [
       {
-        title: "Milk and Milk Products Technology",
-        subtopics: [
+        "title": "Milk and Milk Products Technology",
+        "subtopics": [
           "Market Milk—Quality, testing and grading of raw milk. Processing, packaging, storing, distribution, marketing defects and control. Preparation of Pasteurized, standardized, toned, double toned, sterilized, homogenized, reconstituted, recombined and flavoured milks.",
           "Preparation of cultured milks, cultures/management, yoghurt, Dahi, Lassi and Srikhand. Legal standards. Sanitation requirement for clean/safe milk and milk plant equipment.",
           "Milk Products Technology—Selection of raw materials, processing, storing, distributing and marketing milk products (Cream, Butter, Ghee, Khoa, Channa, Cheese, condensed, evaporated, dried milk, baby food, Ice cream, Kulfi); by-products (whey products, butter milk, lactose, casein).",
@@ -192,8 +192,8 @@ export const optionalSubAnimalHusbandry = [
         ]
       },
       {
-        title: "Meat Hygiene and Technology",
-        subtopics: [
+        "title": "Meat Hygiene and Technology",
+        "subtopics": [
           "Meat Hygiene: Ante mortem care/management, stunning, slaughter/dressing operations; abattoir requirements/designs; Meat inspection and judgement of carcass meat cuts, grading, duties of Veterinarians in wholesome meat production.",
           "Hygienic methods of handling production of meat. Spoilage of meat and control measures, post-slaughter physicochemical changes, Quality improvement, Adulteration detection, Regulatory provisions in Meat trade.",
           "Meat Technology: Physical and chemical characteristics of meat. Meat emulsions. Methods of preservation (Curing, canning, irradiation, packaging), processing and formulations.",
@@ -201,8 +201,8 @@ export const optionalSubAnimalHusbandry = [
         ]
       },
       {
-        title: "Poultry, Egg & Fur Technology",
-        subtopics: [
+        "title": "Poultry, Egg & Fur Technology",
+        "subtopics": [
           "Poultry Products Technology: Chemical composition and nutritive value of poultry meat, pre-slaughter care/management. Slaughtering techniques, inspection, preservation of poultry meat and products. Legal and BIS standards.",
           "Structure, composition and nutritive value of eggs. Microbial spoilage. Preservation and maintenance. Marketing of poultry meat, eggs and products.",
           "Rabbit/Fur Animal farming: Rabbit meat production. Disposal and utilization of fur and wool, recycling of waste by products. Grading of wool."
@@ -210,4 +210,4 @@ export const optionalSubAnimalHusbandry = [
       }
     ]
   }
-];
+]

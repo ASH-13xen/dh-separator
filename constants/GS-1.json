@@ -1,0 +1,131 @@
+[
+  {
+    "section": "Indian Culture",
+    "topics": [
+      {
+        "title": "Art, Literature & Architecture",
+        "subtopics": [
+          "Salient aspects of Art Forms from ancient to modern times",
+          "Literature from ancient to modern times",
+          "Architecture from ancient to modern times"
+        ]
+      }
+    ]
+  },
+  {
+    "section": "Modern Indian History",
+    "topics": [
+      {
+        "title": "18th Century to Present",
+        "subtopics": [
+          "Significant events during the middle of the eighteenth century (1750s) until the present",
+          "Significant issues during the middle of the eighteenth century (1750s) until the present",
+          "Significant personalities during the middle of the eighteenth century (1750s) until the present"
+        ]
+      },
+      {
+        "title": "The Freedom Struggle",
+        "subtopics": [
+          "Different stages of the Freedom Struggle",
+          "Important contributors from various parts of the country",
+          "Important contributions from various parts of the country"
+        ]
+      },
+      {
+        "title": "Post-Independence India",
+        "subtopics": [
+          "Post-independence consolidation within the country",
+          "Post-independence reorganisation within the country"
+        ]
+      },
+      {
+        "title": "testt"
+      }
+    ]
+  },
+  {
+    "section": "World History",
+    "topics": [
+      {
+        "title": "Events Since the 18th Century",
+        "subtopics": [
+          "Industrial revolution",
+          "World wars",
+          "Colonisation and decolonization",
+          "Redrawal of national boundaries",
+          "Events, forms and effect on society since the 18th century"
+        ]
+      },
+      {
+        "title": "Political Philosophies",
+        "subtopics": [
+          "Communism (forms and effect on society)",
+          "Capitalism (forms and effect on society)",
+          "Socialism (forms and effect on society)"
+        ]
+      }
+    ]
+  },
+  {
+    "section": "Society",
+    "topics": [
+      {
+        "title": "Indian Society & Diversity",
+        "subtopics": [
+          "Indian society – Salient aspects",
+          "Diversity of India – Salient aspects"
+        ]
+      },
+      {
+        "title": "Demographics & Development",
+        "subtopics": [
+          "Role of women and women’s organisations",
+          "Population and associated issues",
+          "Poverty and developmental issues",
+          "Urbanisation, their problems and remedies"
+        ]
+      },
+      {
+        "title": "Social Dynamics & Globalization",
+        "subtopics": [
+          "Social empowerment",
+          "Communalism",
+          "Regionalism",
+          "Secularism",
+          "Effects of globalization on Indian society"
+        ]
+      }
+    ]
+  },
+  {
+    "section": "Geography",
+    "topics": [
+      {
+        "title": "Physical Geography & Phenomena",
+        "subtopics": [
+          "Salient features of the world's physical geography",
+          "Important Geophysical phenomena (earthquakes, Tsunami, Volcanic activity, cyclones etc.)"
+        ]
+      },
+      {
+        "title": "Resources & Industries",
+        "subtopics": [
+          "Distribution of key natural resources across the world (including South Asia and the Indian subcontinent)",
+          "Factors responsible for the location of primary, secondary, and tertiary sector industries in various parts of the world (including India)"
+        ]
+      },
+      {
+        "title": "Geographical Features & Changes",
+        "subtopics": [
+          "Geographical features and their location",
+          "Changes in critical geographical features (including water-bodies and polar ice caps)",
+          "Changes in flora and fauna and the effects of such changes"
+        ]
+      }
+    ]
+  },
+  {
+    "section": "test",
+    "topics": []
+  }
+]

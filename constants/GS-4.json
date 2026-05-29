@@ -1,0 +1,130 @@
+[
+  {
+    "section": "Ethics and Human Interface",
+    "topics": [
+      {
+        "title": "Core Concepts & Dimensions",
+        "subtopics": [
+          "Essence of Ethics, Determinants and Consequences of Ethics in Human Interaction",
+          "Dimensions of Ethics",
+          "Ethics in private and public relationships"
+        ]
+      },
+      {
+        "title": "Human Values & Inculcation",
+        "subtopics": [
+          "Human Values – lessons from the lives and teachings of great leaders, reformers and administrators",
+          "Role of family, society and educational institutions in inculcating moral and ethical values"
+        ]
+      }
+    ]
+  },
+  {
+    "section": "Attitude",
+    "topics": [
+      {
+        "title": "Structure & Function",
+        "subtopics": [
+          "Content, structure and function of attitude",
+          "Influence of attitude in thought and behaviour",
+          "Relation of attitude to thought and behaviour"
+        ]
+      },
+      {
+        "title": "Types & Social Influence",
+        "subtopics": [
+          "Moral and Political attitudes",
+          "Social influence and persuasion"
+        ]
+      }
+    ]
+  },
+  {
+    "section": "Aptitude",
+    "topics": [
+      {
+        "title": "Foundational Values of Civil Service",
+        "subtopics": [
+          "Aptitude and foundational values of Civil Service",
+          "Integrity",
+          "Impartiality and non-partisanship",
+          "Objectivity",
+          "Dedication to public service",
+          "Empathy, tolerance and compassion towards the weaker sections of the society"
+        ]
+      },
+      {
+        "title": "Emotional Intelligence",
+        "subtopics": [
+          "Emotional Intelligence",
+          "Concepts of emotional intelligence",
+          "Utility and application of emotional intelligence in administration and governance"
+        ]
+      }
+    ]
+  },
+  {
+    "section": "Contributions of Thinkers and Philosophers",
+    "topics": [
+      {
+        "title": "Moral Thinkers",
+        "subtopics": [
+          "Contributions of moral thinkers and philosophers from India and the world to the concepts of morality"
+        ]
+      }
+    ]
+  },
+  {
+    "section": "Public/Civil Service Values and Ethics in Public Administration",
+    "topics": [
+      {
+        "title": "Status, Dilemmas & Guidance",
+        "subtopics": [
+          "Status and associated problems",
+          "Ethical concerns and dilemmas in government and private institutions",
+          "Laws, rules, regulations and conscience as sources of ethical guidance"
+        ]
+      },
+      {
+        "title": "Accountability & International Ethics",
+        "subtopics": [
+          "Accountability and ethical governance",
+          "Strengthening of ethical and moral values in governance",
+          "Ethical Issues in international relations and funding",
+          "Corporate governance"
+        ]
+      }
+    ]
+  },
+  {
+    "section": "Probity in Governance",
+    "topics": [
+      {
+        "title": "Philosophical Basis & Transparency",
+        "subtopics": [
+          "Concept of public service",
+          "The philosophical basis of governance and probity",
+          "Information sharing and transparency in government",
+          "Right to Information"
+        ]
+      },
+      {
+        "title": "Codes, Culture & Quality",
+        "subtopics": [
+          "Codes of ethics",
+          "Codes of Conduct",
+          "Citizen’s Charters",
+          "Work culture",
+          "Quality of service delivery"
+        ]
+      },
+      {
+        "title": "Public Funds & Corruption",
+        "subtopics": [
+          "Utilization of public funds",
+          "Challenges of corruption"
+        ]
+      }
+    ]
+  }
+]

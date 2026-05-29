@@ -1,10 +1,10 @@
-export const optionalSubManagement = [
+[
   {
-    section: "Managerial Foundations and Organisational Behaviour",
-    topics: [
+    "section": "Managerial Foundations and Organisational Behaviour",
+    "topics": [
       {
-        title: "Managerial Function and Process",
-        subtopics: [
+        "title": "Managerial Function and Process",
+        "subtopics": [
           "Concept and foundations of management, Evolution of Management Thoughts.",
           "Managerial Functions—Planning, Organizing, Controlling; Decision-making.",
           "Role of Manager, Managerial skills; entrepreneurship; Management of innovation.",
@@ -13,8 +13,8 @@ export const optionalSubManagement = [
         ]
       },
       {
-        title: "Organisational Behaviour and Design",
-        subtopics: [
+        "title": "Organisational Behaviour and Design",
+        "subtopics": [
           "Conceptual model of organization behaviour; The individual processes—personality, values and attitude, perception, motivation, learning and reinforcement, work stress and stress management.",
           "The dynamics of Organization behaviour—power and politics, conflict and negotiation, leadership process and styles, communication.",
           "The Organizational Processes—decision-making, job design; Classical, Neoclassical and Contingency approaches to organizational design.",
@@ -25,18 +25,18 @@ export const optionalSubManagement = [
     ]
   },
   {
-    section: "Human Resource Management",
-    topics: [
+    "section": "Human Resource Management",
+    "topics": [
       {
-        title: "HR Planning and Recruitment",
-        subtopics: [
+        "title": "HR Planning and Recruitment",
+        "subtopics": [
           "HR challenges; HRM functions; The future challenges of HRM; Strategic Management of human resources.",
           "Human resource planning; Job analysis; Job evaluation, Recruitment and selection."
         ]
       },
       {
-        title: "Performance, Compensation and Employee Relations",
-        subtopics: [
+        "title": "Performance, Compensation and Employee Relations",
+        "subtopics": [
           "Training and development; Promotion and transfer; Performance management; Compensation management and benefits.",
           "Employee morale and productivity; Management of Organizational climate and Industrial relations.",
           "Human resources accounting and audit; Human resource information system; International human resource management."
@@ -45,11 +45,11 @@ export const optionalSubManagement = [
     ]
   },
   {
-    section: "Accounting and Financial Management",
-    topics: [
+    "section": "Accounting and Financial Management",
+    "topics": [
       {
-        title: "Accounting for Managers",
-        subtopics: [
+        "title": "Accounting for Managers",
+        "subtopics": [
           "Financial accounting—concept, importance and scope, generally accepted accounting principles.",
           "Preparation of financial statements with special reference to analysis of a balance sheet and measurement of business income.",
           "Inventory valuation and depreciation, financial statement analysis, fund flow analysis, the statement of cash flows.",
@@ -60,8 +60,8 @@ export const optionalSubManagement = [
         ]
       },
       {
-        title: "Financial Management",
-        subtopics: [
+        "title": "Financial Management",
+        "subtopics": [
           "Goal of Finance Function. Concepts of value and return. Valuation of bonds and Shares.",
           "Management of working capital: Estimation and Financing; Management of cash, receivables, inventory and current liabilities.",
           "Cost of capital; Capital budgeting; Financial and operating leverage; Design of capital structure: theories and practices.",
@@ -73,11 +73,11 @@ export const optionalSubManagement = [
     ]
   },
   {
-    section: "Marketing Management",
-    topics: [
+    "section": "Marketing Management",
+    "topics": [
       {
-        title: "Marketing Strategy and Consumer Behaviour",
-        subtopics: [
+        "title": "Marketing Strategy and Consumer Behaviour",
+        "subtopics": [
           "Concept, evolution and scope; Marketing strategy formulation and components of marketing plan.",
           "Segmenting and targeting the market; Positioning and differentiating the market offering.",
           "Analyzing competition; Analyzing consumer markets; Industrial buyer behaviour.",
@@ -85,8 +85,8 @@ export const optionalSubManagement = [
         ]
       },
       {
-        title: "Marketing Communication and Trends",
-        subtopics: [
+        "title": "Marketing Communication and Trends",
+        "subtopics": [
           "Integrated marketing communications; Building customer satisfaction, Value and retention.",
           "Services and non-profit marketing; Ethics in marketing; Consumer protection.",
           "Internet marketing; Retail management; Customer relationship management; Concept of holistic marketing."
@@ -95,11 +95,11 @@ export const optionalSubManagement = [
     ]
   },
   {
-    section: "Quantitative Techniques and Operations Management",
-    topics: [
+    "section": "Quantitative Techniques and Operations Management",
+    "topics": [
       {
-        title: "Quantitative Techniques in Decision-making",
-        subtopics: [
+        "title": "Quantitative Techniques in Decision-making",
+        "subtopics": [
           "Descriptive statistics—tabular, graphical and numerical methods.",
           "Introduction to probability, discrete and continuous probability distributions.",
           "Inferential statistics—sampling distributions, central limit theorem, hypothesis testing for differences between means and proportions, inference about population variances, Chi-square and ANOVA.",
@@ -108,8 +108,8 @@ export const optionalSubManagement = [
         ]
       },
       {
-        title: "Production and Operations Management",
-        subtopics: [
+        "title": "Production and Operations Management",
+        "subtopics": [
           "Fundamentals of operations management; Organizing for production; Aggregate production planning, capacity planning.",
           "Plant design: process planning, plant size and scale of operations, Management of facilities; Line balancing; Equipment replacement and maintenance.",
           "Production control; Supply chain management—vendor evaluation and audit; Quality management; Statistical process control, Six Sigma.",
@@ -120,11 +120,11 @@ export const optionalSubManagement = [
     ]
   },
   {
-    section: "Information Systems and Government-Business Interface",
-    topics: [
+    "section": "Information Systems and Government-Business Interface",
+    "topics": [
       {
-        title: "Management Information System (MIS)",
-        subtopics: [
+        "title": "Management Information System (MIS)",
+        "subtopics": [
           "Conceptual foundations of information systems; Information theory; Information resource management; Types of information Systems.",
           "Systems Development—Overview of Systems and Design; System Development management life-cycle, Designing online and distributed environments; Implementation and control of project.",
           "Trends in information technology; Managing data resources—Organising data. DSS and RDBMS.",
@@ -133,8 +133,8 @@ export const optionalSubManagement = [
         ]
       },
       {
-        title: "Government Business Interface",
-        subtopics: [
+        "title": "Government Business Interface",
+        "subtopics": [
           "State participation in business, Interaction between Government, Business and different Chambers of Commerce and Industry in India.",
           "Government’s policy with regard to Small Scale Industries; Government clearances for establishing a new enterprise.",
           "Public Distribution System; Government control over price and distribution.",
@@ -147,11 +147,11 @@ export const optionalSubManagement = [
     ]
   },
   {
-    section: "Strategic Management and International Business",
-    topics: [
+    "section": "Strategic Management and International Business",
+    "topics": [
       {
-        title: "Strategic Management (Strategic Cost Management)",
-        subtopics: [
+        "title": "Strategic Management (Strategic Cost Management)",
+        "subtopics": [
           "Business policy as a field of study; Nature and scope of strategic management, Strategic intent, vision, objectives and policies; Process of strategic planning and implementation.",
           "Environmental analysis and internal analysis; SWOT analysis; Tools and techniques for strategic analysis—Impact matrix: The experience curve, BCG matrix, GEC mode, Industry analysis, Concept of value chain.",
           "Strategic profile of a firm; Framework for analysing competition; Competitive advantage of a firm; Generic competitive strategies.",
@@ -160,8 +160,8 @@ export const optionalSubManagement = [
         ]
       },
       {
-        title: "International Business",
-        subtopics: [
+        "title": "International Business",
+        "subtopics": [
           "International Business Environment: Changing composition of trade in goods and services; India’s Foreign Trade: Policy and trends.",
           "Financing of International trade; Regional Economic Cooperation; FTAs.",
           "Internationalisation of service firms; International production; Operation Management in International companies; International Taxation.",
@@ -172,4 +172,4 @@ export const optionalSubManagement = [
       }
     ]
   }
-];
+]

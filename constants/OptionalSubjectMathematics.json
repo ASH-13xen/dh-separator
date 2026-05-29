@@ -1,18 +1,18 @@
-export const optionalSubMathematics = [
+[
   {
-    section: "Linear Algebra and Abstract Algebra",
-    topics: [
+    "section": "Linear Algebra and Abstract Algebra",
+    "topics": [
       {
-        title: "Linear Algebra",
-        subtopics: [
+        "title": "Linear Algebra",
+        "subtopics": [
           "Vector spaces over R and C, linear dependence and independence, subspaces, bases, dimensions, Linear transformations, rank and nullity, matrix of a linear transformation.",
           "Algebra of Matrices; Row and column reduction, Echelon form, congruence’s and similarity; Rank of a matrix; Inverse of a matrix; Solution of system of linear equations.",
           "Eigenvalues and eigenvectors, characteristic polynomial, Cayley-Hamilton theorem, Symmetric, skew-symmetric, Hermitian, skew-Hermitian, orthogonal and unitary matrices and their eigenvalues."
         ]
       },
       {
-        title: "Algebra",
-        subtopics: [
+        "title": "Algebra",
+        "subtopics": [
           "Groups, subgroups, cyclic groups, cosets, Lagrange’s Theorem, normal subgroups, quotient groups, homomorphism of groups, basic isomorphism theorems, permutation groups, Cayley’s theorem.",
           "Rings, subrings and ideals, homomorphisms of rings; Integral domains, principal ideal domains, Euclidean domains and unique factorization domains; Fields, quotient fields."
         ]
@@ -20,19 +20,19 @@ export const optionalSubMathematics = [
     ]
   },
   {
-    section: "Calculus and Real Analysis",
-    topics: [
+    "section": "Calculus and Real Analysis",
+    "topics": [
       {
-        title: "Calculus",
-        subtopics: [
+        "title": "Calculus",
+        "subtopics": [
           "Real numbers, functions of a real variable, limits, continuity, differentiability, mean-value theorem, Taylor’s theorem with remainders, indeterminate forms, maxima and minima, asymptotes; Curve tracing.",
           "Functions of two or three variables; Limits, continuity, partial derivatives, maxima and minima, Lagrange’s method of multipliers, Jacobian.",
           "Riemann’s definition of definite integrals; Indefinite integrals; Infinite and improper integral; Double and triple integrals (evaluation techniques only); Areas, surface and volumes."
         ]
       },
       {
-        title: "Real Analysis",
-        subtopics: [
+        "title": "Real Analysis",
+        "subtopics": [
           "Real number system as an ordered field with least upper bound property; Sequences, limit of a sequence, Cauchy sequence, completeness of real line.",
           "Series and its convergence, absolute and conditional convergence of series of real and complex terms, rearrangement of series. Continuity and uniform continuity of functions, properties of continuous functions on compact sets.",
           "Riemann integral, improper integrals; Fundamental theorems of integral calculus.",
@@ -42,18 +42,18 @@ export const optionalSubMathematics = [
     ]
   },
   {
-    section: "Geometry and Vector Calculus",
-    topics: [
+    "section": "Geometry and Vector Calculus",
+    "topics": [
       {
-        title: "Analytic Geometry",
-        subtopics: [
+        "title": "Analytic Geometry",
+        "subtopics": [
           "Cartesian and polar coordinates in three dimensions, second degree equations in three variables, reduction to Canonical forms; straight lines, shortest distance between two skew lines.",
           "Plane, sphere, cone, cylinder, paraboloid, ellipsoid, hyperboloid of one and two sheets and their properties."
         ]
       },
       {
-        title: "Vector Analysis",
-        subtopics: [
+        "title": "Vector Analysis",
+        "subtopics": [
           "Scalar and vector fields, differentiation of vector field of a scalar variable; Gradient, divergence and curl in cartesian and cylindrical coordinates; Higher order derivatives; Vector identities and vector equation.",
           "Application to geometry: Curves in space, curvature and torsion; Serret-Frenet’s formulae. Gauss and Stokes’ theorems, Green’s identities."
         ]
@@ -61,18 +61,18 @@ export const optionalSubMathematics = [
     ]
   },
   {
-    section: "Complex Analysis and Differential Equations",
-    topics: [
+    "section": "Complex Analysis and Differential Equations",
+    "topics": [
       {
-        title: "Complex Analysis",
-        subtopics: [
+        "title": "Complex Analysis",
+        "subtopics": [
           "Analytic function, Cauchy-Riemann equations, Cauchy’s theorem, Cauchy’s integral formula, power series, representation of an analytic function, Taylor’s series.",
           "Singularities; Laurent’s series; Cauchy’s residue theorem; Contour integration."
         ]
       },
       {
-        title: "Ordinary Differential Equations",
-        subtopics: [
+        "title": "Ordinary Differential Equations",
+        "subtopics": [
           "Formulation of differential equations; Equations of first order and first degree, integrating factor; Orthogonal trajectory; Equations of first order but not of first degree, Clairaut’s equation, singular solution.",
           "Second and higher order linear equations with constant coefficients, complementary function, particular integral and general solution.",
           "Second order linear equations with variable coefficients, Euler-Cauchy equation; Determination of complete solution when one solution is known using method of variation of parameters.",
@@ -80,8 +80,8 @@ export const optionalSubMathematics = [
         ]
       },
       {
-        title: "Partial Differential Equations",
-        subtopics: [
+        "title": "Partial Differential Equations",
+        "subtopics": [
           "Family of surfaces in three dimensions and formulation of partial differential equations.",
           "Solution of quasilinear partial differential equations of the first order, Cauchy’s method of characteristics.",
           "Linear partial differential equations of the second order with constant coefficients, canonical form; Equation of a vibrating string, heat equation, Laplace equation and their solutions."
@@ -90,18 +90,18 @@ export const optionalSubMathematics = [
     ]
   },
   {
-    section: "Statics, Dynamics, Mechanics and Fluid Dynamics",
-    topics: [
+    "section": "Statics, Dynamics, Mechanics and Fluid Dynamics",
+    "topics": [
       {
-        title: "Dynamics and Statics",
-        subtopics: [
+        "title": "Dynamics and Statics",
+        "subtopics": [
           "Rectilinear motion, simple harmonic motion, motion in a plane, projectiles; Constrained motion; Work and energy, conservation of energy; Kepler’s laws, orbits under central forces.",
           "Equilibrium of a system of particles; Work and potential energy, friction, Common catenary; Principle of virtual work; Stability of equilibrium, equilibrium of forces in three dimensions."
         ]
       },
       {
-        title: "Mechanics and Fluid Dynamics",
-        subtopics: [
+        "title": "Mechanics and Fluid Dynamics",
+        "subtopics": [
           "Generalised coordinates; D’Alembert’s principle and Lagrange’s equations; Hamilton equations; Moment of inertia; Motion of rigid bodies in two dimensions.",
           "Equation of continuity; Euler’s equation of motion for inviscid flow; Stream-lines, path of a particle; Potential flow; Two-dimensional and axisymmetric motion; Sources and sinks, vortex motion; Navier-Stokes equation for a viscous fluid."
         ]
@@ -109,18 +109,18 @@ export const optionalSubMathematics = [
     ]
   },
   {
-    section: "Linear Programming, Numerical Analysis and Computing",
-    topics: [
+    "section": "Linear Programming, Numerical Analysis and Computing",
+    "topics": [
       {
-        title: "Linear Programming",
-        subtopics: [
+        "title": "Linear Programming",
+        "subtopics": [
           "Linear programming problems, basic solution, basic feasible solution and optimal solution; Graphical method and simplex method of solutions; Duality.",
           "Transportation and assignment problems."
         ]
       },
       {
-        title: "Numerical Analysis",
-        subtopics: [
+        "title": "Numerical Analysis",
+        "subtopics": [
           "Numerical methods: Solution of algebraic and transcendental equations of one variable by bisection, Regula-Falsi and Newton-Raphson methods.",
           "Solution of system of linear equations by Gaussian Elimination and Gauss-Jordan (direct), Gauss-Seidel (iterative) methods.",
           "Newton’s (forward and backward) and interpolation, Lagrange’s interpolation.",
@@ -128,8 +128,8 @@ export const optionalSubMathematics = [
         ]
       },
       {
-        title: "Computer Programming",
-        subtopics: [
+        "title": "Computer Programming",
+        "subtopics": [
           "Binary system; Arithmetic and logical operations on numbers; Octal and Hexadecimal Systems; Conversion to and from decimal Systems; Algebra of binary numbers.",
           "Elements of computer systems and concept of memory; Basic logic gates and truth tables, Boolean algebra, normal forms.",
           "Representation of unsigned integers, signed integers and reals, double precision reals and long integers.",
@@ -138,4 +138,4 @@ export const optionalSubMathematics = [
       }
     ]
   }
-];
+]

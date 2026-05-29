@@ -1,10 +1,10 @@
-export const optionalSubGeography = [
+[
   {
-    section: "Principles of Physical Geography",
-    topics: [
+    "section": "Principles of Physical Geography",
+    "topics": [
       {
-        title: "Geomorphology",
-        subtopics: [
+        "title": "Geomorphology",
+        "subtopics": [
           "Factors controlling landform development; endogenetic and exogenetic forces.",
           "Origin and evolution of the earth’s crusts; Fundamentals of geomagnetism; Physical conditions of the earth’s interior.",
           "Geosynclines; Continental drift; Isostasy; Plate tectonics; Recent views on mountain building.",
@@ -15,8 +15,8 @@ export const optionalSubGeography = [
         ]
       },
       {
-        title: "Climatology",
-        subtopics: [
+        "title": "Climatology",
+        "subtopics": [
           "Temperature and pressure belts of the world; Heat budget of the earth.",
           "Atmospheric circulation; Atmospheric stability and instability.",
           "Planetary and local winds; Monsoons and jet streams.",
@@ -28,8 +28,8 @@ export const optionalSubGeography = [
         ]
       },
       {
-        title: "Oceanography",
-        subtopics: [
+        "title": "Oceanography",
+        "subtopics": [
           "Bottom topography of the Atlantic, Indian, and Pacific Oceans.",
           "Temperature and salinity of the oceans; Heat and salt budgets, Ocean deposits.",
           "Waves, currents, and tides.",
@@ -39,8 +39,8 @@ export const optionalSubGeography = [
         ]
       },
       {
-        title: "Biogeography",
-        subtopics: [
+        "title": "Biogeography",
+        "subtopics": [
           "Genesis of soils; Classification and distribution of soils; Soil profile.",
           "Soil erosion, Degradation, and conservation.",
           "Factors influencing world distribution of plants and animals.",
@@ -49,8 +49,8 @@ export const optionalSubGeography = [
         ]
       },
       {
-        title: "Environmental Geography",
-        subtopics: [
+        "title": "Environmental Geography",
+        "subtopics": [
           "Principle of ecology; Human ecological adaptations; Influence of man on ecology and environment.",
           "Global and regional ecological changes and imbalances.",
           "Ecosystem their management and conservation.",
@@ -62,11 +62,11 @@ export const optionalSubGeography = [
     ]
   },
   {
-    section: "Principles of Human Geography",
-    topics: [
+    "section": "Principles of Human Geography",
+    "topics": [
       {
-        title: "Perspectives in Human Geography",
-        subtopics: [
+        "title": "Perspectives in Human Geography",
+        "subtopics": [
           "Areal differentiation; regional synthesis; Dichotomy and dualism.",
           "Environmentalism; Quantitative revolution and locational analysis.",
           "Radical, behavioral, human, and welfare approaches.",
@@ -75,8 +75,8 @@ export const optionalSubGeography = [
         ]
       },
       {
-        title: "Economic Geography",
-        subtopics: [
+        "title": "Economic Geography",
+        "subtopics": [
           "World economic development: measurement and problems.",
           "World resources and their distribution; Energy crisis; the limits to growth.",
           "World agriculture: a typology of agricultural regions; Agricultural inputs and productivity.",
@@ -85,8 +85,8 @@ export const optionalSubGeography = [
         ]
       },
       {
-        title: "Population and Settlement Geography",
-        subtopics: [
+        "title": "Population and Settlement Geography",
+        "subtopics": [
           "Growth and distribution of world population; Demographic attributes.",
           "Causes and consequences of migration.",
           "Concepts of the over-under-and optimum population; Population theories, world population problems and policies.",
@@ -98,8 +98,8 @@ export const optionalSubGeography = [
         ]
       },
       {
-        title: "Regional Planning",
-        subtopics: [
+        "title": "Regional Planning",
+        "subtopics": [
           "Concept of a region; Types of regions and methods of regionalization.",
           "Growth centers and growth poles.",
           "Regional imbalances; regional development strategies.",
@@ -107,8 +107,8 @@ export const optionalSubGeography = [
         ]
       },
       {
-        title: "Models, Theories and Laws in Human Geography",
-        subtopics: [
+        "title": "Models, Theories and Laws in Human Geography",
+        "subtopics": [
           "System analysis in Human geography.",
           "Malthusian, Marxian and demographic transition models.",
           "Central Place theories of Christaller and Losch; Perroux and Boudeville.",
@@ -120,11 +120,11 @@ export const optionalSubGeography = [
     ]
   },
   {
-    section: "Geography of India: Physical, Resources and Economy",
-    topics: [
+    "section": "Geography of India: Physical, Resources and Economy",
+    "topics": [
       {
-        title: "Physical Setting",
-        subtopics: [
+        "title": "Physical Setting",
+        "subtopics": [
           "Space relationship of India with neighboring countries; Structure and relief.",
           "Drainage system and watersheds; Physiographic regions.",
           "Mechanism of Indian monsoons and rainfall patterns; Tropical cyclones and western disturbances; Floods and droughts.",
@@ -132,15 +132,15 @@ export const optionalSubGeography = [
         ]
       },
       {
-        title: "Resources",
-        subtopics: [
+        "title": "Resources",
+        "subtopics": [
           "Land, surface and ground water, energy, minerals, biotic and marine resources.",
           "Forest and wildlife resources and their conservation; Energy crisis."
         ]
       },
       {
-        title: "Agriculture",
-        subtopics: [
+        "title": "Agriculture",
+        "subtopics": [
           "Infrastructure: irrigation, seeds, fertilizers, power.",
           "Institutional factors: land holdings, land tenure and land reforms.",
           "Cropping pattern, agricultural productivity, agricultural intensity, crop combination, land capability.",
@@ -151,8 +151,8 @@ export const optionalSubGeography = [
         ]
       },
       {
-        title: "Industry",
-        subtopics: [
+        "title": "Industry",
+        "subtopics": [
           "Evolution of industries.",
           "Locational factors of cotton, jute, textile, iron and steel, aluminum, fertiliser, paper, chemical and pharmaceutical, automobile, cottage, and ago-based industries.",
           "Industrial houses and complexes including public sector undertakings; Industrial regionalisation.",
@@ -160,8 +160,8 @@ export const optionalSubGeography = [
         ]
       },
       {
-        title: "Transport, Communication, and Trade",
-        subtopics: [
+        "title": "Transport, Communication, and Trade",
+        "subtopics": [
           "Road, railway, waterway, airway, and pipeline networks and their complementary roles in regional development.",
           "Growing importance of ports on national and foreign trade; Trade balance; Trade Policy; Export processing zones.",
           "Developments in communication and information technology and their impacts on economy and society; Indian space programme."
@@ -170,11 +170,11 @@ export const optionalSubGeography = [
     ]
   },
   {
-    section: "Geography of India: Cultural, Regional and Contemporary Issues",
-    topics: [
+    "section": "Geography of India: Cultural, Regional and Contemporary Issues",
+    "topics": [
       {
-        title: "Cultural Setting",
-        subtopics: [
+        "title": "Cultural Setting",
+        "subtopics": [
           "Historical Perspective of Indian Society; Racial linguistic and ethnic diversities; religious minorities.",
           "Major tribes, tribal areas, and their problems; Cultural regions.",
           "Growth, distribution, and density of population; Demographic attributes: sex-ratio, age structure, literacy rate, work-force, dependency ratio, longevity.",
@@ -183,8 +183,8 @@ export const optionalSubGeography = [
         ]
       },
       {
-        title: "Settlements",
-        subtopics: [
+        "title": "Settlements",
+        "subtopics": [
           "Types, patterns, and morphology of rural settlements; Urban developments.",
           "Morphology of Indian cities; Functional classification of Indian cities.",
           "Conurbations and metropolitan regions; Urban sprawl.",
@@ -192,8 +192,8 @@ export const optionalSubGeography = [
         ]
       },
       {
-        title: "Regional Development and Planning",
-        subtopics: [
+        "title": "Regional Development and Planning",
+        "subtopics": [
           "Experience of regional planning in India; Five Year Plans.",
           "Integrated rural development programmes; Panchayati Raj and decentralised planning.",
           "Command area development; Watershed management.",
@@ -202,8 +202,8 @@ export const optionalSubGeography = [
         ]
       },
       {
-        title: "Political Aspects",
-        subtopics: [
+        "title": "Political Aspects",
+        "subtopics": [
           "Geographical basis of Indian federalism; State reorganization; Emergence of new states.",
           "Regional consciousness and inter-state issues.",
           "International boundary of India and related issues; Cross-border terrorism.",
@@ -211,8 +211,8 @@ export const optionalSubGeography = [
         ]
       },
       {
-        title: "Contemporary Issues",
-        subtopics: [
+        "title": "Contemporary Issues",
+        "subtopics": [
           "Ecological issues: Environmental hazards: landslides, earthquakes, Tsunamis, floods and droughts, epidemics.",
           "Issues related to environmental pollution; Changes in patterns of land use.",
           "Principles of environmental impact assessment and environmental management.",
@@ -223,4 +223,4 @@ export const optionalSubGeography = [
       }
     ]
   }
-];
+]

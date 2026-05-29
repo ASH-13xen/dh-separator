@@ -39,41 +39,42 @@ const withRetry = async (fn, retries = 3, delayMs = 5000) => {
 const loadSyllabus = async () => {
     try {
         const constantsDir = path.join(__dirname, '../constants');
-        const files = fs.readdirSync(constantsDir).filter(f => f.endsWith('.js'));
+        const files = fs.readdirSync(constantsDir).filter(f => f.endsWith('.json') && f !== 'customHierarchy.json');
         let syllabusStr = '';
         
         for (const file of files) {
           const filePath = path.join(constantsDir, file);
-          const modulePath = 'file:///' + filePath.replace(/\\/g, '/');
-          const module = await import(modulePath);
+          let data = [];
+          try {
+            data = JSON.parse(fs.readFileSync(filePath, 'utf8'));
+          } catch (err) {
+            console.error(`Error parsing JSON file ${file} in loadSyllabus:`, err);
+            continue;
+          }
           
-          const exportKeys = Object.keys(module);
-          for (const key of exportKeys) {
-            const data = module[key];
-            if (Array.isArray(data)) {
-               if (file.startsWith('OptionalSubject')) {
-                  const subjectName = file.replace('.js', '');
-                  syllabusStr += `\n\n--- OPTIONAL SUBJECT: ${subjectName} ---\n`;
-               } else if (file.startsWith('GS-')) {
-                  syllabusStr += `\n\n--- COMPULSORY PAPER: ${file.replace('.js', '')} ---\n`;
+          if (Array.isArray(data)) {
+             if (file.startsWith('OptionalSubject')) {
+                const subjectName = file.replace('.json', '');
+                syllabusStr += `\n\n--- OPTIONAL SUBJECT: ${subjectName} ---\n`;
+             } else if (file.startsWith('GS-')) {
+                syllabusStr += `\n\n--- COMPULSORY PAPER: ${file.replace('.json', '')} ---\n`;
+             }
+             
+             data.forEach(sectionItem => {
+               if (sectionItem.section) {
+                   syllabusStr += `Section: ${sectionItem.section}\n`;
                }
-               
-               data.forEach(sectionItem => {
-                 if (sectionItem.section) {
-                     syllabusStr += `Section: ${sectionItem.section}\n`;
-                 }
-                 if (sectionItem.topics && Array.isArray(sectionItem.topics)) {
-                   sectionItem.topics.forEach(topicItem => {
-                     if (topicItem.title) {
-                        syllabusStr += `  Topic: ${topicItem.title}\n`;
-                        if (topicItem.subtopics) {
-                           syllabusStr += `    Subtopics: ${topicItem.subtopics.join(', ')}\n`;
-                        }
-                     }
-                   });
-                 }
-               });
-            }
+               if (sectionItem.topics && Array.isArray(sectionItem.topics)) {
+                 sectionItem.topics.forEach(topicItem => {
+                   if (topicItem.title) {
+                      syllabusStr += `  Topic: ${topicItem.title}\n`;
+                      if (topicItem.subtopics && Array.isArray(topicItem.subtopics)) {
+                         syllabusStr += `    Subtopics: ${topicItem.subtopics.join(', ')}\n`;
+                      }
+                   }
+                 });
+               }
+             });
           }
         }
         parsedSyllabusText = syllabusStr;

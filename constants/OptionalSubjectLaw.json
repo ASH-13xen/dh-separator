@@ -1,10 +1,10 @@
-export const optionalSubLaw = [
+[
   {
-    section: "Constitutional and Administrative Law",
-    topics: [
+    "section": "Constitutional and Administrative Law",
+    "topics": [
       {
-        title: "Constitutional Framework and Rights",
-        subtopics: [
+        "title": "Constitutional Framework and Rights",
+        "subtopics": [
           "Constitution and Constitutionalism: The distinctive features of the Constitution.",
           "Fundamental Rights—Public interest litigation; Legal Aid; Legal services authority.",
           "Relationship between Fundamental Rights, Directive Principles, and Fundamental duties.",
@@ -13,8 +13,8 @@ export const optionalSubLaw = [
         ]
       },
       {
-        title: "Executive, Legislature, and Judiciary",
-        subtopics: [
+        "title": "Executive, Legislature, and Judiciary",
+        "subtopics": [
           "Constitutional Position of the President and relation with the Council of Ministers.",
           "Governor and his powers.",
           "Supreme Court and the High Courts: (a) Appointments and transfer. (b) Powers, functions, and jurisdiction.",
@@ -22,15 +22,15 @@ export const optionalSubLaw = [
         ]
       },
       {
-        title: "Federalism, Local Bodies, and Services",
-        subtopics: [
+        "title": "Federalism, Local Bodies, and Services",
+        "subtopics": [
           "Centre, States, and local bodies: (a) Distribution of legislative powers between the Union and the States. (b) Local Bodies. (c) Administrative relationship among Union, State, and Local Bodies. (d) Eminent domain-State property-common property-community property.",
           "Services under the Union and the States: (a) Recruitment and conditions of services; Constitutional safeguards; Administrative tribunals. (b) Union Public Service Commission and state public Service Commissions—Power and functions. (c) Election Commission—Power and functions."
         ]
       },
       {
-        title: "Administrative Law and Governance",
-        subtopics: [
+        "title": "Administrative Law and Governance",
+        "subtopics": [
           "Principle of Natural Justice—Emerging trends and judicial approach.",
           "Delegated legislation and its constitutionality.",
           "Separation of powers and constitutional governance.",
@@ -41,11 +41,11 @@ export const optionalSubLaw = [
     ]
   },
   {
-    section: "International Law",
-    topics: [
+    "section": "International Law",
+    "topics": [
       {
-        title: "Fundamentals, State Jurisdiction, and Treaties",
-        subtopics: [
+        "title": "Fundamentals, State Jurisdiction, and Treaties",
+        "subtopics": [
           "Nature and Definition of International Law.",
           "Relationship between International Law and Municipal Law.",
           "State Recognition and State Succession.",
@@ -54,15 +54,15 @@ export const optionalSubLaw = [
         ]
       },
       {
-        title: "Law of the Sea, Individuals, and Human Rights",
-        subtopics: [
+        "title": "Law of the Sea, Individuals, and Human Rights",
+        "subtopics": [
           "Law of the sea: Inland Waters, Territorial Sea, Contiguous Zone, Continental Shelf, Exclusive Economic Zone, and High Seas.",
           "Individuals: Nationality, statelessness; Human Rights, and procedures available for their enforcement."
         ]
       },
       {
-        title: "UN, Dispute Settlement, and Use of Force",
-        subtopics: [
+        "title": "UN, Dispute Settlement, and Use of Force",
+        "subtopics": [
           "United Nations: Its principal organs, powers and functions, and reform.",
           "Peaceful settlement of disputes—different modes.",
           "Lawful recourse to force: aggression, self-defense, intervention.",
@@ -72,8 +72,8 @@ export const optionalSubLaw = [
         ]
       },
       {
-        title: "International Economic and Environmental Law",
-        subtopics: [
+        "title": "International Economic and Environmental Law",
+        "subtopics": [
           "New International Economic Order and Monetary Law: WTO, TRIPS, GATT, IMF, World Bank.",
           "Protection and Improvement of the Human Environment: International Efforts."
         ]
@@ -81,11 +81,11 @@ export const optionalSubLaw = [
     ]
   },
   {
-    section: "Law of Crimes",
-    topics: [
+    "section": "Law of Crimes",
+    "topics": [
       {
-        title: "General Principles and Liabilities",
-        subtopics: [
+        "title": "General Principles and Liabilities",
+        "subtopics": [
           "General principles of Criminal liability: mens rea and actus reus, mens rea in statutory offences.",
           "Kinds of punishment and emerging trends as to abolition of capital punishment.",
           "Preparations and criminal attempt.",
@@ -96,8 +96,8 @@ export const optionalSubLaw = [
         ]
       },
       {
-        title: "Specific Offences and Statutory Developments",
-        subtopics: [
+        "title": "Specific Offences and Statutory Developments",
+        "subtopics": [
           "Offences against the State.",
           "Offences against public tranquility.",
           "Offences against human body.",
@@ -112,11 +112,11 @@ export const optionalSubLaw = [
     ]
   },
   {
-    section: "Law of Torts",
-    topics: [
+    "section": "Law of Torts",
+    "topics": [
       {
-        title: "Principles, Liabilities, and Defences",
-        subtopics: [
+        "title": "Principles, Liabilities, and Defences",
+        "subtopics": [
           "Nature and definition.",
           "Liability based upon fault and strict liability; Absolute liability.",
           "Vicarious liability including State Liability.",
@@ -126,8 +126,8 @@ export const optionalSubLaw = [
         ]
       },
       {
-        title: "Specific Torts and Consumer Protection",
-        subtopics: [
+        "title": "Specific Torts and Consumer Protection",
+        "subtopics": [
           "Negligence.",
           "Defamation.",
           "Nuisance.",
@@ -140,11 +140,11 @@ export const optionalSubLaw = [
     ]
   },
   {
-    section: "Law of Contracts and Mercantile Law",
-    topics: [
+    "section": "Law of Contracts and Mercantile Law",
+    "topics": [
       {
-        title: "General Principles of Contract",
-        subtopics: [
+        "title": "General Principles of Contract",
+        "subtopics": [
           "Nature and formation of contract/E-contract.",
           "Factors vitiating free consent.",
           "Void, voidable, illegal and unenforceable agreements.",
@@ -155,8 +155,8 @@ export const optionalSubLaw = [
         ]
       },
       {
-        title: "Specific Contracts and Mercantile Law",
-        subtopics: [
+        "title": "Specific Contracts and Mercantile Law",
+        "subtopics": [
           "Contract of indemnity, guarantee and insurance.",
           "Contract of agency.",
           "Sale of goods and hire purchase.",
@@ -168,11 +168,11 @@ export const optionalSubLaw = [
     ]
   },
   {
-    section: "Contemporary Legal Developments",
-    topics: [
+    "section": "Contemporary Legal Developments",
+    "topics": [
       {
-        title: "Emerging Legal Concepts and Statutes",
-        subtopics: [
+        "title": "Emerging Legal Concepts and Statutes",
+        "subtopics": [
           "Public Interest Litigation.",
           "Intellectual property rights—Concept, types/prospects.",
           "Information Technology Law including Cyber Laws—Concept, purpose/prospects.",
@@ -185,4 +185,4 @@ export const optionalSubLaw = [
       }
     ]
   }
-];
+]

@@ -41,36 +41,36 @@ export const updateQuestion = async (req, res) => {
 export const getValidTags = async (req, res) => {
   try {
     const constantsDir = path.join(__dirname, '../constants');
-    const files = fs.readdirSync(constantsDir).filter(f => f.endsWith('.js'));
+    const files = fs.readdirSync(constantsDir).filter(f => f.endsWith('.json') && f !== 'customHierarchy.json');
     
     const validTags = new Set();
     
     for (const file of files) {
       if (file.startsWith('GS-')) {
-         validTags.add(file.replace('.js', ''));
+         validTags.add(file.replace('.json', ''));
       }
       
       const filePath = path.join(constantsDir, file);
-      const modulePath = 'file:///' + filePath.replace(/\\/g, '/');
-      const module = await import(modulePath);
+      let data = [];
+      try {
+        data = JSON.parse(fs.readFileSync(filePath, 'utf8'));
+      } catch (err) {
+        console.error(`Error parsing JSON file ${file} in getValidTags:`, err);
+      }
       
-      const exportKeys = Object.keys(module);
-      for (const key of exportKeys) {
-        const data = module[key];
-        if (Array.isArray(data)) {
-           if (file.startsWith('OptionalSubject')) {
-              validTags.add(file.replace('.js', ''));
+      if (Array.isArray(data)) {
+         if (file.startsWith('OptionalSubject')) {
+            validTags.add(file.replace('.json', ''));
+         }
+         
+         data.forEach(sectionItem => {
+           if (sectionItem.section) validTags.add(sectionItem.section);
+           if (sectionItem.topics && Array.isArray(sectionItem.topics)) {
+             sectionItem.topics.forEach(topicItem => {
+               if (topicItem.title) validTags.add(topicItem.title);
+             });
            }
-           
-           data.forEach(sectionItem => {
-             if (sectionItem.section) validTags.add(sectionItem.section);
-             if (sectionItem.topics && Array.isArray(sectionItem.topics)) {
-               sectionItem.topics.forEach(topicItem => {
-                 if (topicItem.title) validTags.add(topicItem.title);
-               });
-             }
-           });
-        }
+         });
       }
     }
 
@@ -120,7 +120,7 @@ export const getValidTags = async (req, res) => {
 export const getHierarchy = async (req, res) => {
   try {
     const constantsDir = path.join(__dirname, '../constants');
-    const files = fs.readdirSync(constantsDir).filter(f => f.endsWith('.js'));
+    const files = fs.readdirSync(constantsDir).filter(f => f.endsWith('.json') && f !== 'customHierarchy.json');
     
     const hierarchyData = {
       gsModules: {},
@@ -129,25 +129,19 @@ export const getHierarchy = async (req, res) => {
     
     for (const file of files) {
       const filePath = path.join(constantsDir, file);
-      const modulePath = 'file:///' + filePath.replace(/\\/g, '/');
-      const module = await import(modulePath);
-      
       let structure = [];
-      const exportKeys = Object.keys(module);
-      for (const key of exportKeys) {
-        const data = module[key];
-        if (Array.isArray(data)) {
-           structure = data;
-           break;
-        }
+      try {
+        structure = JSON.parse(fs.readFileSync(filePath, 'utf8'));
+      } catch (err) {
+        console.error(`Error parsing JSON file ${file} in getHierarchy:`, err);
       }
       
       if (file.startsWith('GS-')) {
-         const moduleName = file.replace('.js', '');
-         hierarchyData.gsModules[moduleName] = structure;
+         const moduleName = file.replace('.json', '');
+         hierarchyData.gsModules[moduleName] = Array.isArray(structure) ? structure : [];
       } else if (file.startsWith('OptionalSubject')) {
-         const moduleName = file.replace('.js', '');
-         hierarchyData.optionalSubjects[moduleName] = structure;
+         const moduleName = file.replace('.json', '');
+         hierarchyData.optionalSubjects[moduleName] = Array.isArray(structure) ? structure : [];
       }
     }
 
@@ -227,91 +221,68 @@ export const addCustomTag = async (req, res) => {
     }
     
     const constantsDir = path.join(__dirname, '../constants');
-    const customPath = path.join(constantsDir, 'customHierarchy.json');
     
-    let customData = {
-      gsModules: {},
-      optionalSubjects: {}
-    };
+    // Resolve module/subject name
+    let moduleName = '';
+    if (type === 'gsModule' || type === 'optionalSubject') {
+      moduleName = name;
+    } else {
+      moduleName = parentModule;
+    }
     
-    if (fs.existsSync(customPath)) {
+    if (!moduleName) {
+      return res.status(400).json({ error: "parentModule is required for sections and topics." });
+    }
+    
+    // Normalize optional subject name to start with OptionalSubject
+    if (type.startsWith('optional')) {
+      if (!moduleName.startsWith('OptionalSubject')) {
+        const cleanName = moduleName.replace(/\s+/g, '');
+        moduleName = `OptionalSubject${cleanName.charAt(0).toUpperCase()}${cleanName.slice(1)}`;
+      }
+    }
+    
+    const filePath = path.join(constantsDir, `${moduleName}.json`);
+    
+    let data = [];
+    if (fs.existsSync(filePath)) {
       try {
-        customData = JSON.parse(fs.readFileSync(customPath, 'utf8'));
+        data = JSON.parse(fs.readFileSync(filePath, 'utf8'));
       } catch (err) {
-        console.error("Error parsing existing customHierarchy.json, creating new:", err);
+        console.error(`Error parsing existing file ${moduleName}.json:`, err);
       }
     }
     
-    if (type === 'gsModule') {
-      if (!customData.gsModules) customData.gsModules = {};
-      if (!customData.gsModules[name]) {
-        customData.gsModules[name] = [];
+    if (type === 'gsModule' || type === 'optionalSubject') {
+      if (!Array.isArray(data)) {
+        data = [];
       }
-    } else if (type === 'gsSection') {
-      if (!parentModule) return res.status(400).json({ error: "parentModule is required for GS sections." });
-      if (!customData.gsModules) customData.gsModules = {};
-      if (!customData.gsModules[parentModule]) {
-        customData.gsModules[parentModule] = [];
-      }
-      const existingSec = customData.gsModules[parentModule].find(s => s.section === name);
+    } else if (type === 'gsSection' || type === 'optionalSection') {
+      if (!Array.isArray(data)) data = [];
+      const existingSec = data.find(s => s.section === name);
       if (!existingSec) {
-        customData.gsModules[parentModule].push({ section: name, topics: [] });
+        data.push({ section: name, topics: [] });
       }
-    } else if (type === 'gsTopic') {
-      if (!parentModule || !parentSection) {
-        return res.status(400).json({ error: "parentModule and parentSection are required for GS topics." });
+    } else if (type === 'gsTopic' || type === 'optionalTopic') {
+      if (!parentSection) {
+        return res.status(400).json({ error: "parentSection is required for topics." });
       }
-      if (!customData.gsModules) customData.gsModules = {};
-      if (!customData.gsModules[parentModule]) {
-        customData.gsModules[parentModule] = [];
-      }
-      let existingSec = customData.gsModules[parentModule].find(s => s.section === parentSection);
+      if (!Array.isArray(data)) data = [];
+      let existingSec = data.find(s => s.section === parentSection);
       if (!existingSec) {
         existingSec = { section: parentSection, topics: [] };
-        customData.gsModules[parentModule].push(existingSec);
+        data.push(existingSec);
       }
       if (!existingSec.topics) existingSec.topics = [];
       const existingTop = existingSec.topics.find(t => t.title === name);
       if (!existingTop) {
-        existingSec.topics.push({ title: name });
-      }
-    } else if (type === 'optionalSubject') {
-      if (!customData.optionalSubjects) customData.optionalSubjects = {};
-      if (!customData.optionalSubjects[name]) {
-        customData.optionalSubjects[name] = [];
-      }
-    } else if (type === 'optionalSection') {
-      if (!parentModule) return res.status(400).json({ error: "parentModule (subject name) is required for optional sections." });
-      if (!customData.optionalSubjects) customData.optionalSubjects = {};
-      if (!customData.optionalSubjects[parentModule]) {
-        customData.optionalSubjects[parentModule] = [];
-      }
-      const existingSec = customData.optionalSubjects[parentModule].find(s => s.section === name);
-      if (!existingSec) {
-        customData.optionalSubjects[parentModule].push({ section: name, topics: [] });
-      }
-    } else if (type === 'optionalTopic') {
-      if (!parentModule || !parentSection) {
-        return res.status(400).json({ error: "parentModule and parentSection are required for optional topics." });
-      }
-      if (!customData.optionalSubjects) customData.optionalSubjects = {};
-      if (!customData.optionalSubjects[parentModule]) {
-        customData.optionalSubjects[parentModule] = [];
-      }
-      let existingSec = customData.optionalSubjects[parentModule].find(s => s.section === parentSection);
-      if (!existingSec) {
-        existingSec = { section: parentSection, topics: [] };
-        customData.optionalSubjects[parentModule].push(existingSec);
-      }
-      if (!existingSec.topics) existingSec.topics = [];
-      const existingTop = existingSec.topics.find(t => t.title === name);
-      if (!existingTop) {
-        existingSec.topics.push({ title: name });
+        existingSec.topics.push({ title: name, subtopics: [] });
       }
     }
     
-    fs.writeFileSync(customPath, JSON.stringify(customData, null, 2), 'utf8');
-    res.status(200).json({ success: true, customData });
+    fs.writeFileSync(filePath, JSON.stringify(data, null, 2), 'utf8');
+    
+    res.status(200).json({ success: true, name: moduleName });
   } catch (error) {
     console.error("[DataController] Error adding custom tag:", error);
     res.status(500).json({ error: 'Failed to add custom tag.' });

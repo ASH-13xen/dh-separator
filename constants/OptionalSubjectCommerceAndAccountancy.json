@@ -1,10 +1,10 @@
-export const optionalSubFinancingAccounting = [
+[
   {
-    section: "Financial Accounting, Costing, Taxation and Auditing",
-    topics: [
+    "section": "Financial Accounting, Costing, Taxation and Auditing",
+    "topics": [
       {
-        title: "Financial Accounting",
-        subtopics: [
+        "title": "Financial Accounting",
+        "subtopics": [
           "Accounting as a financial information system; Impact of behavioural sciences.",
           "Accounting Standards e.g., accounting for Depreciation, Inventories, Research and Development Costs, Longterm Construction Contracts, Revenue Recognition, Fixed Assets, Contingencies, Foreign Exchange Transactions, Investments and Government Grants, Cash Flow Statement, Earnings per Share.",
           "Accounting for Share Capital Transactions including Bonus Shares, Right Shares. Employees Stock Option and Buy-Back of Securities.",
@@ -13,8 +13,8 @@ export const optionalSubFinancingAccounting = [
         ]
       },
       {
-        title: "Cost Accounting",
-        subtopics: [
+        "title": "Cost Accounting",
+        "subtopics": [
           "Nature and functions of cost accounting. Installation of Cost Accounting System.",
           "Cost Concepts related to Income Measurement, Profit Planning, Cost Control and Decision Making.",
           "Methods of Costing: Job Costing, Process Costing, Activity Based Costing.",
@@ -25,8 +25,8 @@ export const optionalSubFinancingAccounting = [
         ]
       },
       {
-        title: "Taxation",
-        subtopics: [
+        "title": "Taxation",
+        "subtopics": [
           "Income Tax: Definitions. Basis of charge; Incomes which do not form part of total income.",
           "Simple problems of computation of income (of individuals only) under various heads, i.e., salaries, income from house property, profits and gains from business or profession, capital gains, income from other sources, Income of other persons included in assessee’s total income.",
           "Set-off and Carry forward of Loss. Deductions from gross Total Income.",
@@ -34,8 +34,8 @@ export const optionalSubFinancingAccounting = [
         ]
       },
       {
-        title: "Auditing",
-        subtopics: [
+        "title": "Auditing",
+        "subtopics": [
           "Company Audit: Audit related to Divisible Profits, Dividends, Special investigations, Tax audit.",
           "Audit of banking, Insurance, Non-Profit Organization and Charitable societies/Trusts/Organizations."
         ]
@@ -43,11 +43,11 @@ export const optionalSubFinancingAccounting = [
     ]
   },
   {
-    section: "Financial Management, Financial Institutions and Markets",
-    topics: [
+    "section": "Financial Management, Financial Institutions and Markets",
+    "topics": [
       {
-        title: "Financial Management and Analysis",
-        subtopics: [
+        "title": "Financial Management and Analysis",
+        "subtopics": [
           "Finance Function: Nature, Scope and Objectives of Financial Management: Risk and Return relationship.",
           "Tools of Financial Analysis: Ratio Analysis, Funds-Flow and Cash-Flow Statement.",
           "Capital Budgeting Decisions: Process, Procedures and Appraisal Methods. Risk and Uncertainty Analysis and Methods.",
@@ -55,8 +55,8 @@ export const optionalSubFinancingAccounting = [
         ]
       },
       {
-        title: "Financing, Dividend Decisions and Working Capital",
-        subtopics: [
+        "title": "Financing, Dividend Decisions and Working Capital",
+        "subtopics": [
           "Financing Decisions: Theories of Capital Structure—Net Income (NI) Approach, Net Operating Income (NOI) Approach, MM Approach and Traditional Approach.",
           "Designing of Capital structure: Types of Leverages (Operating, Financial and Combined), EBIT-EPS Analysis, and other Factors.",
           "Dividend Decisions and Valuation of Firm: Walter’s Model, MM Thesis, Gordan’s Model, Lintner’s Model. Factors Affecting Dividend Policy.",
@@ -65,8 +65,8 @@ export const optionalSubFinancingAccounting = [
         ]
       },
       {
-        title: "Financial Markets and Institutions",
-        subtopics: [
+        "title": "Financial Markets and Institutions",
+        "subtopics": [
           "Indian Financial System: An Overview.",
           "Money Markets: Participants, Structure and Instruments. Commercial Banks. Reforms in Banking Sector. Monetary and Credit Policy of RBI. RBI as a Regulator.",
           "Capital Market: Primary and Secondary Market. Financial Market Instruments and Innovative Debt Instruments; SEBI as a Regulator.",
@@ -76,11 +76,11 @@ export const optionalSubFinancingAccounting = [
     ]
   },
   {
-    section: "Organisation Theory and Behaviour",
-    topics: [
+    "section": "Organisation Theory and Behaviour",
+    "topics": [
       {
-        title: "Organisation Theory",
-        subtopics: [
+        "title": "Organisation Theory",
+        "subtopics": [
           "Nature and Concept of Organisation; External Environment of Organisation—Technological, Social, Political, Economical and Legal.",
           "Organizational Goals: Primary and Secondary Goals, Single and Multiple Goals; Management by Objectives.",
           "Evolution of Organisation theory: Classical, Neo-classical and system approach.",
@@ -93,8 +93,8 @@ export const optionalSubFinancingAccounting = [
         ]
       },
       {
-        title: "Organisation Behaviour",
-        subtopics: [
+        "title": "Organisation Behaviour",
+        "subtopics": [
           "Meaning and Concept.",
           "Individual in organization: Personality, Theories, and Determinants; Perception Meaning and Process.",
           "Motivation: Concepts, Theories and Applications.",
@@ -106,11 +106,11 @@ export const optionalSubFinancingAccounting = [
     ]
   },
   {
-    section: "Human Resource Management and Industrial Relations",
-    topics: [
+    "section": "Human Resource Management and Industrial Relations",
+    "topics": [
       {
-        title: "Human Resources Management (HRM)",
-        subtopics: [
+        "title": "Human Resources Management (HRM)",
+        "subtopics": [
           "Meaning Nature and Scope of HRM, Human Resource Planning.",
           "Job Analysis, Job Description, Job Specification.",
           "Recruitment Process, Selection Process, Orientational and Placement.",
@@ -121,8 +121,8 @@ export const optionalSubFinancingAccounting = [
         ]
       },
       {
-        title: "Industrial Relations (IR)",
-        subtopics: [
+        "title": "Industrial Relations (IR)",
+        "subtopics": [
           "Meaning, Nature, Importance and Scope of IR.",
           "Formation of Trade Union, Trade Union Legislation, Trade Union Movement in India. Recognition of Trade Unions, Problems of Trade Unions in India. Impact of Liberalization on Trade Union Movement.",
           "Nature of Industrial Disputes: Strikes and Lockouts, Causes of Disputes, Prevention and Settlement of Disputes.",
@@ -135,4 +135,4 @@ export const optionalSubFinancingAccounting = [
       }
     ]
   }
-];
+]

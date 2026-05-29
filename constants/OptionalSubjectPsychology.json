@@ -1,18 +1,18 @@
-export const optionalSubPsychology = [
+[
   {
-    section: "Foundations, Methods, and Research",
-    topics: [
+    "section": "Foundations, Methods, and Research",
+    "topics": [
       {
-        title: "Introduction",
-        subtopics: [
+        "title": "Introduction",
+        "subtopics": [
           "Definition of Psychology; Historical antecedents of Psychology and trends in the 21st century.",
           "Psychology and scientific methods; Psychology in relation to other social sciences and natural sciences.",
           "Application of Psychology to societal problems."
         ]
       },
       {
-        title: "Methods of Psychology",
-        subtopics: [
+        "title": "Methods of Psychology",
+        "subtopics": [
           "Types of research: Descriptive, evaluative, diagnostic and prognostic.",
           "Methods of Research: Survey, observation, case-study and experiments.",
           "Characteristics of experimental design and non-experimental designs; quasi-experimental designs.",
@@ -20,8 +20,8 @@ export const optionalSubPsychology = [
         ]
       },
       {
-        title: "Research Methods",
-        subtopics: [
+        "title": "Research Methods",
+        "subtopics": [
           "Major steps in psychological research (problem statement, hypothesis formulation, research design, sampling, tools of data collection, analysis and interpretation and report writing).",
           "Fundamental versus applied research.",
           "Methods of data collection (interview, observation, questionnaire and case study); Research Designs (Ex-post facto and experimental).",
@@ -31,19 +31,19 @@ export const optionalSubPsychology = [
     ]
   },
   {
-    section: "Human Development and Cognitive Processes",
-    topics: [
+    "section": "Human Development and Cognitive Processes",
+    "topics": [
       {
-        title: "Development of Human Behaviour",
-        subtopics: [
+        "title": "Development of Human Behaviour",
+        "subtopics": [
           "Growth and development; Principles of development.",
           "Role of genetic and environmental factors in determining human behaviour; Influence of cultural factors in socialization.",
           "Life span development—Characteristics, development tasks, promoting psychological wellbeing across major stages of the life span."
         ]
       },
       {
-        title: "Sensation, Attention and Perception",
-        subtopics: [
+        "title": "Sensation, Attention and Perception",
+        "subtopics": [
           "Sensation: concepts of threshold, absolute and difference thresholds, signal-detection and vigilance.",
           "Factors influencing attention including set and characteristics of stimulus.",
           "Definition and concept of perception, biological factors in perception; Perceptual organization, influence of past experiences, perceptual defence.",
@@ -52,8 +52,8 @@ export const optionalSubPsychology = [
         ]
       },
       {
-        title: "Learning and Memory",
-        subtopics: [
+        "title": "Learning and Memory",
+        "subtopics": [
           "Concepts and theories of learning (Behaviourists, Gestaltist and Information processing models).",
           "The processes of extinction, discrimination and generalisation.",
           "Programmed learning, probability learning, self-instructional learning, concepts, types and the schedules of reinforcement, escape, avoidance and punishment, modelling and social learning.",
@@ -62,8 +62,8 @@ export const optionalSubPsychology = [
         ]
       },
       {
-        title: "Thinking, Problem Solving and Language",
-        subtopics: [
+        "title": "Thinking, Problem Solving and Language",
+        "subtopics": [
           "Piaget’s theory of cognitive development; Concept formation processes.",
           "Information processing, Reasoning and problem solving, Facilitating and hindering factors in problem solving, Methods of problem solving.",
           "Creative thinking and fostering creativity; Factors influencing decision making and judgement; Recent trends.",
@@ -74,19 +74,19 @@ export const optionalSubPsychology = [
     ]
   },
   {
-    section: "Motivation, Emotion, Personality and Individual Differences",
-    topics: [
+    "section": "Motivation, Emotion, Personality and Individual Differences",
+    "topics": [
       {
-        title: "Motivation and Emotion",
-        subtopics: [
+        "title": "Motivation and Emotion",
+        "subtopics": [
           "Psychological and physiological basis of motivation and emotion; Measurement of motivation and emotion.",
           "Effects of motivation and emotion on behaviour; Extrinsic and intrinsic motivation; Factors influencing intrinsic motivation.",
           "Emotional competence and the related issues."
         ]
       },
       {
-        title: "Intelligence, Aptitude and Measurement",
-        subtopics: [
+        "title": "Intelligence, Aptitude and Measurement",
+        "subtopics": [
           "Concept of intelligence and aptitude, Nature and theories of intelligence-Spearman, Thurstone, Guilford, Vernon, Sternberg and J.P. Das.",
           "Emotional Intelligence, Social intelligence, measurement of intelligence and aptitudes.",
           "Concept of IQ, deviation IQ, constancy of IQ; Measurement of multiple intelligence; Fluid intelligence and crystallized intelligence.",
@@ -95,8 +95,8 @@ export const optionalSubPsychology = [
         ]
       },
       {
-        title: "Personality, Attitudes and Values",
-        subtopics: [
+        "title": "Personality, Attitudes and Values",
+        "subtopics": [
           "Definition and concept of personality; Theories of personality (psychoanalytical, socio-cultural, interpersonal, developmental, humanistic, behaviouristic, trait and type approaches).",
           "Measurement of personality (projective tests, pencil-paper test); The Indian approach to personality; Training for personality development; Latest approaches like big 5 factor theory; The notion of self in different traditions.",
           "Definitions of attitudes, values and interests; Components of attitudes; Formation and maintenance of attitudes.",
@@ -107,11 +107,11 @@ export const optionalSubPsychology = [
     ]
   },
   {
-    section: "Clinical, Therapeutic and Modern Perspectives",
-    topics: [
+    "section": "Clinical, Therapeutic and Modern Perspectives",
+    "topics": [
       {
-        title: "Issues and Perspectives in Modern Contemporary Psychology",
-        subtopics: [
+        "title": "Issues and Perspectives in Modern Contemporary Psychology",
+        "subtopics": [
           "Computer application in the psychological laboratory and psychological testing.",
           "Artificial intelligence; Psychocybernetics.",
           "Study of consciousness: sleep-wake schedules; dreams, stimulus deprivation, meditation, hypnotic/drug induced states.",
@@ -119,16 +119,16 @@ export const optionalSubPsychology = [
         ]
       },
       {
-        title: "Psychological Wellbeing and Mental Disorders",
-        subtopics: [
+        "title": "Psychological Wellbeing and Mental Disorders",
+        "subtopics": [
           "Concept of health-ill health, positive health, well being.",
           "Causal factors in Mental disorders (Anxiety disorders, mood disorders; schizophrenia and delusional disorders; personality disorders, substance abuse disorders).",
           "Factors influencing positive health, well being; lifestyle and quality of life; Happiness disposition."
         ]
       },
       {
-        title: "Therapeutic Approaches and Rehabilitation",
-        subtopics: [
+        "title": "Therapeutic Approaches and Rehabilitation",
+        "subtopics": [
           "Psychodynamic therapies; Behaviour therapies; Client centered therapy; Cognitive therapies.",
           "Indigenous therapies (Yoga, Meditation); Biofeedback therapy.",
           "Prevention and rehabilitation of the mentally ill; Fostering mental health.",
@@ -140,11 +140,11 @@ export const optionalSubPsychology = [
     ]
   },
   {
-    section: "Applied Psychology: Education, Organization and Community",
-    topics: [
+    "section": "Applied Psychology: Education, Organization and Community",
+    "topics": [
       {
-        title: "Work Psychology and Organisational Behaviour",
-        subtopics: [
+        "title": "Work Psychology and Organisational Behaviour",
+        "subtopics": [
           "Personnel selection and training; Use of Psychological tests in the industry; Training and human resource development.",
           "Theories of work motivation: Herzberg, Maslow, Adam Equity theory, Porter and Lawler, Vroom.",
           "Leadership and participatory management; Transformational leadership; Managerial effectiveness.",
@@ -154,8 +154,8 @@ export const optionalSubPsychology = [
         ]
       },
       {
-        title: "Application of Psychology to Educational Field",
-        subtopics: [
+        "title": "Application of Psychology to Educational Field",
+        "subtopics": [
           "Psychological principles underlying effective teaching-learning process; Learning styles.",
           "Gifted, retarded, learning disabled and their training.",
           "Training for improving memory and better academic achievement.",
@@ -164,8 +164,8 @@ export const optionalSubPsychology = [
         ]
       },
       {
-        title: "Community Psychology and Disadvantaged Groups",
-        subtopics: [
+        "title": "Community Psychology and Disadvantaged Groups",
+        "subtopics": [
           "Definition and concept of Community Psychology; Use of small groups in social action.",
           "Arousing Community consciousness and action for handling social problems; Group decision making and leadership for social change; Effective strategies for social change.",
           "Application of Psychology to disadvantaged groups: The concepts of disadvantaged, deprivation; social, physical, cultural and economic consequences of disadvantaged and deprived groups.",
@@ -175,11 +175,11 @@ export const optionalSubPsychology = [
     ]
   },
   {
-    section: "Social Integration, Media and Emerging Fields",
-    topics: [
+    "section": "Social Integration, Media and Emerging Fields",
+    "topics": [
       {
-        title: "Psychological Problem of Social Integration",
-        subtopics: [
+        "title": "Psychological Problem of Social Integration",
+        "subtopics": [
           "The concept of social integration.",
           "The problem of caste, class, religion and language conflicts and prejudice.",
           "Nature and manifestation of prejudice between the ingroup and outgroup; Causal factors of such conflicts and prejudices.",
@@ -187,8 +187,8 @@ export const optionalSubPsychology = [
         ]
       },
       {
-        title: "Information Technology, Mass Media and Economics",
-        subtopics: [
+        "title": "Information Technology, Mass Media and Economics",
+        "subtopics": [
           "The present scenario of information technology and the mass media boom and the role of psychologists.",
           "Selection and training of Psychology professionals to work in the field of IT and mass media; Distance learning through IT and mass media.",
           "Entrepreneurship through e-commerce; Multilevel marketing.",
@@ -198,8 +198,8 @@ export const optionalSubPsychology = [
         ]
       },
       {
-        title: "Environment, Gender and Other Specialized Fields",
-        subtopics: [
+        "title": "Environment, Gender and Other Specialized Fields",
+        "subtopics": [
           "Environmental Psychology: effects of noise, pollution and crowding.",
           "Population Psychology: Psychological consequence of population explosion and high population density; Motivating for small family norms.",
           "Impact of rapid scientific and technological growth on degradation of environment.",
@@ -211,4 +211,4 @@ export const optionalSubPsychology = [
       }
     ]
   }
-];
+]

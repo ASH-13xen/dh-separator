@@ -1,18 +1,18 @@
-export const optionalSubBotany = [
+[
   {
-    section: "Microbiology and Plant Pathology",
-    topics: [
+    "section": "Microbiology and Plant Pathology",
+    "topics": [
       {
-        title: "Microbiology",
-        subtopics: [
+        "title": "Microbiology",
+        "subtopics": [
           "Structure and reproduction/multiplication of viruses, viroids, bacteria, fungi and mycoplasma.",
           "Applications of microbiology in agriculture, industry, medicine and in control of soil and water pollution.",
           "Prion and Prion hypothesis."
         ]
       },
       {
-        title: "Plant Pathology",
-        subtopics: [
+        "title": "Plant Pathology",
+        "subtopics": [
           "Important crop diseases caused by viruses, bacteria, mycoplasma, fungi and nematodes.",
           "Modes of infection and dissemination.",
           "Molecular basis of infection and disease resistance/defence; Physiology of parasitism and control measures.",
@@ -22,18 +22,18 @@ export const optionalSubBotany = [
     ]
   },
   {
-    section: "Cryptogams and Phanerogams",
-    topics: [
+    "section": "Cryptogams and Phanerogams",
+    "topics": [
       {
-        title: "Cryptogams",
-        subtopics: [
+        "title": "Cryptogams",
+        "subtopics": [
           "Algae, fungi, lichens, bryophytes, pteridophytes-structure and reproduction from evolutionary viewpoint.",
           "Distribution of Cryptogams in India and their ecological and economic importance."
         ]
       },
       {
-        title: "Phanerogams: Gymnosperms",
-        subtopics: [
+        "title": "Phanerogams: Gymnosperms",
+        "subtopics": [
           "Concept of Progymnosperms; Classification and distribution of gymnosperms.",
           "Salient features of Cycadales, Ginkgoales, Coniferales and Gnetales, their structure and reproduction.",
           "General account of Cycadofilicales, Bennettitales and Cordiaitailes.",
@@ -41,8 +41,8 @@ export const optionalSubBotany = [
         ]
       },
       {
-        title: "Phanerogams: Angiosperms (Systematics & Taxonomy)",
-        subtopics: [
+        "title": "Phanerogams: Angiosperms (Systematics & Taxonomy)",
+        "subtopics": [
           "Systematics, anatomy, embryology, palynology and phylogency.",
           "Taxonomic hierarchy; International Code of Botanical Nomenclature; Numerical taxonomy and chemotaxonomy; Evidence from anatomy, embryology and palynology.",
           "Origin and evolution of angiosperms; Comparative account of various systems of classification of angiosperms.",
@@ -50,8 +50,8 @@ export const optionalSubBotany = [
         ]
       },
       {
-        title: "Phanerogams: Angiosperms (Anatomy & Embryology)",
-        subtopics: [
+        "title": "Phanerogams: Angiosperms (Anatomy & Embryology)",
+        "subtopics": [
           "Stomata and their types; Glandular and non-glandular trichomes.",
           "Unusual secondary growth; Anatomy of C3 and C4 plants; Xylem and phloem differentiation; Wood anatomy.",
           "Development of male and female gametophytes, pollination, fertilization; Endosperm—its development and function.",
@@ -62,11 +62,11 @@ export const optionalSubBotany = [
     ]
   },
   {
-    section: "Plant Resource Development and Morphogenesis",
-    topics: [
+    "section": "Plant Resource Development and Morphogenesis",
+    "topics": [
       {
-        title: "Plant Resource Development",
-        subtopics: [
+        "title": "Plant Resource Development",
+        "subtopics": [
           "Domestication and introduction of plants; Origin of cultivated plants, Vavilov’s centres of origin.",
           "Plants as sources for food, fodder, fibers, spices, beverages, edible oils, drugs, narcotics, insecticides, timber, gums, resins and dyes.",
           "Latex, cellulose, starch and its products; Perfumery.",
@@ -74,8 +74,8 @@ export const optionalSubBotany = [
         ]
       },
       {
-        title: "Morphogenesis & Tissue Culture",
-        subtopics: [
+        "title": "Morphogenesis & Tissue Culture",
+        "subtopics": [
           "Totipotency, polarity, symmetry and differentiation.",
           "Cell, tissue, organ and protoplast culture.",
           "Somatic hybrids and Cybrids; Micropropagation; Soma clonal variation and its applications.",
@@ -85,11 +85,11 @@ export const optionalSubBotany = [
     ]
   },
   {
-    section: "Cell Biology",
-    topics: [
+    "section": "Cell Biology",
+    "topics": [
       {
-        title: "Cell Structure and Organelles",
-        subtopics: [
+        "title": "Cell Structure and Organelles",
+        "subtopics": [
           "Techniques of cell biology.",
           "Prokaryotic and eukaryotic cells—structural and ultrastructural details.",
           "Structure and function of extracellular matrix (cell wall) and membranes-cell adhesion, membrane transport and vesicular transport.",
@@ -98,8 +98,8 @@ export const optionalSubBotany = [
         ]
       },
       {
-        title: "Cell Cycle, Signaling & Chromosomes",
-        subtopics: [
+        "title": "Cell Cycle, Signaling & Chromosomes",
+        "subtopics": [
           "Cell signaling and cell receptors; Signal transduction.",
           "Mitosis and meiosis; molecular basis of cell cycle.",
           "Numerical and structural variations in chromosomes and their significance; Chromatin organization and packaging of genome.",
@@ -109,11 +109,11 @@ export const optionalSubBotany = [
     ]
   },
   {
-    section: "Genetics, Molecular Biology and Evolution",
-    topics: [
+    "section": "Genetics, Molecular Biology and Evolution",
+    "topics": [
       {
-        title: "Genetics",
-        subtopics: [
+        "title": "Genetics",
+        "subtopics": [
           "Development of genetics, and gene versus allele concepts (Pseudo alleles); Quantitative genetics and multiple factors.",
           "Incomplete dominance, polygenic inheritance, multiple alleles.",
           "Linkage and crossing over of gene mapping including molecular maps (idea of mapping, function).",
@@ -122,8 +122,8 @@ export const optionalSubBotany = [
         ]
       },
       {
-        title: "Molecular Biology and Evolution",
-        subtopics: [
+        "title": "Molecular Biology and Evolution",
+        "subtopics": [
           "Structure and synthesis of nucleic acids and proteins; Genetic code and regulation of gene expression.",
           "Gene silencing; Multigene families.",
           "Organic evolution-evidences, mechanism and theories.",
@@ -133,11 +133,11 @@ export const optionalSubBotany = [
     ]
   },
   {
-    section: "Plant Breeding, Biotechnology and Biostatistics",
-    topics: [
+    "section": "Plant Breeding, Biotechnology and Biostatistics",
+    "topics": [
       {
-        title: "Plant Breeding and Biotechnology",
-        subtopics: [
+        "title": "Plant Breeding and Biotechnology",
+        "subtopics": [
           "Methods of plant breeding—introduction, selection and hybridization (pedigree, backcross, mass selection, bulk method).",
           "Mutation, polyploidy, male sterility and heterosis breeding; Use of apomixes in plant breeding.",
           "DNA sequencing; Genetic engineering—methods of transfer of genes.",
@@ -146,8 +146,8 @@ export const optionalSubBotany = [
         ]
       },
       {
-        title: "Biostatistics",
-        subtopics: [
+        "title": "Biostatistics",
+        "subtopics": [
           "Standard deviation and coefficient of variation (CV).",
           "Tests of significance (Z-test, t-test and chi-square tests).",
           "Probability and distributions (normal, binomial and Poisson).",
@@ -157,11 +157,11 @@ export const optionalSubBotany = [
     ]
   },
   {
-    section: "Physiology and Biochemistry",
-    topics: [
+    "section": "Physiology and Biochemistry",
+    "topics": [
       {
-        title: "Plant Physiology",
-        subtopics: [
+        "title": "Plant Physiology",
+        "subtopics": [
           "Water relations, mineral nutrition and ion transport, mineral deficiencies.",
           "Photosynthesis— photochemical reactions, photophosphorylation and carbon fixation pathways; C3, C4 and CAM pathways.",
           "Mechanism of phloem transport.",
@@ -173,8 +173,8 @@ export const optionalSubBotany = [
         ]
       },
       {
-        title: "Biochemistry",
-        subtopics: [
+        "title": "Biochemistry",
+        "subtopics": [
           "Chemiosmotic theory and ATP synthesis; Lipid metabolism.",
           "Nitrogen fixation and nitrogen metabolism.",
           "Enzymes, coenzymes; Energy transfer and energy conservation.",
@@ -185,11 +185,11 @@ export const optionalSubBotany = [
     ]
   },
   {
-    section: "Ecology and Plant Geography",
-    topics: [
+    "section": "Ecology and Plant Geography",
+    "topics": [
       {
-        title: "Ecology and Environment",
-        subtopics: [
+        "title": "Ecology and Environment",
+        "subtopics": [
           "Concept of ecosystem; Ecological factors.",
           "Concepts and dynamics of community; Plant succession.",
           "Concepts of biosphere; Ecosystems; Conservation.",
@@ -198,8 +198,8 @@ export const optionalSubBotany = [
         ]
       },
       {
-        title: "Forestry, Biodiversity and Phytogeography",
-        subtopics: [
+        "title": "Forestry, Biodiversity and Phytogeography",
+        "subtopics": [
           "Forest types of India— Ecological and economic importance of forests, afforestation, deforestation and social forestry.",
           "Endangered plants, endemism IUCN categories, Red Data Books.",
           "Biodiversity and its conservation; Protected Area Network.",
@@ -210,4 +210,4 @@ export const optionalSubBotany = [
       }
     ]
   }
-];
+]

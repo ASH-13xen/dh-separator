@@ -1,10 +1,10 @@
-export const optionalSubStatistics = [
+[
   {
-    section: "Probability and Statistical Inference",
-    topics: [
+    "section": "Probability and Statistical Inference",
+    "topics": [
       {
-        title: "Probability",
-        subtopics: [
+        "title": "Probability",
+        "subtopics": [
           "Sample space and events, probability measure and probability space, random variable as a measurable function.",
           "Distribution function of a random variable, discrete and continuous-type random variable, probability mass function, probability density function, vector-valued random variable, marginal and conditional distributions.",
           "Stochastic independence of events and of random variables, expectation and moments of a random variable, conditional expectation.",
@@ -15,8 +15,8 @@ export const optionalSubStatistics = [
         ]
       },
       {
-        title: "Statistical Inference: Estimation",
-        subtopics: [
+        "title": "Statistical Inference: Estimation",
+        "subtopics": [
           "Consistency, unbiasedness, efficiency, sufficiency, completeness, ancillary statistics, factorization theorem, exponential family of distribution and its properties.",
           "Uniformly minimum variance unbiased (UMVU) estimation, Rao-Blackwell and Lehmann-Scheffe theorems, Cramer-Rao inequality for single parameter.",
           "Estimation by methods of moments, maximum likelihood, least squares, minimum chi-square and modified minimum chi-square, properties of maximum likelihood and other estimators, asymptotic efficiency.",
@@ -24,8 +24,8 @@ export const optionalSubStatistics = [
         ]
       },
       {
-        title: "Statistical Inference: Hypothesis Testing",
-        subtopics: [
+        "title": "Statistical Inference: Hypothesis Testing",
+        "subtopics": [
           "Non-randomised and randomised tests, critical function, MP tests, Neyman-Pearson lemma, UMP tests.",
           "Monotone likelihood ratio: similar and unbiased tests, UMPU tests for single parameter, likelihood ratio test and its asymptotic distribution. Confidence bounds and its relation with tests.",
           "Kolmogorov’s test for goodness of fit and its consistency, sign test and its optimality. Wilcoxon signed-ranks test and its consistency.",
@@ -36,11 +36,11 @@ export const optionalSubStatistics = [
     ]
   },
   {
-    section: "Linear Inference, Multivariate Analysis and Design of Experiments",
-    topics: [
+    "section": "Linear Inference, Multivariate Analysis and Design of Experiments",
+    "topics": [
       {
-        title: "Linear Inference and Multivariate Analysis",
-        subtopics: [
+        "title": "Linear Inference and Multivariate Analysis",
+        "subtopics": [
           "Linear statistical models, theory of least squares and analysis of variance, Gauss-Markoff theory, normal equations, least squares estimates and their precision.",
           "Test of significance and interval estimates based on least squares theory in one-way, two-way and three-way classified data.",
           "Regression analysis, linear regression, curvilinear regression and orthogonal polynomials, multiple regression, multiple and partial correlations, estimation of variance and covariance components.",
@@ -49,8 +49,8 @@ export const optionalSubStatistics = [
         ]
       },
       {
-        title: "Sampling Theory",
-        subtopics: [
+        "title": "Sampling Theory",
+        "subtopics": [
           "An outline of fixed-population and super-population approaches, distinctive features of finite population sampling, probability sampling designs.",
           "Simple random sampling with and without replacement, stratified random sampling, systematic sampling and its efficacy.",
           "Cluster sampling, two-stage and multi-stage sampling, ratio and regression methods of estimation involving one or more auxiliary variables.",
@@ -59,8 +59,8 @@ export const optionalSubStatistics = [
         ]
       },
       {
-        title: "Design of Experiments",
-        subtopics: [
+        "title": "Design of Experiments",
+        "subtopics": [
           "Fixed effects model (two-way classification), random and mixed effects models (two-way classification with equal observation per cell).",
           "CRD, RBD, LSD and their analyses, incomplete block designs, concepts of orthogonality and balance, BIBD, missing plot technique.",
           "Factorial experiments and 2^4 and 3^2, confounding in factorial experiments, split-plot and simple lattice designs, transformation of data, Duncan’s multiple range test."
@@ -69,11 +69,11 @@ export const optionalSubStatistics = [
     ]
   },
   {
-    section: "Industrial Statistics and Optimization Techniques",
-    topics: [
+    "section": "Industrial Statistics and Optimization Techniques",
+    "topics": [
       {
-        title: "Quality Control and Reliability",
-        subtopics: [
+        "title": "Quality Control and Reliability",
+        "subtopics": [
           "Process and product control, general theory of control charts, different types of control charts for variables and attributes, X, R, s, p, np and c charts, cumulative sum chart.",
           "Single, double, multiple and sequential sampling plans for attributes, OC, ASN, AOQ and ATI curves, concepts of producer’s and consumer’s risks, AQL, LTPD and AOQL.",
           "Sampling plans for variables, Use of Dodge-Romig tables.",
@@ -82,8 +82,8 @@ export const optionalSubStatistics = [
         ]
       },
       {
-        title: "Operations Research and Optimization",
-        subtopics: [
+        "title": "Operations Research and Optimization",
+        "subtopics": [
           "Different types of models in Operations Research, their construction and general methods of solution, simulation and Monte-Carlo methods.",
           "Formulation of Linear Programming (LP) problem, simple LP model and its graphical solution, the simplex procedure, the two-phase method and the M-technique with artificial variables.",
           "The duality theory of LP and its economic interpretation, sensitivity analysis, transportation and assignment problems.",
@@ -93,8 +93,8 @@ export const optionalSubStatistics = [
         ]
       },
       {
-        title: "Stochastic Processes and Computing",
-        subtopics: [
+        "title": "Stochastic Processes and Computing",
+        "subtopics": [
           "Homogeneous discrete-time Markov chains, transition probability matrix, classification of states and ergodic theorems, homogeneous continuous-time Markov chains, Poisson process.",
           "Elements of queuing theory, M/M/1, M/M/K, G/M/1 and M/G/1 queues.",
           "Solution of statistical problems on computers using well-known statistical software packages like SPSS."
@@ -103,11 +103,11 @@ export const optionalSubStatistics = [
     ]
   },
   {
-    section: "Quantitative Economics, Demography and Psychometry",
-    topics: [
+    "section": "Quantitative Economics, Demography and Psychometry",
+    "topics": [
       {
-        title: "Quantitative Economics",
-        subtopics: [
+        "title": "Quantitative Economics",
+        "subtopics": [
           "Determination of trend, seasonal and cyclical components, Box-Jenkins method, tests for stationary series.",
           "ARIMA models and determination of orders of autoregressive and moving average components, forecasting.",
           "Commonly used index numbers - Laspeyres, Paasche's and Fisher's ideal index numbers, chain-base index number, uses and limitations of index numbers.",
@@ -118,16 +118,16 @@ export const optionalSubStatistics = [
         ]
       },
       {
-        title: "Official Statistics",
-        subtopics: [
+        "title": "Official Statistics",
+        "subtopics": [
           "Present official statistical system in India relating to population, agriculture, industrial production, trade and prices.",
           "Methods of collection of official statistics, their reliability and limitations.",
           "Principal publications containing such statistics, various official agencies responsible for data collection and their main functions."
         ]
       },
       {
-        title: "Demography and Psychometry",
-        subtopics: [
+        "title": "Demography and Psychometry",
+        "subtopics": [
           "Demographic data from census, registration, NSS and other surveys, their limitations and uses.",
           "Definition, construction and uses of vital rates and ratios, measures of fertility, reproduction rates, morbidity rate, standardized death rate.",
           "Complete and abridged life tables, construction of life tables from vital statistics and census returns, uses of life tables.",
@@ -139,4 +139,4 @@ export const optionalSubStatistics = [
       }
     ]
   }
-];
+]

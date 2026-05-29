@@ -1,17 +1,17 @@
-export const optionalSubMechanicalEngineering = [
+[
   {
-    section: "Mechanics, Materials and Theory of Machines",
-    topics: [
+    "section": "Mechanics, Materials and Theory of Machines",
+    "topics": [
       {
-        title: "Mechanics of Rigid Bodies",
-        subtopics: [
+        "title": "Mechanics of Rigid Bodies",
+        "subtopics": [
           "Equations of equilibrium in space and its application; first and second moments of area.",
           "Simple problems on friction; kinematics of particles for plane motion; elementary particle dynamics."
         ]
       },
       {
-        title: "Mechanics of Deformable Bodies",
-        subtopics: [
+        "title": "Mechanics of Deformable Bodies",
+        "subtopics": [
           "Generalized Hooke’s law and its application; design problems on axial stress, shear stress and bearing stress; material properties for dynamic loading.",
           "Bending shear and stresses in beams; determination of principle stresses and strains-analytical and graphical.",
           "Compound and combined stresses; bi-axial stresses-thin walled pressure vessel.",
@@ -20,15 +20,15 @@ export const optionalSubMechanicalEngineering = [
         ]
       },
       {
-        title: "Engineering Materials",
-        subtopics: [
+        "title": "Engineering Materials",
+        "subtopics": [
           "Basic concepts on structure of solids, common ferrous and non-ferrous materials and their applications.",
           "Heat-treatment of steels; non-metals, plastics, ceramics, composite materials and nano-materials."
         ]
       },
       {
-        title: "Theory of Machines",
-        subtopics: [
+        "title": "Theory of Machines",
+        "subtopics": [
           "Kinematic and dynamic analysis of plane mechanisms.",
           "Cams, Gears and epicyclic gear trains, flywheels, governors.",
           "Balancing of rigid rotors, balancing of single and multicylinder engines.",
@@ -38,11 +38,11 @@ export const optionalSubMechanicalEngineering = [
     ]
   },
   {
-    section: "Manufacturing Science and Management",
-    topics: [
+    "section": "Manufacturing Science and Management",
+    "topics": [
       {
-        title: "Manufacturing Process",
-        subtopics: [
+        "title": "Manufacturing Process",
+        "subtopics": [
           "Machine tool engineering: Merchant’s force analysis; Taylor’s tool life equation; conventional machining; NC and CNC machining process; jigs and fixtures.",
           "Non-conventional machining: EDM, ECM, ultrasonic, water jet machining etc.; application of lasers and plasmas; energy rate calculations.",
           "Forming and welding processes: standard processes.",
@@ -50,8 +50,8 @@ export const optionalSubMechanicalEngineering = [
         ]
       },
       {
-        title: "Manufacturing Management",
-        subtopics: [
+        "title": "Manufacturing Management",
+        "subtopics": [
           "System design: factory location—simple OR models; plant layout-methods based; applications of engineering economic analysis and break-even analysis for product selection, process selection and capacity planning; predetermined time standards.",
           "System planning: forecasting methods based on regression and decomposition, design and balancing of multi-model and stochastic assembly lines; inventory management-probabilistic inventory models for order time and order quantity determination; JIT systems; strategic sourcing; managing inter-plant logistics.",
           "System operations and control: Scheduling algorithms for job shops; applications of statistical methods for product and process quality control applications of control charts for mean, range, percent defective, number of defectives and defects per unit; quality cost systems; management of resources, organizations and risks in projects.",
@@ -61,11 +61,11 @@ export const optionalSubMechanicalEngineering = [
     ]
   },
   {
-    section: "Thermodynamics, Gas Dynamics and Heat Transfer",
-    topics: [
+    "section": "Thermodynamics, Gas Dynamics and Heat Transfer",
+    "topics": [
       {
-        title: "Thermodynamics, Gas Dynamics and Turbines",
-        subtopics: [
+        "title": "Thermodynamics, Gas Dynamics and Turbines",
+        "subtopics": [
           "Basic concept of First-law and Second law of Thermodynamics; concept of entropy and reversibility; availability and unavailability and irreversibility.",
           "Classification and properties of fluids; incompressible and compressible fluids flows; effect of Mach number and compressibility.",
           "Continuity momentum and energy equations; normal and oblique shocks; one dimensional isentropic flow; flow of fluids in duct with frictions that transfer.",
@@ -74,8 +74,8 @@ export const optionalSubMechanicalEngineering = [
         ]
       },
       {
-        title: "Heat Transfer",
-        subtopics: [
+        "title": "Heat Transfer",
+        "subtopics": [
           "Conduction heat transfer: general conduction equation-Laplace, Poisson and Fourier equations; Fourier law of conduction; one dimensional steady state heat conduction applied to simple wall, solid and hollow cylinder and spheres.",
           "Convection heat transfer: Newton’s law of convection; free and forced convection; heat transfer during laminar and turbulent flow of an incompressible fluid over a flat plate.",
           "Concepts of Nusselt number, hydrodynamic and thermal boundary layer their thickness; Prandtl number; analogy between heat and momentum transfer—Reynolds, Colburn, Prandtl analogies; heat transfer during laminar and turbulent flow through horizontal tubes; free convection from horizontal and vertical plates.",
@@ -86,19 +86,19 @@ export const optionalSubMechanicalEngineering = [
     ]
   },
   {
-    section: "Power Generation, Engines and Refrigeration",
-    topics: [
+    "section": "Power Generation, Engines and Refrigeration",
+    "topics": [
       {
-        title: "IC Engines",
-        subtopics: [
+        "title": "IC Engines",
+        "subtopics": [
           "Classification, thermodynamic cycles of operation; determination of brake power, indicated power, mechanical efficiency, heat balance sheet, interpretation of performance characteristics, petrol, gas and diesel engines.",
           "Combustion in SI and CI engines, normal and abnormal combustion; effect of working parameters on knocking, reduction of knocking; Forms of combustion chamber for SI and CI engines; rating of fuels; additives; emission.",
           "Different systems of IC engines-fuels; lubricating; cooling and transmission systems. Alternate fuels in IC engines."
         ]
       },
       {
-        title: "Steam Engineering",
-        subtopics: [
+        "title": "Steam Engineering",
+        "subtopics": [
           "Steam generation: modified Rankine cycle analysis; Modern steam boilers; steam at critical and supercritical pressures; draught equipment; natural and artificial draught; boiler fuels solid, liquid and gaseous fuels.",
           "Steam turbines: Principle; types; compounding; impulse and reaction turbines; axial thrust.",
           "Steam nozzles: flow of steam in convergent and divergent nozzle pressure at throat for maximum discharge with different initial steam conditions such as wet, saturated and superheated, effect of variation of back pressure; supersaturated flow of steam in nozzles, Wilson line.",
@@ -107,8 +107,8 @@ export const optionalSubMechanicalEngineering = [
         ]
       },
       {
-        title: "Refrigeration and Air-conditioning",
-        subtopics: [
+        "title": "Refrigeration and Air-conditioning",
+        "subtopics": [
           "Vapour compression refrigeration cycle: cycle on p-H & T-s diagrams; ecofriendly refrigerants—R 134a, R 123.",
           "Systems like evaporators, condensers, compressor, expansion devices. Simple vapour absorption systems.",
           "Psychrometry: properties; processes; charts; sensible heating and cooling; humidification and dehumidification effective temperature; air-conditioning load calculation; simple duct design."
@@ -116,4 +116,4 @@ export const optionalSubMechanicalEngineering = [
       }
     ]
   }
-];
+]

@@ -9,20 +9,22 @@ const __dirname = path.dirname(__filename);
 
 async function loadModuleHierarchy(moduleName) {
     const constantsDir = path.join(__dirname, '../constants');
-    const filePath = path.join(constantsDir, `${moduleName}.js`);
-    if (!fs.existsSync(filePath)) {
-        throw new Error(`Module ${moduleName} not found.`);
-    }
-    const modulePath = 'file:///' + filePath.replace(/\\/g, '/');
-    const imported = await import(modulePath);
+    let finalModuleName = moduleName;
     
-    const keys = Object.keys(imported);
-    for (const k of keys) {
-        if (Array.isArray(imported[k])) {
-            return imported[k];
-        }
+    // Normalize Optional Subject if needed
+    if (!finalModuleName.startsWith('GS-') && !finalModuleName.startsWith('OptionalSubject')) {
+       const cleanName = finalModuleName.replace(/\s+/g, '');
+       finalModuleName = `OptionalSubject${cleanName.charAt(0).toUpperCase()}${cleanName.slice(1)}`;
     }
-    return [];
+    
+    const filePath = path.join(constantsDir, `${finalModuleName}.json`);
+    if (!fs.existsSync(filePath)) {
+        throw new Error(`Module ${finalModuleName} not found.`);
+    }
+    
+    const content = fs.readFileSync(filePath, 'utf8');
+    const parsed = JSON.parse(content);
+    return Array.isArray(parsed) ? parsed : [];
 }
 
 export const previewSubjectData = async (req, res) => {
