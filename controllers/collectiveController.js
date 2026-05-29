@@ -8,23 +8,23 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 async function loadModuleHierarchy(moduleName) {
-    const constantsDir = path.join(__dirname, '../constants');
-    let finalModuleName = moduleName;
+    const hierarchyPath = path.join(__dirname, '../syllabus_hierarchy.json');
+    if (!fs.existsSync(hierarchyPath)) {
+        throw new Error("Syllabus hierarchy file not found.");
+    }
     
-    // Normalize Optional Subject if needed
+    let finalModuleName = moduleName;
     if (!finalModuleName.startsWith('GS-') && !finalModuleName.startsWith('OptionalSubject')) {
        const cleanName = finalModuleName.replace(/\s+/g, '');
        finalModuleName = `OptionalSubject${cleanName.charAt(0).toUpperCase()}${cleanName.slice(1)}`;
     }
     
-    const filePath = path.join(constantsDir, `${finalModuleName}.json`);
-    if (!fs.existsSync(filePath)) {
-        throw new Error(`Module ${finalModuleName} not found.`);
+    const customData = JSON.parse(fs.readFileSync(hierarchyPath, 'utf8'));
+    if (finalModuleName.startsWith('GS-')) {
+       return customData.gsModules?.[finalModuleName] || [];
+    } else {
+       return customData.optionalSubjects?.[finalModuleName] || [];
     }
-    
-    const content = fs.readFileSync(filePath, 'utf8');
-    const parsed = JSON.parse(content);
-    return Array.isArray(parsed) ? parsed : [];
 }
 
 export const previewSubjectData = async (req, res) => {

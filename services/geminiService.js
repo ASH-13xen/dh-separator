@@ -38,45 +38,61 @@ const withRetry = async (fn, retries = 3, delayMs = 5000) => {
 
 const loadSyllabus = async () => {
     try {
-        const constantsDir = path.join(__dirname, '../constants');
-        const files = fs.readdirSync(constantsDir).filter(f => f.endsWith('.json') && f !== 'customHierarchy.json');
+        const hierarchyPath = path.join(__dirname, '../syllabus_hierarchy.json');
+        if (!fs.existsSync(hierarchyPath)) {
+            console.warn("[GeminiService] syllabus_hierarchy.json not found!");
+            return;
+        }
+        
+        const customData = JSON.parse(fs.readFileSync(hierarchyPath, 'utf8'));
         let syllabusStr = '';
         
-        for (const file of files) {
-          const filePath = path.join(constantsDir, file);
-          let data = [];
-          try {
-            data = JSON.parse(fs.readFileSync(filePath, 'utf8'));
-          } catch (err) {
-            console.error(`Error parsing JSON file ${file} in loadSyllabus:`, err);
-            continue;
-          }
-          
-          if (Array.isArray(data)) {
-             if (file.startsWith('OptionalSubject')) {
-                const subjectName = file.replace('.json', '');
-                syllabusStr += `\n\n--- OPTIONAL SUBJECT: ${subjectName} ---\n`;
-             } else if (file.startsWith('GS-')) {
-                syllabusStr += `\n\n--- COMPULSORY PAPER: ${file.replace('.json', '')} ---\n`;
-             }
-             
-             data.forEach(sectionItem => {
-               if (sectionItem.section) {
-                   syllabusStr += `Section: ${sectionItem.section}\n`;
-               }
-               if (sectionItem.topics && Array.isArray(sectionItem.topics)) {
-                 sectionItem.topics.forEach(topicItem => {
-                   if (topicItem.title) {
-                      syllabusStr += `  Topic: ${topicItem.title}\n`;
-                      if (topicItem.subtopics && Array.isArray(topicItem.subtopics)) {
-                         syllabusStr += `    Subtopics: ${topicItem.subtopics.join(', ')}\n`;
-                      }
-                   }
-                 });
-               }
-             });
-          }
+        if (customData.gsModules) {
+          Object.entries(customData.gsModules).forEach(([moduleName, sections]) => {
+            syllabusStr += `\n\n--- COMPULSORY PAPER: ${moduleName} ---\n`;
+            if (Array.isArray(sections)) {
+              sections.forEach(sectionItem => {
+                if (sectionItem.section) {
+                    syllabusStr += `Section: ${sectionItem.section}\n`;
+                }
+                if (sectionItem.topics && Array.isArray(sectionItem.topics)) {
+                  sectionItem.topics.forEach(topicItem => {
+                    if (topicItem.title) {
+                       syllabusStr += `  Topic: ${topicItem.title}\n`;
+                       if (topicItem.subtopics && Array.isArray(topicItem.subtopics)) {
+                          syllabusStr += `    Subtopics: ${topicItem.subtopics.join(', ')}\n`;
+                       }
+                    }
+                  });
+                }
+              });
+            }
+          });
         }
+        
+        if (customData.optionalSubjects) {
+          Object.entries(customData.optionalSubjects).forEach(([subjectName, sections]) => {
+            syllabusStr += `\n\n--- OPTIONAL SUBJECT: ${subjectName} ---\n`;
+            if (Array.isArray(sections)) {
+              sections.forEach(sectionItem => {
+                if (sectionItem.section) {
+                    syllabusStr += `Section: ${sectionItem.section}\n`;
+                }
+                if (sectionItem.topics && Array.isArray(sectionItem.topics)) {
+                  sectionItem.topics.forEach(topicItem => {
+                    if (topicItem.title) {
+                       syllabusStr += `  Topic: ${topicItem.title}\n`;
+                       if (topicItem.subtopics && Array.isArray(topicItem.subtopics)) {
+                          syllabusStr += `    Subtopics: ${topicItem.subtopics.join(', ')}\n`;
+                       }
+                    }
+                  });
+                }
+              });
+            }
+          });
+        }
+        
         parsedSyllabusText = syllabusStr;
     } catch (e) {
         console.error("Failed to load dynamic syllabus:", e);
