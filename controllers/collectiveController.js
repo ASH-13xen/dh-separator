@@ -27,6 +27,76 @@ async function loadModuleHierarchy(moduleName) {
     }
 }
 
+async function getKnownHierarchyTags() {
+    const hierarchyPath = path.join(__dirname, '../syllabus_hierarchy.json');
+    if (!fs.existsSync(hierarchyPath)) {
+        return new Set();
+    }
+    const customData = JSON.parse(fs.readFileSync(hierarchyPath, 'utf8'));
+    const knownTags = new Set();
+
+    if (customData.gsModules) {
+      Object.entries(customData.gsModules).forEach(([mod, sections]) => {
+        knownTags.add(mod);
+        if (Array.isArray(sections)) {
+          sections.forEach(secItem => {
+            if (secItem.section) knownTags.add(secItem.section);
+            if (secItem.topics && Array.isArray(secItem.topics)) {
+              secItem.topics.forEach(topicItem => {
+                if (topicItem.title) knownTags.add(topicItem.title);
+              });
+            }
+          });
+        }
+      });
+    }
+
+    if (customData.optionalSubjects) {
+      Object.entries(customData.optionalSubjects).forEach(([sub, sections]) => {
+        knownTags.add(sub);
+        if (Array.isArray(sections)) {
+          sections.forEach(secItem => {
+            if (secItem.section) knownTags.add(secItem.section);
+            if (secItem.topics && Array.isArray(secItem.topics)) {
+              secItem.topics.forEach(topicItem => {
+                if (topicItem.title) knownTags.add(topicItem.title);
+              });
+            }
+          });
+        }
+      });
+    }
+
+    return knownTags;
+}
+
+function getPaperTagsForSubject(questions, knownTags) {
+    const paperTags = new Set();
+    for (const q of questions) {
+        if (q.tags && Array.isArray(q.tags)) {
+            for (const tag of q.tags) {
+                if (!knownTags.has(tag) && !tag.startsWith('GS-') && !tag.startsWith('OptionalSubject')) {
+                    paperTags.add(tag);
+                }
+            }
+        }
+    }
+    
+    const papersList = Array.from(paperTags);
+    papersList.sort((a, b) => {
+        const isDefaultA = (a === "Paper 1" || a === "Paper 2");
+        const isDefaultB = (b === "Paper 1" || b === "Paper 2");
+        if (isDefaultA && !isDefaultB) return -1;
+        if (!isDefaultA && isDefaultB) return 1;
+        return a.localeCompare(b);
+    });
+    
+    if (papersList.length === 0) {
+        return ["Paper 1", "Paper 2"];
+    }
+    return papersList;
+}
+
 export const previewSubjectData = async (req, res) => {
   try {
     const { moduleName } = req.query; // e.g., 'GS-1'
@@ -77,8 +147,11 @@ export const previewSubjectData = async (req, res) => {
     };
 
     if (isOptional) {
-        processHierarchy("Paper 1");
-        processHierarchy("Paper 2");
+        const knownTags = await getKnownHierarchyTags();
+        const paperTags = getPaperTagsForSubject(questions, knownTags);
+        for (const paper of paperTags) {
+            processHierarchy(paper);
+        }
     } else {
         processHierarchy(null);
     }
@@ -100,7 +173,7 @@ export const previewSubjectData = async (req, res) => {
     console.error(err);
     res.status(500).json({ error: 'Failed to fetch hierarchical preview data.' });
   }
-}
+};
 
 export const generateCollectivePdf = async (req, res) => {
   try {
@@ -162,8 +235,11 @@ export const generateCollectivePdf = async (req, res) => {
     };
 
     if (isOptional) {
-        processHierarchy("Paper 1");
-        processHierarchy("Paper 2");
+        const knownTags = await getKnownHierarchyTags();
+        const paperTags = getPaperTagsForSubject(questionsResponse, knownTags);
+        for (const paper of paperTags) {
+            processHierarchy(paper);
+        }
     } else {
         processHierarchy(null);
     }

@@ -19,11 +19,15 @@ export const getAllQuestions = async (req, res) => {
 export const updateQuestion = async (req, res) => {
   try {
     const { id } = req.params;
-    const { tags, file_urls } = req.body;
+    const { tags, file_urls, question_text } = req.body;
+
+    const updateFields = { tags };
+    if (file_urls) updateFields.file_urls = file_urls;
+    if (question_text !== undefined) updateFields.question_text = question_text;
 
     const updatedQuestion = await UPSCQA.findByIdAndUpdate(
       id,
-      { tags, ...(file_urls && { file_urls }) },
+      updateFields,
       { new: true, runValidators: true }
     );
 
@@ -106,6 +110,10 @@ export const addCustomTag = async (req, res) => {
     const { type, name, parentModule, parentSection } = req.body;
     if (!type || !name) {
       return res.status(400).json({ error: "Type and name are required." });
+    }
+
+    if (type === 'optionalPaper') {
+      return res.status(200).json({ success: true, name: name.trim() });
     }
     
     const hierarchyPath = path.join(__dirname, '../syllabus_hierarchy.json');
