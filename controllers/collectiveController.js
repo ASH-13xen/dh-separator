@@ -71,30 +71,7 @@ async function getKnownHierarchyTags() {
 }
 
 function getPaperTagsForSubject(questions, knownTags) {
-    const paperTags = new Set();
-    for (const q of questions) {
-        if (q.tags && Array.isArray(q.tags)) {
-            for (const tag of q.tags) {
-                if (!knownTags.has(tag) && !tag.startsWith('GS-') && !tag.startsWith('OptionalSubject')) {
-                    paperTags.add(tag);
-                }
-            }
-        }
-    }
-    
-    const papersList = Array.from(paperTags);
-    papersList.sort((a, b) => {
-        const isDefaultA = (a === "Paper 1" || a === "Paper 2");
-        const isDefaultB = (b === "Paper 1" || b === "Paper 2");
-        if (isDefaultA && !isDefaultB) return -1;
-        if (!isDefaultA && isDefaultB) return 1;
-        return a.localeCompare(b);
-    });
-    
-    if (papersList.length === 0) {
-        return ["Paper 1", "Paper 2"];
-    }
-    return papersList;
+    return ["Paper 1", "Paper 2", "Paper 3", "Paper 4"];
 }
 
 export const previewSubjectData = async (req, res) => {
