@@ -983,29 +983,22 @@
           {
             "title": "Meaning, Scope, and Branches",
             "subtopics": [
-              "Meaning, Scope and development of Anthropology.",
-              "Relationships with other disciplines: Social Sciences, behavioural Sciences, Life Sciences, Medical Sciences, Earth Sciences and Humanities.",
-              "Main branches of Anthropology, their scope and relevance: Social-cultural Anthropology, biological Anthropology, Archaeological Anthropology, Linguistic Anthropology."
+              "1.1  Meaning, Scope and development of Anthropology.",
+              "1.2  Relationships with other disciplines: Social Sciences, behavioural Sciences, Life Sciences, Medical Sciences, Earth Sciences and Humanities.",
+              "1.3  Main branches of Anthropology, their scope and relevance:\n     (a) Social-cultural Anthropology.\n     (b) biological Anthropology.\n     (c) Archaeological Anthropology.\n     (d) Linguistic Anthropology."
             ]
           },
           {
             "title": "Human Evolution and Emergence of Man",
             "subtopics": [
-              "Biological and Cultural factors in human evolution.",
-              "Theories of Organic Evolution (Pre-Darwinian, Darwinian and Post-Darwinian).",
-              "Synthetic theory of evolution; Brief outline of terms and concepts of evolutionary biology (Doll’s rule, Cope’s rule, Gause’s rule, parallelism, convergence, adaptive radiation, and mosaic evolution)."
+              "1.4  Human Evolution and emergence of Man:\n     (a) Biological and Cultural factors in human evolution.\n     (b) Theories of Organic Evolution (Pre-Darwinian, Darwinian and Post-Darwinian).\n     (c) Synthetic theory of evolution; Brief outline of terms and concepts of evolutionary biology (Doll's rule, Cope's rule, Gause's rule, parallelism, convergence, adaptive radiation, and mosaic evolution)."
             ]
           },
           {
             "title": "Primatology and Fossil Hominids",
             "subtopics": [
-              "Characteristics of Primates; Evolutionary Trend and Primate Taxonomy; Primate Adaptations; (Arboreal and Terrestrial) Primate Taxonomy; Primate Behaviour.",
-              "Tertiary and Quaternary fossil primates; Living Major Primates; Comparative Anatomy of Man and Apes; Skeletal changes due to erect posture and its implications.",
-              "Phylogenetic status, characteristics and geographical distribution of: Plio-preleistocene hominids in South and East Africa—Australopithecines.",
-              "Homo erectus: Africa (Paranthropus), Europe (Homo erectus heidelbergensis), Asia (Homo erectus javanicus, Homo erectus pekinensis).",
-              "Neanderthal man—La-chapelle-aux-saints (Classical type), Mt. Carmel (Progressive type).",
-              "Rhodesian man.",
-              "Homo sapiens—Cromagnon, Grimaldi and Chancelede."
+              "1.5  Characteristics of Primates; Evolutionary Trend and Primate Taxonomy; Primate Adaptations; (Arboreal and Terrestrial) Primate Taxonomy; Primate Behaviour; Tertiary and Quaternary fossil primates; Living Major Primates; Comparative Anatomy of Man and Apes; Skeletal changes due to erect posture and its implications.",
+              "1.6  Phylogenetic status, characteristics and geographical distribution of the following:\n     (a) Plio-preleistocene hominids in South and East Africa — Australopithecines.\n     (b) Homo erectus: Africa (Paranthropus), Europe (Homo erectus (heidelbergensis), Asia (Homo erectus javanicus, Homo erectus pekinensis.\n     (c) Neanderthal man — La-chapelle-aux-saints (Classical type), Mt. Carmel (Progressive type).\n     (d) Rhodesian man.\n     (e) Homo sapiens — Cromagnon, Grimaldi and Chancelede."
             ]
           }
         ]
@@ -1016,14 +1009,13 @@
           {
             "title": "The Biological Basis of Life",
             "subtopics": [
-              "The Cell, DNA structure and replication, Protein Synthesis, Gene, Mutation, Chromosomes, and Cell Division."
+              "1.7  The biological basis of Life: The Cell, DNA structure and replication, Protein Synthesis, Gene, Mutation, Chromosomes, and Cell Division."
             ]
           },
           {
             "title": "Prehistoric Archaeology",
             "subtopics": [
-              "Principles of Prehistoric Archaeology. Chronology: Relative and Absolute Dating methods.",
-              "Cultural Evolution—Broad Outlines of Prehistoric cultures: Paleolithic, Mesolithic, Neolithic, Chalcolithic, Copper-Bronze age, Iron Age."
+              "1.8  (a) Principles of Prehistoric Archaeology. Chronology: Relative and Absolute Dating methods.\n     (b) Cultural Evolution — Broad Outlines of Prehistoric cultures:\n         (i)   Paleolithic\n         (ii)  Mesolithic\n         (iii) Neolithic\n         (iv)  Chalcolithic\n         (v)   Copper-Bronze age\n         (vi)  Iron Age"
             ]
           }
         ]
@@ -1034,16 +1026,16 @@
           {
             "title": "Nature of Culture and Society",
             "subtopics": [
-              "The Nature of Culture: The concept and Characteristics of culture and civilization; Ethnocentrism vis-a-vis cultural Relativism.",
-              "The Nature of Society: Concept of Society; Society and Culture; Social Institution; Social groups; and social stratification."
+              "2.1  The Nature of Culture: The concept and Characteristics of culture and civilization; Ethnocentrism vis-a-vis cultural Relativism.",
+              "2.2  The Nature of Society: Concept of Society; Society and Culture; Social Institution; Social groups; and Social stratification."
             ]
           },
           {
             "title": "Marriage, Family, and Kinship",
             "subtopics": [
-              "Marriage: Definition and universality; Laws of marriage (endogamy, exogamy, hypergamy, hypogamy, incest taboo); Type of marriage (monogamy, polygamy, polyandry, group marriage). Functions of marriage; Marriage regulations; Marriage payments (bride wealth and dowry).",
-              "Family: Definition and universality; Family, household and domestic groups; functions of family; Types of family (structure, blood relation, marriage, residence, succession); Impact of urbanization, industrialization and feminist movements on family.",
-              "Kinship: Consanguinity and Affinity; Principles and types of descent (Unilineal, Double, Bilateral Ambilineal); Forms of descent groups (lineage, clan, phratry, moiety and kindred); Kinship terminology (descriptive and classificatory); Descent, Filiation and Complimentary Filiation; Decent and Alliance."
+              "2.3  Marriage: Definition and universality; Laws of marriage (endogamy, exogamy, hypergamy, hypogamy, incest taboo); Type of marriage (monogamy, polygamy, polyandry, group marriage). Functions of marriage; Marriage regulations (preferential, prescriptive and proscriptive); Marriage payments (bride wealth and dowry).",
+              "2.4  Family: Definition and universality; Family, household and domestic groups; functions of family; Types of family (from the perspectives of structure, blood relation, marriage, residence and succession); Impact of urbanization, industrialisation and feminist movements on family.",
+              "2.5  Kinship: Consanguinity and Affinity; Principles and types of descent (Unilineal, Double, Bilateral Ambilineal); Forms of descent groups (lineage, clan, phratry, moiety and kindred); Kinship terminology (descriptive and classificatory); Descent, Filiation and Complimentary Filiation; Decent and Alliance."
             ]
           }
         ]
@@ -1054,17 +1046,14 @@
           {
             "title": "Economic and Political Organization",
             "subtopics": [
-              "Economic Organization: Meaning, scope and relevance; Formalist and Substantivist debate; Principles governing production, distribution and exchange (reciprocity, redistribution and market).",
-              "Subsistence strategies: hunting and gathering, fishing, swiddening, pastoralism, horticulture, and agriculture; globalization and indigenous economic systems.",
-              "Political Organization and Social Control: Band, tribe, chiefdom, kingdom and state; concepts of power, authority and legitimacy; social control, law and justice in simple Societies."
+              "3.   Economic Organization: Meaning, scope and relevance of economic anthropology; Formalist and Substantivist debate; Principles governing production, distribution and exchange (reciprocity, redistribution and market), in communities, subsisting on hunting and gathering, fishing, swiddening, pastoralism, horticulture, and agriculture; globalization and indigenous economic systems.",
+              "4.   Political Organization and Social Control: Band, tribe, chiefdom, kingdom and state; concepts of power, authority and legitimacy; social control, law and justice in simple Societies."
             ]
           },
           {
             "title": "Religion",
             "subtopics": [
-              "Anthropological approaches to the study of religion (evolutionary, psychological and functional); monotheism and polytheism; sacred and profane; myths and rituals.",
-              "Forms of religion in tribal and peasant Societies (animism, animatism, fetishism, naturism and totemism).",
-              "Religion, magic and science distinguished; magico-religious functionaries (priest, shaman, medicine man, sorcerer and witch)."
+              "5.   Religion: Anthropological approaches to the study of religion (evolutionary, psychological and functional); monotheism and polytheism; sacred and profane; myths and rituals; forms of religion in tribal and peasant Societies (animism, animatism, fetishism, naturism and totemism); religion, magic and science distinguished; magico-religious functionaries (priest, shaman, medicine man, sorcerer and witch)."
             ]
           }
         ]
@@ -1075,25 +1064,14 @@
           {
             "title": "Anthropological Theories",
             "subtopics": [
-              "Classical evolutionism (Tylor, Morgan and Frazer).",
-              "Historical particularism (Boas); Diffusionism (British, German and American).",
-              "Functionalism (Malinowski); Structural—Functionalism (Radcliffe-Brown).",
-              "Structuralism (L’evi-Strauss and E. Leach).",
-              "Culture and personality (Benedict, Mead, Linton, Kardiner and Cora-du Bois).",
-              "Neo—evolutionism (Childe, White, Steward, Sahlins and Service).",
-              "Cultural materialism (Harris).",
-              "Symbolic and interpretive theories (Turner, Schneider and Geertz).",
-              "Cognitive theories (Tyler, Conklin).",
-              "Post-modernism in anthropology."
+              "6.   Anthropological theories:\n     (a) Classical evolutionism (Tylor, Morgan and Frazer)\n     (b) Historical particularism (Boas) Diffusionism (British, German and American)\n     (c) Functionalism (Malinowski); Structural — Functionlism (Radcliffe-Brown)\n     (d) Structuralism (L'evi-Strauss and E. Leach)\n     (e) Culture and personality (Benedict, Mead, Linton, Kardiner and Cora-du Bois)\n     (f) Neo-evolutionism (Childe, White, Steward, Sahlins and Service)\n     (g) Cultural materialism (Harris)\n     (h) Symbolic and interpretive theories (Turner, Schneider and Geertz)\n     (i) Cognitive theories (Tyler, Conklin)\n     (j) Post-modernism in anthropology."
             ]
           },
           {
             "title": "Language, Communication, and Research Methods",
             "subtopics": [
-              "Culture, Language and Communication: Nature, origin and characteristics of language; verbal and non-verbal communication; social context of language use.",
-              "Research methods in Anthropology: Fieldwork tradition; Distinction between technique, method and methodology.",
-              "Tools of data collection: observation, interview, schedules, questionnaire, case study, genealogy, life-history, oral history, secondary sources of information, participatory methods.",
-              "Analysis, interpretation and presentation of data."
+              "7.   Culture, Language and Communication: Nature, origin and characteristics of language; verbal and non-verbal communication; social contex of language use.",
+              "8.   Research methods in Anthropology:\n     (a) Fieldwork tradition in anthropology\n     (b) Distinction between technique, method and methodology\n     (c) Tools of data collection: observation, interview, schedules, questionnaire, case study, genealogy, life-history, oral history, secondary sources of information, participatory methods.\n     (d) Analysis, interpretation and presentation of data."
             ]
           }
         ]
@@ -1104,28 +1082,24 @@
           {
             "title": "Human Genetics and Inheritance",
             "subtopics": [
-              "Human Genetics Methods: family study (pedigree analysis, twin study, foster child, co-twin method), cytogenetic method, chromosomal and karyotype analysis, biochemical methods, immunological methods, D.N.A. technology and recombinant technologies.",
-              "Mendelian genetics in man-family study, single factor, multifactor, lethal, sub-lethal and polygenic inheritance.",
-              "Concept of genetic polymorphism and selection, Mendelian population, Hardy-Weinberg law; causes of frequency changes (mutation, isolation, migration, selection, inbreeding, genetic drift).",
-              "Consanguineous and non-consanguineous mating, genetic load, genetic effect of consanguineous and cousin marriages."
+              "9.1  Human Genetics: Methods and Application: Methods for study of genetic principles in man-family study (pedigree analysis, twin study, foster child, co-twin method, cytogenetic method, chromosomal and karyo-type analysis), biochemical methods, immunological methods, D.N.A. technology and recombinant technologies.",
+              "9.2  Mendelian genetics in man-family study, single factor, multifactor, lethal, sub-lethal and polygenic inheritance in man.",
+              "9.3  Concept of genetic polymorphism and selection, Mendelian population, Hardy-Weinberg law; causes and changes which bring down frequency-mutation, isolation, migration, selection, inbreeding and genetic drift. Consanguineous and non-consanguineous mating, genetic load, genetic effect of consanguineous and cousin marriages."
             ]
           },
           {
             "title": "Chromosomal Aberrations and Human Variation",
             "subtopics": [
-              "Chromosomes and chromosomal aberrations in man: Numerical and structural aberrations.",
-              "Sex chromosomal aberration (Klinefelter, Turner, Super female, intersex).",
-              "Autosomal aberrations (Down syndrome, Patau, Edward and Cri-du-chat syndromes).",
-              "Genetic imprints in human disease, genetic screening, genetic counseling, human DNA profiling, gene mapping and genome study.",
-              "Race and racism, biological basis of morphological variation; Racial criteria, traits, classification, differentiation and race crossing.",
-              "Age, sex and population variation as genetic marker: ABO, Rh blood groups, HLA Hp, transferring, Gm, blood enzymes. Physiological characteristics (Hb level, body fat, pulse rate, respiratory functions, sensory perceptions)."
+              "9.4  Chromosomes and chromosomal aberrations in man, methodology.\n     (a) Numerical and structural aberrations (disorders).\n     (b) Sex chromosomal aberration- Klinefelter (XXY), Turner (XO), Super female (XXX), intersex and other syndromic disorders.\n     (c) Autosomal aberrations- Down syndrome, Patau, Edward and Cri-du-chat syndromes.\n     (d) Genetic imprints in human disease, genetic screening, genetic counseling, human DNA profiling, gene mapping and genome study.",
+              "9.5  Race and racism, biological basis of morphological variation of non-metric and characters. Racial criteria, racial traits in relation to heredity and environment; biological basis of racial classification, racial differentiation and race crossing in man.",
+              "9.6  Age, sex and population variation as genetic marker: ABO, Rh blood groups, HLA Hp, transferring, Gm, blood enzymes. Physiological characteristics-Hb level, body fat, pulse rate, respiratory functions and sensory perceptions in different cultural and socio-economic groups."
             ]
           },
           {
             "title": "Ecological and Epidemiological Anthropology",
             "subtopics": [
-              "Ecological Anthropology: Bio-cultural Adaptations—Genetic and Non-genetic factors. Man’s physiological responses to environmental stresses: hot desert, cold, high-altitude climate.",
-              "Epidemiological Anthropology: Health and disease. Infectious and non-infectious diseases, Nutritional deficiency related diseases."
+              "9.7  Concepts and methods of Ecological Anthropology: Bio-cultural Adaptations — Genetic and Nongenetic factors. Man's physiological responses to environmental stresses: hot desert, cold, high altitude climate.",
+              "9.8  Epidemiological Anthropology: Health and disease. Infectious and non-infectious diseases, Nutritional deficiency related diseases."
             ]
           }
         ]
@@ -1136,22 +1110,16 @@
           {
             "title": "Human Growth and Demography",
             "subtopics": [
-              "Concept of human growth and Development: Stages of growth (pre-natal, natal, infant, childhood, adolescence, maturity, senescence).",
-              "Factors affecting growth and development (genetic, environmental, biochemical, nutritional, cultural, socio-economic).",
-              "Ageing and senescence. Theories and observations; biological and chronological longevity. Human physique and somatotypes. Methodologies for growth studies.",
-              "Relevance of menarche, menopause and other bioevents to fertility. Fertility patterns and differentials.",
-              "Demographic theories-biological, social and cultural.",
-              "Biological and socio-ecological factors influencing fecundity, fertility, natality and mortality."
+              "10.  Concept of human growth and Development: Stages of growth — pre-natal, natal, infant, childhood, adolescence, maturity, senescence.\n     - Factors affecting growth and development genetic, environmental, biochemical, nutritional, cultural and socio-economic.\n     - Ageing and senescence. Theories and observations biological and chronological longevity. Human physique and somatotypes. Methodologies for growth studies.",
+              "11.1 Relevance of menarche, menopause and other bioevents to fertility. Fertility patterns and differentials.",
+              "11.2 Demographic theories-biological, social and cultural.",
+              "11.3 Biological and socio-ecological factors influencing fecundity, fertility, natality and mortality."
             ]
           },
           {
             "title": "Applications of Anthropology",
             "subtopics": [
-              "Anthropology of sports, Nutritional anthropology.",
-              "Anthropology in designing of defence and other equipment.",
-              "Forensic Anthropology, Methods and principles of personal identification and reconstruction.",
-              "Applied human genetics—Paternity diagnosis, genetic counselling and eugenics.",
-              "DNA technology in diseases and medicine, serogenetics and cytogenetics in reproductive biology."
+              "12.  Applications of Anthropology: Anthropology of sports, Nutritional anthropology, Anthropology in designing of defence and other equipments, Forensic Anthropology, Methods and principles of personal identification and reconstruction, Applied human genetics — Paternity diagnosis, genetic counselling and eugenics, DNA technology in diseases and medicine, serogenetics and cytogenetics in reproductive biology."
             ]
           }
         ]
@@ -1162,24 +1130,23 @@
           {
             "title": "Indian Culture, Prehistory, and Demography",
             "subtopics": [
-              "Evolution of the Indian Culture and Civilization: Prehistoric (Paleolithic, Mesolithic, Neolithic, Chalcolithic), Protohistoric (Indus Civilization).",
-              "Pre-Harappan, Harappan and post-Harappan cultures. Contributions of the tribal cultures to Indian civilization.",
-              "Paleo-Anthropological evidences from India with special reference to Siwaliks and Narmada basin (Ramapithecus, Sivapithecus and Narmada Man).",
-              "Ethno-archaeology in India: concept; Survivals and Parallels among hunting, foraging, fishing, pastoral and peasant communities.",
-              "Demographic profile of India: Ethnic and linguistic elements and their distribution. Factors influencing structure and growth.",
-              "The structure and nature of traditional Indian social system: Varnashram, Purushartha, Karma, Rina and Rebirth."
+              "1.1  Evolution of the Indian Culture and Civilization: Prehistoric (Palaeolithic, Mesolithic, Neolithic and Neolithic-Chalcolithic), Protohistoric (Indus Civilization). Pre-Harappan, Harappan and post-Harappan cultures. Contributions of the tribal cultures to Indian civilization.",
+              "1.2  Palaeo: Anthropological evidences from India with special reference to Siwaliks and Narmada basin (Ramapithecus, Sivapithecus and Narmada Man).",
+              "1.3  Ethno-archaeology in India: The concept of ethno-archaeology; Survivals and Parallels among the hunting, foraging, fishing, pastoral and peasant communities including arts and crafts producing communities.",
+              "2.   Demographic profile of India: Ethnic and linguistic elements in the Indian population and their distribution. Indian population — factors influencing its structure and growth.",
+              "3.1  The structure and nature of traditional Indian social system: Varnashram, Purushartha, Karma, Rina and Rebirth."
             ]
           },
           {
             "title": "Caste System and Indian Village",
             "subtopics": [
-              "Caste system in India: Structure and characteristics (Varna and caste), Theories of origin, Dominant caste, Caste mobility, Future of caste system, Jajmani system. Tribe-case continuum.",
-              "Sacred Complex and Nature-Man-Spirit Complex.",
-              "Impact of Buddhism, Jainism, Islam and Christianity of Indian society.",
-              "Emergence, growth and development in India: Contributions of the 18th, 19th and early 20th Century scholar-administrators. Contributions of Indian anthropologists.",
-              "Indian Village: Significance of village study in India; Indian village as a social system; Traditional and changing patterns of settlement and inter-caste relations; Agrarian relations; Impact of globalization.",
-              "Linguistic and religious minorities and their social, political and economic status.",
-              "Indigenous and exogenous processes of socio-cultural change in Indian society: Sanskritization, Westernization, Modernization; Inter-play of little and great traditions; Panchayati Raj and social change; Media and Social change."
+              "3.2  Caste system in India: Structure and characteristics Varna and caste, Theories of origin of caste system, Dominant caste, Caste mobility, Future of caste system, Jajmani system. Tribe-caste continuum.",
+              "3.3  Sacred Complex and Nature: Man-Spirit Complex.",
+              "3.4  Impact of Buddhism, Jainism, Islam and Christianity of Indian society.",
+              "4.   Emergence, growth and development in India: Contributions of the 18th, 19th and early 20th Century scholar-administrators. Contributions of Indian anthropologists to tribal and caste studies.",
+              "5.1  Indian Village: Significance of village study in India; Indian village as a social system; Traditional and changing patterns of settlement and inter-caste relations; Agrarian relations in Indian villages; Impact of globalization on Indian villages.",
+              "5.2  Linguistic and religious minorities and their social, political and economic status.",
+              "5.3  Indigenous and exogenous processes of socio-cultural change in Indian society: Sanskritization, Westernization, Modernization; Inter-play of little and great traditions; Panchayati Raj and social change; Media and Social change."
             ]
           }
         ]
@@ -1190,24 +1157,22 @@
           {
             "title": "Tribal Situation and Social Change",
             "subtopics": [
-              "Tribal situation in India: Bio-genetic variability, linguistic and socio-economic characteristics of the tribal populations and their distribution.",
-              "Problems of the tribal Communities: Land alienation, poverty, indebtedness, low literacy, poor educational facilities, unemployment, under-employment, health and nutrition.",
-              "Developmental projects and their impact on tribal displacement and problems of rehabilitation. Development of forest policy and tribals. Impact of urbanisation and industrialization.",
-              "Problems of exploitation and deprivation of SCs, STs, and OBCs. Constitutional safeguards.",
-              "Social change and contemporary tribal societies: Impact of modern democratic institutions, development programmes and welfare measures.",
-              "The concept of ethnicity; Ethnic conflicts and political developments; Unrest among tribal communities; Regionalism and demand for autonomy; Pseudo-tribalism. Social change during colonial and post-Independent India.",
-              "Impact of Hinduism, Buddhism, Christianity, Islam and other religions on tribal societies.",
-              "Tribe and nation state: a comparative study of tribal communities in India and other countries."
+              "6.1  Tribal situation in India: Bio-genetic variability, linguistic and socio-economic characteristics of the tribal populations and their distribution.",
+              "6.2  Problems of the tribal Communities: Land alienation, poverty, indebtedness, low literacy, poor educational facilities, unemployment, under-employment, health and nutrition.",
+              "6.3  Developmental projects and their impact on tribal displacement and problems of rehabilitation. Development of forest policy and tribals. Impact of urbanisation and industrialization on tribal populations.",
+              "7.1  Problems of exploitation and deprivation of Scheduled Castes, Scheduled Tribes and Other Backward Classes. Constitutional safeguards for Scheduled Tribes and Scheduled Castes.",
+              "7.2  Social change and contemporary tribal societies: Impact of modern democratic institutions, development programmes and welfare measures on tribals and weaker sections.",
+              "7.3  The concept of ethnicity: Ethnic conflicts and political developments; Unrest among tribal communities; Regionalism and demand for autonomy; Pseudo-tribalism. Social change among the tribes during colonial and post-Independent India.",
+              "8.1  Impact of Hinduism, Buddhism, Christianity, Islam and other religions on tribal societies.",
+              "8.2  Tribe and nation state: a comparative study of tribal communities in India and other countries."
             ]
           },
           {
             "title": "Administration and Role of Anthropology",
             "subtopics": [
-              "History of administration of tribal areas, tribal policies, plans, programmes of tribal development and their implementation.",
-              "The concept of PTGs (Primitive Tribal Groups), their distribution, special programmes for their development.",
-              "Role of N.G.O.s in tribal development.",
-              "Role of anthropology in tribal and rural development.",
-              "Contributions of anthropology to the understanding of regionalism, communalism and ethnic and political movements."
+              "9.1  History of administration of tribal areas, tribal policies, plans, programmes of tribal development and their implementation. The concept of PTGs (Primitive Tribal Groups), their distribution, special programmes for their development. Role of N.G.O.s in tribal development.",
+              "9.2  Role of anthropology in tribal and rural development.",
+              "9.3  Contributions of anthropology to the understanding of regionalism, communalism and ethnic and political movements."
             ]
           }
         ]
@@ -2331,58 +2296,91 @@
           {
             "title": "Geomorphology",
             "subtopics": [
-              "Factors controlling landform development; endogenetic and exogenetic forces.",
-              "Origin and evolution of the earth’s crusts; Fundamentals of geomagnetism; Physical conditions of the earth’s interior.",
-              "Geosynclines; Continental drift; Isostasy; Plate tectonics; Recent views on mountain building.",
-              "Volcanicity; Earthquakes and Tsunamis.",
-              "Concepts of geomorphic cycles and Landscape development; Denudation chronology.",
-              "Channel morphology; Erosion surfaces; Slope development.",
-              "Applied Geomorphology; Geomorphology, economic geology, and environment."
+              "1. Factors controlling landform development;",
+              "2. Endogenetic and exogenetic forces;",
+              "3. Origin and evolution of the earth’s crusts;",
+              "4. Fundamentals of geomagnetism;",
+              "5. Physical conditions of the earth’s interior;",
+              "6. Geosynclines;",
+              "7. Continental drift;",
+              "8. Isostasy;",
+              "9. Plate tectonics;",
+              "10. Recent views on mountain building;",
+              "11. Volcanicity;",
+              "12. Earthquakes and Tsunamis;",
+              "13. Concepts of geomorphic cycles and Land scape development;",
+              "14. Denudation chronology;",
+              "15. Channel morphology;",
+              "16. Erosion surfaces;",
+              "17. Slope development;",
+              "18. Applied Geomorphology;",
+              "19. Geomorphology, economic geology and environment."
             ]
           },
           {
             "title": "Climatology",
             "subtopics": [
-              "Temperature and pressure belts of the world; Heat budget of the earth.",
-              "Atmospheric circulation; Atmospheric stability and instability.",
-              "Planetary and local winds; Monsoons and jet streams.",
-              "Air masses and fronts; Temperate and tropical cyclones.",
-              "Types and distribution of precipitation; Weather and Climate.",
-              "Koppen’s, Thornthwaite’s and Trewartha’s classification of world climate.",
-              "Hydrological cycle; Global climatic change, and role and response of man in climatic changes.",
-              "Applied climatology and Urban climate."
+              "1. Temperature and pressure belts of the world;",
+              "2. Heat budget of the earth;",
+              "3. Atmospheric circulation;",
+              "4. Atmospheric stability and instability.",
+              "5. Planetary and local winds;",
+              "6. Monsoons and jet streams;",
+              "7. Air masses and Fronts;",
+              "8. Temperate and tropical cyclones;",
+              "9. Types and distribution of precipitation;",
+              "10. Weather and Climate;",
+              "11. Koppen’s Thornthwaite’s and Trewartha’s classification of world climate;",
+              "12. Hydrological cycle;",
+              "13. Global climatic change, and role and response of man in climatic changes",
+              "14. Applied climatology and",
+              "15. Urban climate."
             ]
           },
           {
             "title": "Oceanography",
             "subtopics": [
-              "Bottom topography of the Atlantic, Indian, and Pacific Oceans.",
-              "Temperature and salinity of the oceans; Heat and salt budgets, Ocean deposits.",
-              "Waves, currents, and tides.",
-              "Marine resources; biotic, mineral, and energy resources.",
-              "Coral reefs coral bleaching; Sea-level changes.",
-              "Law of the sea and marine pollution."
+              "1. Bottom topography of the Atlantic, Indian and Pacific Oceans;",
+              "2. Temperature and salinity of the oceans;",
+              "3. Heat and salt budgets,",
+              "4. Ocean deposits;",
+              "5. Waves, currents and tides;",
+              "6. Marine resources;",
+              "7. Biotic, mineral and energy resources;",
+              "8. Coral reefs coral bleaching;",
+              "9. Sea-level changes;",
+              "10. Law of the sea and",
+              "11. Marine pollution."
             ]
           },
           {
             "title": "Biogeography",
             "subtopics": [
-              "Genesis of soils; Classification and distribution of soils; Soil profile.",
-              "Soil erosion, Degradation, and conservation.",
-              "Factors influencing world distribution of plants and animals.",
-              "Problems of deforestation and conservation measures; Social forestry, agro-forestry.",
-              "Wildlife; Major gene pool centers."
+              "1. Genesis of soils;",
+              "2. Classification and distribution of soils;",
+              "3. Soil profile;",
+              "4. Soil erosion,",
+              "5. Degradation and conservation;",
+              "6. Factors influencing world distribution of plants and animals;",
+              "7. Problems of deforestation and conservation measures;",
+              "8. Social forestry, agro-forestry;",
+              "9. Wild life;",
+              "10. Major gene pool centres."
             ]
           },
           {
             "title": "Environmental Geography",
             "subtopics": [
-              "Principle of ecology; Human ecological adaptations; Influence of man on ecology and environment.",
-              "Global and regional ecological changes and imbalances.",
-              "Ecosystem their management and conservation.",
-              "Environmental degradation, management, and conservation.",
-              "Biodiversity and sustainable development.",
-              "Environmental policy; Environmental hazards and remedial measures; Environmental education and legislation."
+              "1. Principle ecology;",
+              "2. Human ecological adaptations;",
+              "3. Influence of man on ecology and environment;",
+              "4. Global and regional ecological changes and imbalances;",
+              "5. Ecosystem their management and conservation;",
+              "6. Environmental degradation, management and conservation;",
+              "7. Biodiversity and sustainable development;",
+              "8. Environmental policy;",
+              "9. Environmental hazards and remedial measures;",
+              "10. Environmental education and legislation."
             ]
           }
         ]
@@ -2393,54 +2391,79 @@
           {
             "title": "Perspectives in Human Geography",
             "subtopics": [
-              "Areal differentiation; regional synthesis; Dichotomy and dualism.",
-              "Environmentalism; Quantitative revolution and locational analysis.",
-              "Radical, behavioral, human, and welfare approaches.",
-              "Languages, religions, and secularisation.",
-              "Cultural regions of the world; Human development index."
+              "1. Areal differentiation;",
+              "2. Regional synthesis;",
+              "3. Dichotomy and dualism;",
+              "4. Environmentalism;",
+              "5. Quantitative revolution and locational analysis;",
+              "6. Radical, behavioural, human and welfare approaches;",
+              "7. Languages, religions and secularisation;",
+              "8. Cultural regions of the world;",
+              "9. Human development index."
             ]
           },
           {
             "title": "Economic Geography",
             "subtopics": [
-              "World economic development: measurement and problems.",
-              "World resources and their distribution; Energy crisis; the limits to growth.",
-              "World agriculture: a typology of agricultural regions; Agricultural inputs and productivity.",
-              "Food and nutrition problems; Food security; famine: causes, effects, and remedies.",
-              "World industries: location patterns and problems; Patterns of world trade."
+              "1. World economic development: measurement and problems;",
+              "2. World resources and their distribution;",
+              "3. Energy crisis;",
+              "4. The limits to growth;",
+              "5. World agriculture: typology of agricultural regions;",
+              "6. Agricultural inputs and productivity;",
+              "7. Food and nutritions problems;",
+              "8. Food security;",
+              "9. Famine: causes, effects and remedies;",
+              "10. World industries: location patterns and problems;",
+              "11. Patterns of world trade."
             ]
           },
           {
             "title": "Population and Settlement Geography",
             "subtopics": [
-              "Growth and distribution of world population; Demographic attributes.",
-              "Causes and consequences of migration.",
-              "Concepts of the over-under-and optimum population; Population theories, world population problems and policies.",
-              "Social well-being and quality of life; Population as social capital.",
-              "Types and patterns of rural settlements; Environmental issues in rural settlements.",
-              "Hierarchy of urban settlements; Urban morphology; Concept of primate city and rank-size rule.",
-              "Functional classification of towns; Sphere of urban influence; Rural-urban fringe; Satellite towns.",
-              "Problems and remedies of urbanization; Sustainable development of cities."
+              "1. Growth and distribution of world population;",
+              "2. Demographic attributes;",
+              "3. Causes and consequences of migration;",
+              "4. Concepts of over-under-and optimum population;",
+              "5. Population theories, world population problems and policies, Socialwellbeing and quality of life;",
+              "6. Population as social capital.",
+              "7. Types and patterns of rural settlements;",
+              "8. Environmental issues in rural settlements;",
+              "9. Hierarchy of urban settlements;",
+              "10. Urban morphology;",
+              "11. Concept of primate city and rank-size rule;",
+              "12. Functional classification of towns;",
+              "13. Sphere of urban influence;",
+              "14. Rural-urban fringe;",
+              "15. Satellite towns;",
+              "16. Problems and remedies of urbanization;",
+              "17. Sustainable development of cities."
             ]
           },
           {
             "title": "Regional Planning",
             "subtopics": [
-              "Concept of a region; Types of regions and methods of regionalization.",
-              "Growth centers and growth poles.",
-              "Regional imbalances; regional development strategies.",
-              "Environmental issues in regional planning; Planning for sustainable development."
+              "1. Concept of a region;",
+              "2. Types of regions and methods of regionalisation;",
+              "3. Growth centres and growth poles;",
+              "4. Regional imbalances;",
+              "5. Regional development strategies;",
+              "6. Environmental issues in regional planning;",
+              "7. Planning for sustainable development."
             ]
           },
           {
             "title": "Models, Theories and Laws in Human Geography",
             "subtopics": [
-              "System analysis in Human geography.",
-              "Malthusian, Marxian and demographic transition models.",
-              "Central Place theories of Christaller and Losch; Perroux and Boudeville.",
-              "Von Thunen’s model of agricultural location; Weber’s model of industrial location.",
-              "Ostov’s model of stages of growth.",
-              "Heartland and Rimland theories; Laws of international boundaries and frontiers."
+              "1. System analysis in Human geography;",
+              "2. Malthusian, Marxian and demographic transition models;",
+              "3. Central Place theories of Christaller and Losch;",
+              "4. Perroux and Boudeville;",
+              "5. Von Thunen’s model of agricultural location;",
+              "6. Weber’s model of industrial location;",
+              "7. Rostov’s model of stages of growth.",
+              "8. Heart-land and Rimland theories;",
+              "9. Laws of international boundaries and frontiers."
             ]
           }
         ]
@@ -2451,46 +2474,65 @@
           {
             "title": "Physical Setting",
             "subtopics": [
-              "Space relationship of India with neighboring countries; Structure and relief.",
-              "Drainage system and watersheds; Physiographic regions.",
-              "Mechanism of Indian monsoons and rainfall patterns; Tropical cyclones and western disturbances; Floods and droughts.",
-              "Climatic regions; Natural vegetation, Soil types and their distributions."
+              "1. Space relationship of India with neighbouring countries;",
+              "2. Structure and relief;",
+              "3. Drainage system and watersheds;",
+              "4. Physiographic regions;",
+              "5. Mechanism of Indian monsoons and rainfall patterns;",
+              "6. Tropical cyclones and western disturbances;",
+              "7. Floods and droughts;",
+              "8. Climatic regions;",
+              "9. Natural vegetation,",
+              "10. Soil types and their distributions."
             ]
           },
           {
             "title": "Resources",
             "subtopics": [
-              "Land, surface and ground water, energy, minerals, biotic and marine resources.",
-              "Forest and wildlife resources and their conservation; Energy crisis."
+              "1. Land, surface and ground water, energy, minerals, biotic and marine resources, Forest and wild life resources and their conservation;",
+              "2. Energy crisis."
             ]
           },
           {
             "title": "Agriculture",
             "subtopics": [
-              "Infrastructure: irrigation, seeds, fertilizers, power.",
-              "Institutional factors: land holdings, land tenure and land reforms.",
-              "Cropping pattern, agricultural productivity, agricultural intensity, crop combination, land capability.",
-              "Agro and social-forestry; Green revolution and its socio-economic and ecological implications.",
-              "Significance of dry farming; Livestock resources and white revolution.",
-              "Aquaculture; Sericulture, Agriculture and poultry.",
-              "Agricultural regionalisation; Agro-climatic zones; Agroecological regions."
+              "1. Infrastructure: irrigation, seeds, fertilizers, power;",
+              "2. Institutional factors; land holdings, land tenure and land reforms;",
+              "3. Cropping pattern, agricultural productivity, agricultural intensity,crop combination, land capability;",
+              "4. Agro and social-forestry;",
+              "5. Green revolution and its socio-economic and ecological implications;",
+              "6. Significance of dry farming;",
+              "7. Livestock resources and white revolution;",
+              "8. Aqua-culture;",
+              "9. Sericulture, Agriculture and poultry;",
+              "10. Agricultural regionalisation;",
+              "11. Agro-climatic zones;",
+              "12. Agro-ecological regions."
             ]
           },
           {
             "title": "Industry",
             "subtopics": [
-              "Evolution of industries.",
-              "Locational factors of cotton, jute, textile, iron and steel, aluminum, fertiliser, paper, chemical and pharmaceutical, automobile, cottage, and ago-based industries.",
-              "Industrial houses and complexes including public sector undertakings; Industrial regionalisation.",
-              "New industrial policy; Multinationals and liberalisation; Special Economic Zones; Tourism including ecotourism."
+              "1. Evolution of industries;",
+              "2. Locational factors of cotton, jute, textile, iron and steel, aluminium, fertiliser, paper, chemical and pharmaceutical, automobile, cottage and agobased industries;",
+              "3. Industrial houses and complexes including public sector underkings;",
+              "4. Industrial regionalisation;",
+              "5. New industrial policy;",
+              "6. Multinationals and liberalisation;",
+              "7. Special Economic Zones;",
+              "8. Tourism including ecotourism."
             ]
           },
           {
-            "title": "Transport, Communication, and Trade",
+            "title": "Transport, Communication and Trade",
             "subtopics": [
-              "Road, railway, waterway, airway, and pipeline networks and their complementary roles in regional development.",
-              "Growing importance of ports on national and foreign trade; Trade balance; Trade Policy; Export processing zones.",
-              "Developments in communication and information technology and their impacts on economy and society; Indian space programme."
+              "1. Road, railway, waterway, airway and pipeline net works and their complementary roles in regional development;",
+              "2. Growing importance of ports on national and foreign trade;",
+              "3. Trade balance;",
+              "4. Trade Policy;",
+              "5. Export processing zones;",
+              "6. Developments in communication and information technology andtheir impacts on economy and society;",
+              "7. Indian space programme."
             ]
           }
         ]
@@ -2501,50 +2543,75 @@
           {
             "title": "Cultural Setting",
             "subtopics": [
-              "Historical Perspective of Indian Society; Racial linguistic and ethnic diversities; religious minorities.",
-              "Major tribes, tribal areas, and their problems; Cultural regions.",
-              "Growth, distribution, and density of population; Demographic attributes: sex-ratio, age structure, literacy rate, work-force, dependency ratio, longevity.",
-              "Migration (inter-regional, intraregional and international) and associated problems.",
-              "Population problems and policies; Health indicators."
+              "1. Historical Perspective of Indian Society;",
+              "2. Racial linguistic and ethnic diversities;",
+              "3. Religious minorities;",
+              "4. Major tribes, tribal areas and their problems;",
+              "5. Cultural regions;",
+              "6. Growth, distribution and density of population;",
+              "7. Demographic attributes: sex-ratio, age structure, literacy rate,workforce, dependency ratio, longevity;",
+              "8. Migration (inter-regional, interaregional and international) andassociated problems;",
+              "9. Population problems and policies;",
+              "10. Health indicators."
             ]
           },
           {
             "title": "Settlements",
             "subtopics": [
-              "Types, patterns, and morphology of rural settlements; Urban developments.",
-              "Morphology of Indian cities; Functional classification of Indian cities.",
-              "Conurbations and metropolitan regions; Urban sprawl.",
-              "Slums and associated problems; Town planning; Problems of urbanisation and remedies."
+              "1. Types, patterns and morphology of rural settlements;",
+              "2. Urban developments;",
+              "3. Morphology of Indian cities;",
+              "4. Functional classification of Indian cities;",
+              "5. Conurbations and metropolitan regions;",
+              "6. Urban sprawl;",
+              "7. Slums and asssociated problems;",
+              "8. Town planning;",
+              "9. Problems of urbanisation and remedies."
             ]
           },
           {
             "title": "Regional Development and Planning",
             "subtopics": [
-              "Experience of regional planning in India; Five Year Plans.",
-              "Integrated rural development programmes; Panchayati Raj and decentralised planning.",
-              "Command area development; Watershed management.",
-              "Planning for backward area, desert, drought-prone, hill tribal area development.",
-              "Multi-level planning; Regional planning and development of island territories."
+              "1. Experience of regional planning in India;",
+              "2. Five Year Plans;",
+              "3. Integrated rural development programmes;",
+              "4. Panchayati Raj and decentralised planning;",
+              "5. Command area development;",
+              "6. Watershed management;",
+              "7. Planning for backward area, desert, drought-prone, hill tribal areadevelopment;",
+              "8. Multi-level planning;",
+              "9. Regional planning and development of island territories."
             ]
           },
           {
             "title": "Political Aspects",
             "subtopics": [
-              "Geographical basis of Indian federalism; State reorganization; Emergence of new states.",
-              "Regional consciousness and inter-state issues.",
-              "International boundary of India and related issues; Cross-border terrorism.",
-              "India’s role in world affairs; Geopolitics of South Asia and Indian Ocean realm."
+              "1. Geographical basis of Indian federalism;",
+              "2. State reorganisation;",
+              "3. Emergence of new states;",
+              "4. Regional consciousness and inter-state issues;",
+              "5. International boundary of India and related issues;",
+              "6. Cross-border terrorism;",
+              "7. India’s role in world affairs;",
+              "8. Geopolitics of South Asia and Indian Ocean realm."
             ]
           },
           {
             "title": "Contemporary Issues",
             "subtopics": [
-              "Ecological issues: Environmental hazards: landslides, earthquakes, Tsunamis, floods and droughts, epidemics.",
-              "Issues related to environmental pollution; Changes in patterns of land use.",
-              "Principles of environmental impact assessment and environmental management.",
-              "Population explosion and food security; Environmental degradation; Deforestation, desertification, and soil erosion.",
-              "Problems of agrarian and industrial unrest; Regional disparities in economic development.",
-              "Concept of sustainable growth and development; Environmental awareness; Linkage of rivers; Globalisation and Indian economy."
+              "1. Ecological issues: Environmental hazards: landslides, earthquakes, Tsunamis, floods and droughts, epidemics;",
+              "2. Issues related to environmental pollution;",
+              "3. Changes in patterns of land use;",
+              "4. Principles of environmental impact assessment and environmental management;",
+              "5. Population explosion and food security;",
+              "6. Environmental degradation;",
+              "7. Deforestation, desertification and soil erosion;",
+              "8. Problems of agrarian and industrial unrest;",
+              "9. Regional disparities in economic development;",
+              "10. Concept of sustainable growth and development;",
+              "11. Environmental awareness;",
+              "12. Linkage of rivers;",
+              "13. Globalisation and Indian economy."
             ]
           }
         ]
@@ -3966,26 +4033,26 @@
           {
             "title": "Political Theory, State and Ideologies",
             "subtopics": [
-              "Political Theory: meaning and approaches.",
-              "Theories of state: Liberal, Neo-liberal, Marxist, Pluralist, Post-colonial, and Feminist.",
-              "Concept of power: hegemony, ideology, and legitimacy.",
-              "Political Ideologies: Liberalism, Socialism, Marxism, Fascism, Gandhism, and Feminism."
+              "1.\tPolitical Theory: \na)meaning\nb)approaches.",
+              "2.\tTheories of state : \na)Liberal, \nb)Neo-liberal, \nc)Marxist, \nc)Pluiralist, \nd)post-colonial\nd)Feminist.",
+              "7.\tConcept of power : \na)hegemony, \nb)ideology and \nc)legitimacy.",
+              "8.\tPolitical Ideologies : \na)Liberalism, \nb)Socialism, \nc)Marxism, \nd)Fascism, \ne)Gandhism and\nf)Feminism."
             ]
           },
           {
             "title": "Core Political Concepts",
             "subtopics": [
-              "Justice: Conceptions of justice with special reference to Rawls’s theory of justice and its communitarian critiques.",
-              "Equality: Social, political, and economic; the relationship between equality and freedom; Affirmative action.",
-              "Rights: Meaning and theories; different kinds of rights; Concept of Human Rights.",
-              "Democracy: Classical and contemporary theories; different models of democracy—representative, participatory and deliberative."
+              "3.\tJustice : \na)Conceptions of justice with special reference to Rawl’s theory of justice and \nb)its communitarian critiques.",
+              "4.\tEquality : \na)Social, political and economic; \nb)relationship between equality and freedom; \nc)Affirmative action.",
+              "5.\tRights : \na)Meaning and theories; \nb)different kinds of rights; \nc)Concept of Human Rights.",
+              "6.\tDemocracy : \na)Classical and contemporary theories; \nb)different models of democracy—representative, \nc)participatory and \nd)deliberative."
             ]
           },
           {
             "title": "Political Thought",
             "subtopics": [
-              "Indian Political Thought: Dharmashastra, Arthashastra, and Buddhist Traditions; Sir Syed Ahmed Khan, Sri Aurobindo, M. K. Gandhi, B. R. Ambedkar, M. N. Roy.",
-              "Western Political Thought: Plato, Aristotle, Machiavelli, Hobbes, Locke, John S. Mill, Marx, Gramsci, Hannah Arendt."
+              "9.\tIndian Political Thought: \na) Dharamshastra, \nb) Arthashastra and\nc) Buddhist Traditions; \nd) Sir Syed Ahmed Khan, \ne) Sri Aurobindo, \nf) M. K. Gandhi,\ng) B. R. Ambedkar,\nh) M. N. Roy.",
+              "10.\tWestern Political Thought : \na)Plato, \nb) Aristotle, \nc) Machiavelli, \nd) Hobbes, \ne) Locke, \nf) John S. Mill,\ng) Marx, \nh)Gramsci, \ni)Hannah Arendt."
             ]
           }
         ]
@@ -3996,29 +4063,27 @@
           {
             "title": "Indian Nationalism and Constitution",
             "subtopics": [
-              "Indian Nationalism: Political Strategies of India’s Freedom Struggle (Constitutionalism to mass Satyagraha, Noncooperation, Civil Disobedience; Militant and Revolutionary Movements, Peasant and Workers Movements).",
-              "Perspectives on Indian National Movement; Liberal, Socialist, and Marxist; Radical Humanist and Dalit.",
-              "Making of the Indian Constitution: Legacies of the British rule; different social and political perspectives.",
-              "Salient Features of the Indian Constitution: The Preamble, Fundamental Rights and Duties, Directive Principles; Parliamentary System and Amendment Procedures; Judicial Review and Basic Structure doctrine."
+              "1.\tIndian Nationalism :\n(a)\tPolitical Strategies of India’s Freedom Struggle : 1)Constitutionalism to mass Satyagraha,\n2) Non- cooperation, Civil Disobedience;\n3) Militant and Revolutionary Movements, \n4) Peasant and Workers Movements.\n(b)\tPerspectives on Indian National Movement\n1) Liberal, \n2) Socialist and\n3) Marxist; \n4) Radical Humanist and\n5) Dalit.",
+              "2.\tMaking of the Indian Constitution :\n1)\tLegacies of the British rule; d\n2)\tDifferent social and political perspectives.",
+              "3.\tSalient Features of the Indian Constitution :\na)\tThe Preamble, \nb)\tFundamental Rights and Duties, \nc)\tDirective Principles; \nd)\tParliamentary System and Amendment Procedures; \ne)\tJudicial Review and Basic Structure doctrine."
             ]
           },
           {
             "title": "Government Organs, Institutions and Federalism",
             "subtopics": [
-              "Principal Organs of the Union Government: Envisaged role and actual working of the Executive, Legislature, and Supreme Court.",
-              "Principal Organs of the State Government: Envisaged role and actual working of the Executive, Legislature, and High Courts.",
-              "Grassroots Democracy: Panchayati Raj and Municipal Government; Significance of 73rd and 74th Amendments; Grassroot movements.",
-              "Statutory Institutions/Commissions: Election Commission, Comptroller and Auditor General, Finance Commission, Union Public Service Commission, National Commission for Scheduled Castes, National Commission for Scheduled Tribes, National Commission for Women; National Human Rights Commission, National Commission for Minorities, National Backward Classes Commission.",
-              "Federalism: Constitutional provisions; changing nature of center-state relations; integrationist tendencies and regional aspirations; inter-state disputes."
+              "4.\t(a)Principal Organs of the Union Government :\n1)  Envisaged role and actual working of the Executive, 2)Legislature and \n3) Supreme Court.\n(b)Principal Organs of the State Government : \n1) Envisaged role and actual working of the Executive, \n2)Legislature and \n3) High Courts.",
+              "5.\tGrassroots Democracy :\na)\tPanchayati Raj and Municipal Government; \nb)\tSignificance of 73rd and 74th Amendments; \nc)\tGrassroot movements.",
+              "6.\tStatutory Institutions/Commissions :\na)\tElection Commission, \nb)\tComptroller and Auditor General, \nc)\tFinance Commission, Union Public Service Commission, \nd)\tNational Commission for Scheduled Castes, \ne)\tNational Commission for Scheduled Tribes, \nf)\tNational Commission for Women;\ng)\t National Human Rights Commission,\nh)\t National Commission for Minorities, \ni)\tNational Backward Classes Commission.",
+              "7.\tFederalism :\na)\tConstitutional provisions; \nb)\tchanging nature of centre-state relations;\nc)\t integrationist tendencies and regional aspirations; \nd)\tinter-state disputes."
             ]
           },
           {
             "title": "Political Dynamics and Social Movements",
             "subtopics": [
-              "Planning and Economic Development: Nehruvian and Gandhian perspectives; Role of planning and public sector; Green Revolution, land reforms and agrarian relations; liberalization and economic reforms.",
-              "Caste, Religion, and Ethnicity in Indian Politics.",
-              "Party System: National and regional political parties, ideological and social bases of parties; Patterns of coalition politics; Pressure groups, trends in electoral behavior; changing socio-economic profile of Legislators.",
-              "Social Movement: Civil liberties and human rights movements; women’s movements; environmentalist movements."
+              "8.\tPlanning and Economic development :\na)\tNehruvian and Gandhian perspectives; \nb)\tRole of planning and public sector; \nc)\tGreen Revolution, \nd)\tland reforms and agrarian relations;\ne)\t liberalization and economic reforms.",
+              "9.\tA) Caste,\nB) Religion and \nC)\tEthnicity in Indian Politics.",
+              "10.\tParty System :\na)\tNational and regional political parties,\nb)\t ideological and social bases of parties;\nc)\t Patterns of coalition politics;\nd)\t Pressure groups,\ne)\t trends in electoral behaviour;\nf)\t changing socio-economic profile of Legislators.",
+              "11.\tSocial Movement :\na)\tCivil liberties and human rights movements; \nb)\twomen’s movements;\nc)\t environmentalist movements."
             ]
           }
         ]
@@ -4029,28 +4094,27 @@
           {
             "title": "Comparative Political Analysis",
             "subtopics": [
-              "Comparative Politics: Nature and major approaches; Political economy and political sociology perspectives; Limitations of the comparative method.",
-              "State in Comparative Perspective: Characteristics and changing nature of the State in capitalist and socialist economies, and advanced industrial and developing societies.",
-              "Politics of Representation and Participation: Political parties, pressure groups and social movements in advanced industrial and developing societies.",
-              "Globalisation: Responses from developed and developing societies."
+              "1.\tComparative Politics :\nA)\tNature and major approaches; \nB)\tPolitical economy and \nC)\tpolitical sociology perspectives;\nD)\t Limitations of the comparative method.",
+              "2.\tState in Comparative Perspective :\nA)\tCharacteristics and changing nature of the State in capitalist and socialist economies, and\nB)\t advanced industrial and developing societies.",
+              "3.\tPolitics of Representation and Participation :\nA)\tPolitical parties, \nB)\tpressure groups and \nC)\tsocial movements in advanced industrial and developing societies.",
+              "4.\tGlobalisation :\nResponses from developed and developing societies."
             ]
           },
           {
             "title": "International Relations: Theory and Concepts",
             "subtopics": [
-              "Approaches to the Study of International Relations: Idealist, Realist, Marxist, Functionalist and Systems theory.",
-              "Key Concepts in International Relations: National interest, security and power; Balance of power and deterrence; Transnational actors and collective security; World capitalist economy and globalisation.",
-              "Changing International Political Order: Rise of superpowers; Strategic and ideological Bipolarity, arms race and cold war; Nuclear threat.",
-              "Non-aligned movement: Aims and achievements; Collapse of the Soviet Union; Unipolarity and American hegemony; Relevance of non-alignment in the contemporary world."
+              "5.\tApproaches to the Study of International Relations :\nA)\tIdealist, \nB)\tRealist,\nC)\t Marxist,\nD)\t Functionalist and \nE)\tSystems theory.",
+              "6.\tKey Concepts in International Relations :\nA)\tNational interest, security and power;\nB)\t Balance of power and deterrence;\nC)\t Transational actors and \nD)\tcollective security; \nE)\tWorld capitalist economy and globalisation.",
+              "7.\tChanging International Political Order :\n(a)\tRise of super powers; \n(b)\tStrategic and ideological Bipolarity\n(c)\t arms race and cold war;\n(d)\t Nuclear threat;\n(e)\tNon-aligned Movement: Aims and achievements.\n(f)\tCollapse of the Soviet Union; \n(g)\tUnipolarity and American hegemony; \n(h)\tRelevance of non-alignment in the contemporary world."
             ]
           },
           {
             "title": "Global Institutions and Contemporary Concerns",
             "subtopics": [
-              "Evolution of the International Economic System: From Bretton woods to WTO; Socialist economies and the CMEA (Council for Mutual Economic Assistance); Third World demand for new international economic order; Globalisation of the world economy.",
-              "United Nations: Envisaged role and actual record; Specialized UN agencies—aims and functioning; the need for UN reforms.",
-              "Regionalisation of World Politics: EU, ASEAN, APEC, SAARC (AARC), NAFTA.",
-              "Contemporary Global Concerns: Democracy, human rights, environment, gender justice, terrorism, nuclear proliferation."
+              "8.\tEvolution of the International Economic System :\n \nA)\tFrom Brettonwoods to WTO; \nB)\tSocialist economies and the CMEA (Council for Mutual Economic Assistance); \nC)\tThird World demand for new international economic order; \nD)\tGlobalisation of the world economy.",
+              "9.\tUnited Nations :\nA)\tEnvisaged role and actual record; \nB)\tSpecialized UN agencies—aims and functioning;\nC)\t need for UN reforms.",
+              "10.\tRegionalisation of World Politics : A) EU,\nB) ASEAN, \nC) APEC, \nD) SAARC, \nE) NAFTA.",
+              "11.\tContemporary Global Concerns :\nA)\tDemocracy, \nB)\thuman rights, \nC)\tenvironment, \nD)\tgender justice \nE)\tterrorism, \nF)\tnuclear proliferation."
             ]
           }
         ]
@@ -4061,22 +4125,19 @@
           {
             "title": "Foreign Policy and Global Relations",
             "subtopics": [
-              "Indian Foreign Policy: Determinants of foreign policy; the institutions of policy-making; continuity and change.",
-              "India’s Contribution to the Non-Alignment Movement: Different phases; current role.",
-              "India and the Global South: Relations with Africa and Latin America; Leadership role in the demand for NIEO and WTO negotiations.",
-              "India and the Global Centres of Power: USA, EU, Japan, China and Russia.",
-              "India and the UN System: Role in UN Peace-keeping; Demand for Permanent Seat in the Security Council.",
-              "India and the Nuclear Question: Changing perceptions and policy.",
-              "Recent developments in Indian Foreign Policy: India’s position on the recent crises in Afghanistan, Iraq, and West Asia, growing relations with US and Israel; Vision of a new world order."
+              "1.\tIndian Foreign Policy :\nA)\tDeterminants of foreign policy; \nB)\tthe institutions of policy-making; \nC)\tContinuity and change.",
+              "2.\tIndia’s Contribution to the Non-Alignment Movement Different phases; Current role.",
+              "4.\tIndia and the Global South :\nA)\tRelations with Africa and Latin America; \nB)\tLeadership role in the demand for NIEO and WTO negotiations.",
+              "5.\tIndia and the Global Centres of Power : A) USA, \nB) EU, \nC) Japan, \nD) China and\nE)  Russia.",
+              "6.\tIndia and the UN System:\nA)\tRole in UN Peace-keeping;\nB)\t Demand for Permanent Seat in the Security Council.",
+              "7.\tIndia and the Nuclear Question : Changing perceptions and policy.",
+              "8.\tRecent developments in Indian Foreign Policy :\nA) India’s position on the recent crises in Afghanistan,\nB) Iraq and \nC) West Asia, \nD) growing relations with US and Israel; \nE) Vision of a new world order."
             ]
           },
           {
             "title": "India and South Asia",
             "subtopics": [
-              "Regional Co-operation: SAARC-past performance and future prospects.",
-              "South Asia as a Free Trade Area.",
-              "India’s “Look East” policy.",
-              "Impediments to regional co-operation: River water disputes; illegal cross-border migration; Ethnic conflicts and insurgencies; Border disputes."
+              "3.\tIndia and South Asia :\n(a)\tRegional Co-operation : SAARC-past performance and future prospects.\n(b)\tSouth Asia as a Free Trade Area.\n(c)\tIndia’s“LookEast”policy.\n(d)\tImpediments to regional co-operation: \n(e)\tRiver water disputes; \n(f)\tillegal cross border migration; \n(g)\tEthnic conflicts and insurgencies; \n(h)\tBorder disputes."
             ]
           }
         ]

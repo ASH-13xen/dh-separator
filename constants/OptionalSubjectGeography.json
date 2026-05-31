@@ -5,58 +5,91 @@
       {
         "title": "Geomorphology",
         "subtopics": [
-          "Factors controlling landform development; endogenetic and exogenetic forces.",
-          "Origin and evolution of the earth’s crusts; Fundamentals of geomagnetism; Physical conditions of the earth’s interior.",
-          "Geosynclines; Continental drift; Isostasy; Plate tectonics; Recent views on mountain building.",
-          "Volcanicity; Earthquakes and Tsunamis.",
-          "Concepts of geomorphic cycles and Landscape development; Denudation chronology.",
-          "Channel morphology; Erosion surfaces; Slope development.",
-          "Applied Geomorphology; Geomorphology, economic geology, and environment."
+          "1. Factors controlling landform development;",
+          "2. Endogenetic and exogenetic forces;",
+          "3. Origin and evolution of the earth’s crusts;",
+          "4. Fundamentals of geomagnetism;",
+          "5. Physical conditions of the earth’s interior;",
+          "6. Geosynclines;",
+          "7. Continental drift;",
+          "8. Isostasy;",
+          "9. Plate tectonics;",
+          "10. Recent views on mountain building;",
+          "11. Volcanicity;",
+          "12. Earthquakes and Tsunamis;",
+          "13. Concepts of geomorphic cycles and Land scape development;",
+          "14. Denudation chronology;",
+          "15. Channel morphology;",
+          "16. Erosion surfaces;",
+          "17. Slope development;",
+          "18. Applied Geomorphology;",
+          "19. Geomorphology, economic geology and environment."
         ]
       },
       {
         "title": "Climatology",
         "subtopics": [
-          "Temperature and pressure belts of the world; Heat budget of the earth.",
-          "Atmospheric circulation; Atmospheric stability and instability.",
-          "Planetary and local winds; Monsoons and jet streams.",
-          "Air masses and fronts; Temperate and tropical cyclones.",
-          "Types and distribution of precipitation; Weather and Climate.",
-          "Koppen’s, Thornthwaite’s and Trewartha’s classification of world climate.",
-          "Hydrological cycle; Global climatic change, and role and response of man in climatic changes.",
-          "Applied climatology and Urban climate."
+          "1. Temperature and pressure belts of the world;",
+          "2. Heat budget of the earth;",
+          "3. Atmospheric circulation;",
+          "4. Atmospheric stability and instability.",
+          "5. Planetary and local winds;",
+          "6. Monsoons and jet streams;",
+          "7. Air masses and Fronts;",
+          "8. Temperate and tropical cyclones;",
+          "9. Types and distribution of precipitation;",
+          "10. Weather and Climate;",
+          "11. Koppen’s Thornthwaite’s and Trewartha’s classification of world climate;",
+          "12. Hydrological cycle;",
+          "13. Global climatic change, and role and response of man in climatic changes",
+          "14. Applied climatology and",
+          "15. Urban climate."
         ]
       },
       {
         "title": "Oceanography",
         "subtopics": [
-          "Bottom topography of the Atlantic, Indian, and Pacific Oceans.",
-          "Temperature and salinity of the oceans; Heat and salt budgets, Ocean deposits.",
-          "Waves, currents, and tides.",
-          "Marine resources; biotic, mineral, and energy resources.",
-          "Coral reefs coral bleaching; Sea-level changes.",
-          "Law of the sea and marine pollution."
+          "1. Bottom topography of the Atlantic, Indian and Pacific Oceans;",
+          "2. Temperature and salinity of the oceans;",
+          "3. Heat and salt budgets,",
+          "4. Ocean deposits;",
+          "5. Waves, currents and tides;",
+          "6. Marine resources;",
+          "7. Biotic, mineral and energy resources;",
+          "8. Coral reefs coral bleaching;",
+          "9. Sea-level changes;",
+          "10. Law of the sea and",
+          "11. Marine pollution."
         ]
       },
       {
         "title": "Biogeography",
         "subtopics": [
-          "Genesis of soils; Classification and distribution of soils; Soil profile.",
-          "Soil erosion, Degradation, and conservation.",
-          "Factors influencing world distribution of plants and animals.",
-          "Problems of deforestation and conservation measures; Social forestry, agro-forestry.",
-          "Wildlife; Major gene pool centers."
+          "1. Genesis of soils;",
+          "2. Classification and distribution of soils;",
+          "3. Soil profile;",
+          "4. Soil erosion,",
+          "5. Degradation and conservation;",
+          "6. Factors influencing world distribution of plants and animals;",
+          "7. Problems of deforestation and conservation measures;",
+          "8. Social forestry, agro-forestry;",
+          "9. Wild life;",
+          "10. Major gene pool centres."
         ]
       },
       {
         "title": "Environmental Geography",
         "subtopics": [
-          "Principle of ecology; Human ecological adaptations; Influence of man on ecology and environment.",
-          "Global and regional ecological changes and imbalances.",
-          "Ecosystem their management and conservation.",
-          "Environmental degradation, management, and conservation.",
-          "Biodiversity and sustainable development.",
-          "Environmental policy; Environmental hazards and remedial measures; Environmental education and legislation."
+          "1. Principle ecology;",
+          "2. Human ecological adaptations;",
+          "3. Influence of man on ecology and environment;",
+          "4. Global and regional ecological changes and imbalances;",
+          "5. Ecosystem their management and conservation;",
+          "6. Environmental degradation, management and conservation;",
+          "7. Biodiversity and sustainable development;",
+          "8. Environmental policy;",
+          "9. Environmental hazards and remedial measures;",
+          "10. Environmental education and legislation."
         ]
       }
     ]
@@ -67,54 +100,79 @@
       {
         "title": "Perspectives in Human Geography",
         "subtopics": [
-          "Areal differentiation; regional synthesis; Dichotomy and dualism.",
-          "Environmentalism; Quantitative revolution and locational analysis.",
-          "Radical, behavioral, human, and welfare approaches.",
-          "Languages, religions, and secularisation.",
-          "Cultural regions of the world; Human development index."
+          "1. Areal differentiation;",
+          "2. Regional synthesis;",
+          "3. Dichotomy and dualism;",
+          "4. Environmentalism;",
+          "5. Quantitative revolution and locational analysis;",
+          "6. Radical, behavioural, human and welfare approaches;",
+          "7. Languages, religions and secularisation;",
+          "8. Cultural regions of the world;",
+          "9. Human development index."
         ]
       },
       {
         "title": "Economic Geography",
         "subtopics": [
-          "World economic development: measurement and problems.",
-          "World resources and their distribution; Energy crisis; the limits to growth.",
-          "World agriculture: a typology of agricultural regions; Agricultural inputs and productivity.",
-          "Food and nutrition problems; Food security; famine: causes, effects, and remedies.",
-          "World industries: location patterns and problems; Patterns of world trade."
+          "1. World economic development: measurement and problems;",
+          "2. World resources and their distribution;",
+          "3. Energy crisis;",
+          "4. The limits to growth;",
+          "5. World agriculture: typology of agricultural regions;",
+          "6. Agricultural inputs and productivity;",
+          "7. Food and nutritions problems;",
+          "8. Food security;",
+          "9. Famine: causes, effects and remedies;",
+          "10. World industries: location patterns and problems;",
+          "11. Patterns of world trade."
         ]
       },
       {
         "title": "Population and Settlement Geography",
         "subtopics": [
-          "Growth and distribution of world population; Demographic attributes.",
-          "Causes and consequences of migration.",
-          "Concepts of the over-under-and optimum population; Population theories, world population problems and policies.",
-          "Social well-being and quality of life; Population as social capital.",
-          "Types and patterns of rural settlements; Environmental issues in rural settlements.",
-          "Hierarchy of urban settlements; Urban morphology; Concept of primate city and rank-size rule.",
-          "Functional classification of towns; Sphere of urban influence; Rural-urban fringe; Satellite towns.",
-          "Problems and remedies of urbanization; Sustainable development of cities."
+          "1. Growth and distribution of world population;",
+          "2. Demographic attributes;",
+          "3. Causes and consequences of migration;",
+          "4. Concepts of over-under-and optimum population;",
+          "5. Population theories, world population problems and policies, Socialwellbeing and quality of life;",
+          "6. Population as social capital.",
+          "7. Types and patterns of rural settlements;",
+          "8. Environmental issues in rural settlements;",
+          "9. Hierarchy of urban settlements;",
+          "10. Urban morphology;",
+          "11. Concept of primate city and rank-size rule;",
+          "12. Functional classification of towns;",
+          "13. Sphere of urban influence;",
+          "14. Rural-urban fringe;",
+          "15. Satellite towns;",
+          "16. Problems and remedies of urbanization;",
+          "17. Sustainable development of cities."
         ]
       },
       {
         "title": "Regional Planning",
         "subtopics": [
-          "Concept of a region; Types of regions and methods of regionalization.",
-          "Growth centers and growth poles.",
-          "Regional imbalances; regional development strategies.",
-          "Environmental issues in regional planning; Planning for sustainable development."
+          "1. Concept of a region;",
+          "2. Types of regions and methods of regionalisation;",
+          "3. Growth centres and growth poles;",
+          "4. Regional imbalances;",
+          "5. Regional development strategies;",
+          "6. Environmental issues in regional planning;",
+          "7. Planning for sustainable development."
         ]
       },
       {
         "title": "Models, Theories and Laws in Human Geography",
         "subtopics": [
-          "System analysis in Human geography.",
-          "Malthusian, Marxian and demographic transition models.",
-          "Central Place theories of Christaller and Losch; Perroux and Boudeville.",
-          "Von Thunen’s model of agricultural location; Weber’s model of industrial location.",
-          "Ostov’s model of stages of growth.",
-          "Heartland and Rimland theories; Laws of international boundaries and frontiers."
+          "1. System analysis in Human geography;",
+          "2. Malthusian, Marxian and demographic transition models;",
+          "3. Central Place theories of Christaller and Losch;",
+          "4. Perroux and Boudeville;",
+          "5. Von Thunen’s model of agricultural location;",
+          "6. Weber’s model of industrial location;",
+          "7. Rostov’s model of stages of growth.",
+          "8. Heart-land and Rimland theories;",
+          "9. Laws of international boundaries and frontiers."
         ]
       }
     ]
@@ -125,46 +183,65 @@
       {
         "title": "Physical Setting",
         "subtopics": [
-          "Space relationship of India with neighboring countries; Structure and relief.",
-          "Drainage system and watersheds; Physiographic regions.",
-          "Mechanism of Indian monsoons and rainfall patterns; Tropical cyclones and western disturbances; Floods and droughts.",
-          "Climatic regions; Natural vegetation, Soil types and their distributions."
+          "1. Space relationship of India with neighbouring countries;",
+          "2. Structure and relief;",
+          "3. Drainage system and watersheds;",
+          "4. Physiographic regions;",
+          "5. Mechanism of Indian monsoons and rainfall patterns;",
+          "6. Tropical cyclones and western disturbances;",
+          "7. Floods and droughts;",
+          "8. Climatic regions;",
+          "9. Natural vegetation,",
+          "10. Soil types and their distributions."
         ]
       },
       {
         "title": "Resources",
         "subtopics": [
-          "Land, surface and ground water, energy, minerals, biotic and marine resources.",
-          "Forest and wildlife resources and their conservation; Energy crisis."
+          "1. Land, surface and ground water, energy, minerals, biotic and marine resources, Forest and wild life resources and their conservation;",
+          "2. Energy crisis."
         ]
       },
       {
         "title": "Agriculture",
         "subtopics": [
-          "Infrastructure: irrigation, seeds, fertilizers, power.",
-          "Institutional factors: land holdings, land tenure and land reforms.",
-          "Cropping pattern, agricultural productivity, agricultural intensity, crop combination, land capability.",
-          "Agro and social-forestry; Green revolution and its socio-economic and ecological implications.",
-          "Significance of dry farming; Livestock resources and white revolution.",
-          "Aquaculture; Sericulture, Agriculture and poultry.",
-          "Agricultural regionalisation; Agro-climatic zones; Agroecological regions."
+          "1. Infrastructure: irrigation, seeds, fertilizers, power;",
+          "2. Institutional factors; land holdings, land tenure and land reforms;",
+          "3. Cropping pattern, agricultural productivity, agricultural intensity,crop combination, land capability;",
+          "4. Agro and social-forestry;",
+          "5. Green revolution and its socio-economic and ecological implications;",
+          "6. Significance of dry farming;",
+          "7. Livestock resources and white revolution;",
+          "8. Aqua-culture;",
+          "9. Sericulture, Agriculture and poultry;",
+          "10. Agricultural regionalisation;",
+          "11. Agro-climatic zones;",
+          "12. Agro-ecological regions."
         ]
       },
       {
         "title": "Industry",
         "subtopics": [
-          "Evolution of industries.",
-          "Locational factors of cotton, jute, textile, iron and steel, aluminum, fertiliser, paper, chemical and pharmaceutical, automobile, cottage, and ago-based industries.",
-          "Industrial houses and complexes including public sector undertakings; Industrial regionalisation.",
-          "New industrial policy; Multinationals and liberalisation; Special Economic Zones; Tourism including ecotourism."
+          "1. Evolution of industries;",
+          "2. Locational factors of cotton, jute, textile, iron and steel, aluminium, fertiliser, paper, chemical and pharmaceutical, automobile, cottage and agobased industries;",
+          "3. Industrial houses and complexes including public sector underkings;",
+          "4. Industrial regionalisation;",
+          "5. New industrial policy;",
+          "6. Multinationals and liberalisation;",
+          "7. Special Economic Zones;",
+          "8. Tourism including ecotourism."
         ]
       },
       {
-        "title": "Transport, Communication, and Trade",
+        "title": "Transport, Communication and Trade",
         "subtopics": [
-          "Road, railway, waterway, airway, and pipeline networks and their complementary roles in regional development.",
-          "Growing importance of ports on national and foreign trade; Trade balance; Trade Policy; Export processing zones.",
-          "Developments in communication and information technology and their impacts on economy and society; Indian space programme."
+          "1. Road, railway, waterway, airway and pipeline net works and their complementary roles in regional development;",
+          "2. Growing importance of ports on national and foreign trade;",
+          "3. Trade balance;",
+          "4. Trade Policy;",
+          "5. Export processing zones;",
+          "6. Developments in communication and information technology andtheir impacts on economy and society;",
+          "7. Indian space programme."
         ]
       }
     ]
@@ -175,50 +252,75 @@
       {
         "title": "Cultural Setting",
         "subtopics": [
-          "Historical Perspective of Indian Society; Racial linguistic and ethnic diversities; religious minorities.",
-          "Major tribes, tribal areas, and their problems; Cultural regions.",
-          "Growth, distribution, and density of population; Demographic attributes: sex-ratio, age structure, literacy rate, work-force, dependency ratio, longevity.",
-          "Migration (inter-regional, intraregional and international) and associated problems.",
-          "Population problems and policies; Health indicators."
+          "1. Historical Perspective of Indian Society;",
+          "2. Racial linguistic and ethnic diversities;",
+          "3. Religious minorities;",
+          "4. Major tribes, tribal areas and their problems;",
+          "5. Cultural regions;",
+          "6. Growth, distribution and density of population;",
+          "7. Demographic attributes: sex-ratio, age structure, literacy rate,workforce, dependency ratio, longevity;",
+          "8. Migration (inter-regional, interaregional and international) andassociated problems;",
+          "9. Population problems and policies;",
+          "10. Health indicators."
         ]
       },
       {
         "title": "Settlements",
         "subtopics": [
-          "Types, patterns, and morphology of rural settlements; Urban developments.",
-          "Morphology of Indian cities; Functional classification of Indian cities.",
-          "Conurbations and metropolitan regions; Urban sprawl.",
-          "Slums and associated problems; Town planning; Problems of urbanisation and remedies."
+          "1. Types, patterns and morphology of rural settlements;",
+          "2. Urban developments;",
+          "3. Morphology of Indian cities;",
+          "4. Functional classification of Indian cities;",
+          "5. Conurbations and metropolitan regions;",
+          "6. Urban sprawl;",
+          "7. Slums and asssociated problems;",
+          "8. Town planning;",
+          "9. Problems of urbanisation and remedies."
         ]
       },
       {
         "title": "Regional Development and Planning",
         "subtopics": [
-          "Experience of regional planning in India; Five Year Plans.",
-          "Integrated rural development programmes; Panchayati Raj and decentralised planning.",
-          "Command area development; Watershed management.",
-          "Planning for backward area, desert, drought-prone, hill tribal area development.",
-          "Multi-level planning; Regional planning and development of island territories."
+          "1. Experience of regional planning in India;",
+          "2. Five Year Plans;",
+          "3. Integrated rural development programmes;",
+          "4. Panchayati Raj and decentralised planning;",
+          "5. Command area development;",
+          "6. Watershed management;",
+          "7. Planning for backward area, desert, drought-prone, hill tribal areadevelopment;",
+          "8. Multi-level planning;",
+          "9. Regional planning and development of island territories."
         ]
       },
       {
         "title": "Political Aspects",
         "subtopics": [
-          "Geographical basis of Indian federalism; State reorganization; Emergence of new states.",
-          "Regional consciousness and inter-state issues.",
-          "International boundary of India and related issues; Cross-border terrorism.",
-          "India’s role in world affairs; Geopolitics of South Asia and Indian Ocean realm."
+          "1. Geographical basis of Indian federalism;",
+          "2. State reorganisation;",
+          "3. Emergence of new states;",
+          "4. Regional consciousness and inter-state issues;",
+          "5. International boundary of India and related issues;",
+          "6. Cross-border terrorism;",
+          "7. India’s role in world affairs;",
+          "8. Geopolitics of South Asia and Indian Ocean realm."
         ]
       },
       {
         "title": "Contemporary Issues",
         "subtopics": [
-          "Ecological issues: Environmental hazards: landslides, earthquakes, Tsunamis, floods and droughts, epidemics.",
-          "Issues related to environmental pollution; Changes in patterns of land use.",
-          "Principles of environmental impact assessment and environmental management.",
-          "Population explosion and food security; Environmental degradation; Deforestation, desertification, and soil erosion.",
-          "Problems of agrarian and industrial unrest; Regional disparities in economic development.",
-          "Concept of sustainable growth and development; Environmental awareness; Linkage of rivers; Globalisation and Indian economy."
+          "1. Ecological issues: Environmental hazards: landslides, earthquakes, Tsunamis, floods and droughts, epidemics;",
+          "2. Issues related to environmental pollution;",
+          "3. Changes in patterns of land use;",
+          "4. Principles of environmental impact assessment and environmental management;",
+          "5. Population explosion and food security;",
+          "6. Environmental degradation;",
+          "7. Deforestation, desertification and soil erosion;",
+          "8. Problems of agrarian and industrial unrest;",
+          "9. Regional disparities in economic development;",
+          "10. Concept of sustainable growth and development;",
+          "11. Environmental awareness;",
+          "12. Linkage of rivers;",
+          "13. Globalisation and Indian economy."
         ]
       }
     ]
