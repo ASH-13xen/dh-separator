@@ -1,5 +1,6 @@
 import { GoogleGenerativeAI, SchemaType } from '@google/generative-ai';
 import { GoogleAIFileManager } from '@google/generative-ai/server';
+import { PDFDocument } from 'pdf-lib';
 import fs from 'fs';
 import os from 'os';
 import path from 'path';
@@ -325,3 +326,68 @@ CRITICAL RULES:
     if (fs.existsSync(tempFilePath)) fs.unlinkSync(tempFilePath);
   }
 };
+
+export const processLargePdfInChunks = async (pdfBuffer, chunkPageCount = 50, forceContinuity = true) => {
+  try {
+    const mainPdfDoc = await PDFDocument.load(pdfBuffer);
+    const totalPages = mainPdfDoc.getPageCount();
+
+    console.log(`[GeminiService] Splitting large PDF (${totalPages} pages) into chunks of ${chunkPageCount} pages...`);
+    const allQuestions = [];
+
+    for (let startPage = 1; startPage <= totalPages; startPage += chunkPageCount) {
+      const endPage = Math.min(startPage + chunkPageCount - 1, totalPages);
+      console.log(`[GeminiService] Processing chunk: pages ${startPage} to ${endPage}`);
+
+      // Create a sub-pdf for this chunk
+      const subPdf = await PDFDocument.create();
+      const pagesToCopy = Array.from({ length: endPage - startPage + 1 }, (_, index) => startPage - 1 + index);
+      const copiedPages = await subPdf.copyPages(mainPdfDoc, pagesToCopy);
+      copiedPages.forEach((page) => subPdf.addPage(page));
+
+      const subPdfBytes = await subPdf.save();
+
+      // Process this chunk with Gemini
+      const chunkQuestions = await processEntirePdfWithGemini(Buffer.from(subPdfBytes));
+
+      if (chunkQuestions && Array.isArray(chunkQuestions)) {
+        for (const q of chunkQuestions) {
+          const absStart = startPage + q.start_page - 1;
+          const absEnd = startPage + q.end_page - 1;
+
+          allQuestions.push({
+            question_text: q.question_text,
+            tags: q.tags || [],
+            start_page: Math.min(absStart, totalPages),
+            end_page: Math.min(absEnd, totalPages),
+            answer_sheet_index: q.answer_sheet_index || 1
+          });
+        }
+      }
+    }
+
+    // Sort by start_page to ensure sequence
+    allQuestions.sort((a, b) => a.start_page - b.start_page);
+
+    if (forceContinuity) {
+      // Clean up end pages to ensure continuity
+      for (let i = 0; i < allQuestions.length; i++) {
+        if (i < allQuestions.length - 1) {
+          allQuestions[i].end_page = allQuestions[i + 1].start_page - 1;
+        } else {
+          allQuestions[i].end_page = totalPages;
+        }
+
+        if (allQuestions[i].end_page < allQuestions[i].start_page) {
+          allQuestions[i].end_page = allQuestions[i].start_page;
+        }
+      }
+    }
+
+    console.log(`[GeminiService] Batched processing complete. Found ${allQuestions.length} total questions.`);
+    return allQuestions;
+  } catch (error) {
+    console.error("[GeminiService] Error in processLargePdfInChunks:", error);
+    throw error;
+  }
+};

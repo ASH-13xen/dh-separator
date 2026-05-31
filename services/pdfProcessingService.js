@@ -1,4 +1,4 @@
-import { processEntirePdfWithGemini } from './geminiService.js';
+import { processLargePdfInChunks } from './geminiService.js';
 import { UPSCQA } from '../models/UPSCQA.js';
 import { PDFDocument } from 'pdf-lib';
 import streamifier from 'streamifier';
@@ -15,8 +15,8 @@ export const processPdf = async (fileBuffer, metadataList) => {
   try {
     console.log(`[PdfProcessingService] Processing single-upload PDF...`);
     
-    // 1. Get the Index from Gemini (Single Call)
-    const indexArray = await processEntirePdfWithGemini(fileBuffer);
+    // 1. Get the Index from Gemini (Chunked Batched Call)
+    const indexArray = await processLargePdfInChunks(fileBuffer);
     
     if (!indexArray || indexArray.length === 0) {
       throw new Error("No questions detected in document.");
