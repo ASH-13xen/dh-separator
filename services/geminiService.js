@@ -390,4 +390,130 @@ export const processLargePdfInChunks = async (pdfBuffer, chunkPageCount = 50, fo
     console.error("[GeminiService] Error in processLargePdfInChunks:", error);
     throw error;
   }
-};
+};
+
+export const getSubjectSyllabusText = (subject) => {
+  try {
+    const hierarchyPath = path.join(__dirname, '../syllabus_hierarchy.json');
+    if (!fs.existsSync(hierarchyPath)) {
+      console.warn("[GeminiService] syllabus_hierarchy.json not found!");
+      return '';
+    }
+    
+    const customData = JSON.parse(fs.readFileSync(hierarchyPath, 'utf8'));
+    let syllabusStr = '';
+    
+    let finalSubject = subject;
+    if (!finalSubject.startsWith('GS-') && !finalSubject.startsWith('OptionalSubject')) {
+       const cleanName = finalSubject.replace(/\s+/g, '');
+       finalSubject = `OptionalSubject${cleanName.charAt(0).toUpperCase()}${cleanName.slice(1)}`;
+    }
+
+    if (finalSubject.startsWith('GS-')) {
+      const sections = customData.gsModules?.[finalSubject] || [];
+      syllabusStr += `--- COMPULSORY PAPER: ${finalSubject} ---\n`;
+      sections.forEach(sectionItem => {
+        if (sectionItem.section) {
+          syllabusStr += `Section: ${sectionItem.section}\n`;
+        }
+        if (sectionItem.topics && Array.isArray(sectionItem.topics)) {
+          sectionItem.topics.forEach(topicItem => {
+            if (topicItem.title) {
+               syllabusStr += `  Topic: ${topicItem.title}\n`;
+               if (topicItem.subtopics && Array.isArray(topicItem.subtopics)) {
+                  syllabusStr += `    Subtopics: ${topicItem.subtopics.join(', ')}\n`;
+               }
+            }
+          });
+        }
+      });
+    } else {
+      const sections = customData.optionalSubjects?.[finalSubject] || [];
+      syllabusStr += `--- OPTIONAL SUBJECT: ${finalSubject} ---\n`;
+      sections.forEach(sectionItem => {
+        if (sectionItem.section) {
+          syllabusStr += `Section: ${sectionItem.section}\n`;
+        }
+        if (sectionItem.topics && Array.isArray(sectionItem.topics)) {
+          sectionItem.topics.forEach(topicItem => {
+            if (topicItem.title) {
+               syllabusStr += `  Topic: ${topicItem.title}\n`;
+               if (topicItem.subtopics && Array.isArray(topicItem.subtopics)) {
+                  syllabusStr += `    Subtopics: ${topicItem.subtopics.join(', ')}\n`;
+               }
+            }
+          });
+        }
+      });
+    }
+    
+    return syllabusStr;
+  } catch (e) {
+    console.error("Failed to load subject syllabus:", e);
+    return '';
+  }
+};
+
+export const tagQuestionWithGemini = async (questionText, subject) => {
+  try {
+    const syllabusText = getSubjectSyllabusText(subject);
+    const prompt = `You are an expert UPSC question classifier.
+Analyze the following question text:
+"${questionText}"
+
+Your task is to assign the correct tags to this question strictly based on the syllabus hierarchy of the subject: ${subject}.
+
+--- SUBJECT SYLLABUS ---
+${syllabusText}
+------------------------
+
+Provide the tags as a JSON object with a single property 'tags', which is a list of EXACT match string tags from the syllabus.
+Follow this strict hierarchy:
+If the subject is a Compulsory Paper (GS, e.g. GS-1, GS-2, GS-3, GS-4):
+- Include the GS paper tag (e.g., '${subject}').
+- Include exactly ONE Section tag matching that GS paper.
+- Include exactly ONE Topic Title tag matching that Section.
+If the subject is an Optional Subject (e.g. OptionalSubjectAnthropology):
+- Include the Optional Subject tag (e.g., '${subject}').
+- Include exactly ONE paper tag, which MUST be either "Paper 1" or "Paper 2".
+- Include exactly ONE Section tag matching that Optional Subject.
+- Include exactly ONE Topic Title tag matching that Section.
+
+Note: The tags MUST match the names/titles in the syllabus hierarchy EXACTLY. Do not invent tags.
+Return ONLY a JSON object matching this schema:
+{
+  "tags": ["tag1", "tag2", "tag3"]
+}
+`;
+
+    const responseSchema = {
+      type: SchemaType.OBJECT,
+      properties: {
+        tags: {
+          type: SchemaType.ARRAY,
+          items: { type: SchemaType.STRING },
+          description: "List of exactly matched syllabus tags representing subject, paper, section, and topic."
+        }
+      },
+      required: ["tags"]
+    };
+
+    console.log(`[GeminiService] Assigning tags for question: "${questionText.substring(0, 40)}..."`);
+    const result = await withRetry(() => model.generateContent({
+      contents: [{ role: 'user', parts: [{ text: prompt }] }],
+      generationConfig: {
+        responseMimeType: "application/json",
+        responseSchema: responseSchema,
+        temperature: 0.0
+      }
+    }), 3, 3000);
+
+    const responseText = result.response.text();
+    const jsonResult = JSON.parse(responseText);
+    return jsonResult.tags || [];
+  } catch (error) {
+    console.error("[GeminiService] Error in tagQuestionWithGemini:", error);
+    return [];
+  }
+};
+
