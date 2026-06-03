@@ -15,6 +15,16 @@ const saveLocally = (buffer, fileName) => {
   return `/public/extracted_pdfs/${fileName}`;
 };
 
+const saveCompiledLocally = (buffer, fileName) => {
+  const pdfDir = path.join(process.cwd(), 'public', 'reorder_books');
+  if (!fs.existsSync(pdfDir)) {
+    fs.mkdirSync(pdfDir, { recursive: true });
+  }
+  const filePath = path.join(pdfDir, fileName);
+  fs.writeFileSync(filePath, buffer);
+  return `/public/reorder_books/${fileName}`;
+};
+
 // Local path resolver from URL
 const getLocalPath = (fileUrl) => {
   try {
@@ -205,7 +215,7 @@ export const compileReorderPdf = async (req, res) => {
       const mergedPdfBytes = await mergedPdf.save();
       const fileName = `Compiled_Reorder_${id}_${Date.now()}.pdf`;
 
-      const relativeCompiledPath = saveLocally(Buffer.from(mergedPdfBytes), fileName);
+      const relativeCompiledPath = saveCompiledLocally(Buffer.from(mergedPdfBytes), fileName);
       const compiledUrl = `${req.protocol}://${req.get('host')}${relativeCompiledPath}`;
 
       record.pdfUrl = compiledUrl;
@@ -554,7 +564,7 @@ export const compileReorderPdf = async (req, res) => {
     const mergedPdfBytes = await pdfDoc.save();
     const fileName = `Compiled_Book_Reorder_${id}_${Date.now()}.pdf`;
 
-    const relativeCompiledPath = saveLocally(Buffer.from(mergedPdfBytes), fileName);
+    const relativeCompiledPath = saveCompiledLocally(Buffer.from(mergedPdfBytes), fileName);
     const compiledUrl = `${req.protocol}://${req.get('host')}${relativeCompiledPath}`;
 
     record.pdfUrl = compiledUrl;

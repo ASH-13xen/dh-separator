@@ -95,7 +95,7 @@ export const processPdf = async (fileBuffer, metadataList) => {
             start_page: item.start_page,
             end_page: item.end_page,
             file_url: file_url,
-            answer_sheet_index: item.answer_sheet_index || 1, // Added this line
+            answer_sheet_index: item.answer_sheet_index || 1,
             topper_name: mappedTopper.topperName || 'Unknown Topper',
             topper_year: mappedTopper.topperYear || '',
             topper_rank: mappedTopper.topperRank || '',
