@@ -6,12 +6,6 @@ on:
       paper:
         description: 'Paper Name (e.g., Paper 1A)'
         required: true
-      selections:
-        description: 'JSON string of topper selections'
-        required: true
-      includedQuestionIds:
-        description: 'JSON string of included question IDs'
-        required: true
       jobId:
         description: 'The MongoDB document ID tracking this build job'
         required: true
@@ -44,6 +38,4 @@ jobs:
         run: |
           node backend/scripts/generatePsirPdf.js \
             --paper "${{ github.event.inputs.paper }}" \
-            --selections '${{ github.event.inputs.selections }}' \
-            --includedQuestionIds '${{ github.event.inputs.includedQuestionIds }}' \
             --jobId "${{ github.event.inputs.jobId }}"

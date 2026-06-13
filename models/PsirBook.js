@@ -10,6 +10,14 @@ const psirBookSchema = new mongoose.Schema({
     enum: ['pending', 'processing', 'completed', 'failed'], 
     default: 'pending' 
   },
+  selections: {
+    type: mongoose.Schema.Types.Mixed,
+    default: {}
+  },
+  includedQuestionIds: {
+    type: [String],
+    default: []
+  },
   pdfUrl: { 
     type: String 
   },

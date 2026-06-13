@@ -217,11 +217,13 @@ export const generatePsirPdf = async (req, res) => {
       return res.status(400).json({ error: 'Please select at least one question to include in the book.' });
     }
 
-    // 1. Create a new PsirBook job record in database
+    // 1. Create a new PsirBook job record in database with large inputs included
     console.log('[PsirController] [generatePsirPdf] Step 1: Creating database compilation job tracking record...');
     const job = await PsirBook.create({
       paper,
-      status: 'pending'
+      status: 'pending',
+      selections,
+      includedQuestionIds
     });
     console.log(`[PsirController] [generatePsirPdf] Database record created successfully. Job ID: ${job._id}`);
 
@@ -241,12 +243,11 @@ export const generatePsirPdf = async (req, res) => {
     const githubUrl = `https://api.github.com/repos/${GITHUB_REPO_OWNER}/${GITHUB_REPO_NAME}/actions/workflows/${GITHUB_WORKFLOW_NAME}/dispatches`;
     console.log(`[PsirController] [generatePsirPdf] Triggering GitHub workflow API dispatch. URL: ${githubUrl}`);
 
+    // Pass only basic identifier inputs to fit within GitHub's 1024-byte input size limit
     const payload = {
       ref: GITHUB_REF || 'main',
       inputs: {
         paper: paper,
-        selections: JSON.stringify(selections || {}),
-        includedQuestionIds: JSON.stringify(includedQuestionIds),
         jobId: job._id.toString()
       }
     };

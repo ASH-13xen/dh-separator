@@ -143,23 +143,16 @@ async function main() {
   };
 
   const paper = getArgValue('--paper');
-  const selectionsStr = getArgValue('--selections');
-  const includedQuestionIdsStr = getArgValue('--includedQuestionIds');
   const jobId = getArgValue('--jobId');
 
   console.log(`[Runner] Extracted CLI arguments:`);
   console.log(`  - Paper: '${paper}'`);
   console.log(`  - Job ID: '${jobId}'`);
-  console.log(`  - Selections JSON: '${selectionsStr ? (selectionsStr.length > 100 ? selectionsStr.substring(0, 100) + '...' : selectionsStr) : 'N/A'}'`);
-  console.log(`  - Included Question IDs: '${includedQuestionIdsStr ? (includedQuestionIdsStr.length > 100 ? includedQuestionIdsStr.substring(0, 100) + '...' : includedQuestionIdsStr) : 'N/A'}'`);
 
   if (!paper || !jobId) {
     console.error('[Runner] Error: --paper and --jobId are required arguments. Terminating execution.');
     process.exit(1);
   }
-
-  const selections = selectionsStr ? JSON.parse(selectionsStr) : {};
-  const includedQuestionIds = includedQuestionIdsStr ? JSON.parse(includedQuestionIdsStr) : [];
 
   // Connect to DB
   if (!process.env.MONGO_URI) {
@@ -177,6 +170,13 @@ async function main() {
     console.error(`[Runner] Error: PsirBook job not found in DB: ${jobId}. Terminating execution.`);
     process.exit(1);
   }
+
+  // Retrieve selections and included question IDs directly from the database record
+  const selections = job.selections || {};
+  const includedQuestionIds = job.includedQuestionIds || [];
+  console.log(`[Runner] Extracted inputs from database record:`);
+  console.log(`  - Selections Count: ${Object.keys(selections).length}`);
+  console.log(`  - Included Questions Count: ${includedQuestionIds.length}`);
 
   try {
     console.log('[Runner] Updating job status in DB to "processing"...');
