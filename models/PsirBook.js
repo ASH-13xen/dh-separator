@@ -15,21 +15,9 @@ const psirBookSchema = new mongoose.Schema({
   },
   error: { 
     type: String 
-  },
-  createdAt: { 
-    type: Date, 
-    default: Date.now 
-  },
-  updatedAt: { 
-    type: Date, 
-    default: Date.now 
   }
-});
-
-// Auto-update updatedAt field on save
-psirBookSchema.pre('save', function (next) {
-  this.updatedAt = Date.now();
-  next();
+}, { 
+  timestamps: true 
 });
 
 export const PsirBook = mongoose.model('PsirBook', psirBookSchema);
