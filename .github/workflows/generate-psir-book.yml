@@ -22,11 +22,10 @@ jobs:
         with:
           node-version: '18'
           cache: 'npm'
-          cache-dependency-path: 'backend/package-lock.json'
+          cache-dependency-path: 'package-lock.json'
 
       - name: Install Dependencies
         run: |
-          cd backend
           npm ci
 
       - name: Compile and Upload PDF
@@ -36,6 +35,6 @@ jobs:
           CLOUDINARY_API_KEY: ${{ secrets.CLOUDINARY_API_KEY }}
           CLOUDINARY_API_SECRET: ${{ secrets.CLOUDINARY_API_SECRET }}
         run: |
-          node backend/scripts/generatePsirPdf.js \
+          node scripts/generatePsirPdf.js \
             --paper "${{ github.event.inputs.paper }}" \
             --jobId "${{ github.event.inputs.jobId }}"
