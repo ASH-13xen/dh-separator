@@ -2,8 +2,7 @@ import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { PDFDocument, rgb, StandardFonts } from 'pdf-lib';
-import { v2 as cloudinary } from 'cloudinary';
-import streamifier from 'streamifier';
+import { GridFSBucket } from 'mongodb';
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
 import { PsirBook } from '../models/PsirBook.js';
@@ -13,14 +12,6 @@ dotenv.config();
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-
-console.log('[Runner] Cloudinary initialization...');
-cloudinary.config({ 
-  cloud_name: process.env.CLOUDINARY_CLOUD_NAME, 
-  api_key: process.env.CLOUDINARY_API_KEY, 
-  api_secret: process.env.CLOUDINARY_API_SECRET 
-});
-console.log('[Runner] Cloudinary configured successfully.');
 
 // RFC 4180 compliant CSV Parser
 function parseCSV(text) {
@@ -115,28 +106,17 @@ async function fetchUrlsInParallel(urls, concurrencyLimit = 5) {
   return results;
 }
 
-const uploadToCloudinary = (buffer, fileName) => {
-  console.log(`[Runner] [uploadToCloudinary] Uploading buffer to Cloudinary as image/pdf. Folder: 'psir_books', public_id: ${fileName}`);
+const saveToGridFS = (db, buffer, filename) => {
+  console.log(`[Runner] [saveToGridFS] Uploading '${filename}' to GridFS bucket 'psir_books'...`);
   return new Promise((resolve, reject) => {
-    const stream = cloudinary.uploader.upload_chunked_stream(
-      { 
-        resource_type: 'image', 
-        format: 'pdf',
-        folder: 'psir_books', 
-        public_id: fileName.replace('.pdf', ''), 
-        chunk_size: 6000000 
-      },
-      (error, result) => {
-        if (error) {
-          console.error('[Runner] [uploadToCloudinary] Cloudinary upload stream error:', error);
-          reject(error);
-        } else if (result) {
-          console.log(`[Runner] [uploadToCloudinary] Cloudinary upload successful. secure_url: ${result.secure_url}`);
-          resolve(result.secure_url);
-        }
-      }
-    );
-    streamifier.createReadStream(buffer).pipe(stream);
+    const bucket = new GridFSBucket(db, { bucketName: 'psir_books' });
+    const uploadStream = bucket.openUploadStream(filename, { contentType: 'application/pdf' });
+    uploadStream.on('error', reject);
+    uploadStream.on('finish', () => {
+      console.log(`[Runner] [saveToGridFS] Upload complete. File ID: ${uploadStream.id}`);
+      resolve(uploadStream.id);
+    });
+    uploadStream.end(buffer);
   });
 };
 
@@ -796,13 +776,16 @@ async function main() {
     }
 
     console.log('[Runner] Saving final Master PDF bytes to memory...');
-    const pdfBytes = await pdfDoc.save();
+    const pdfBytes = await pdfDoc.save({ useObjectStreams: true });
     console.log(`[Runner] PDF successfully built. File size: ${pdfBytes.length} bytes.`);
 
     // Update job status and store the compiled binary PDF directly in MongoDB
-    console.log('[Runner] Saving binary PDF data and status: "completed" to MongoDB...');
+    const fileName = `PSIR_${paper.replace(/[^a-z0-9]/gi, '_')}_${jobId}.pdf`;
+    const gridFsFileId = await saveToGridFS(mongoose.connection.db, Buffer.from(pdfBytes), fileName);
+
+    console.log('[Runner] Saving GridFS file ID and status: "completed" to MongoDB...');
     job.status = 'completed';
-    job.pdfData = Buffer.from(pdfBytes);
+    job.pdfFileId = gridFsFileId.toString();
     await job.save();
     console.log('[Runner] MongoDB update succeeded. Job completed.');
 

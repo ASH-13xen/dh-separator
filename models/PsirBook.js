@@ -18,8 +18,11 @@ const psirBookSchema = new mongoose.Schema({
     type: [String],
     default: []
   },
-  pdfUrl: { 
-    type: String 
+  pdfFileId: {
+    type: String
+  },
+  pdfUrl: {
+    type: String
   },
   pdfData: {
     type: Buffer

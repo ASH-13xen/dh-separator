@@ -2,6 +2,8 @@ import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { PDFDocument, rgb, StandardFonts } from 'pdf-lib';
+import { GridFSBucket } from 'mongodb';
+import mongoose from 'mongoose';
 import { PsirBook } from '../models/PsirBook.js';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -319,14 +321,61 @@ export const downloadPsirBook = async (req, res) => {
   console.log(`[PsirController] [downloadPsirBook] Serving direct download for Job ID: ${id}`);
   try {
     const job = await PsirBook.findById(id);
-    if (!job || !job.pdfData) {
+    if (!job || (!job.pdfFileId && !job.pdfUrl && !job.pdfData)) {
       console.warn(`[PsirController] [downloadPsirBook] PDF not found or not yet generated for Job ID: ${id}`);
       return res.status(404).json({ error: 'PDF book not found or compilation not finished yet.' });
     }
 
     const fileName = `Formal_PSIR_${job.paper.replace(/[^a-z0-9]/gi, '_')}.pdf`;
-    
-    console.log(`[PsirController] [downloadPsirBook] Streaming ${job.pdfData.length} bytes to user's browser as: ${fileName}`);
+
+    if (job.pdfFileId) {
+      const bucket = new GridFSBucket(mongoose.connection.db, { bucketName: 'psir_books' });
+      const fileId = new mongoose.Types.ObjectId(job.pdfFileId);
+
+      const files = await bucket.find({ _id: fileId }).toArray();
+      if (files.length === 0) {
+        console.warn(`[PsirController] [downloadPsirBook] GridFS file not found for ID: ${job.pdfFileId}`);
+        return res.status(404).json({ error: 'PDF file not found in storage.' });
+      }
+
+      console.log(`[PsirController] [downloadPsirBook] Streaming ${files[0].length} bytes from GridFS as: ${fileName}`);
+      res.setHeader('Content-Disposition', `attachment; filename="${fileName}"`);
+      res.setHeader('Content-Type', 'application/pdf');
+      res.setHeader('Content-Length', files[0].length);
+
+      const downloadStream = bucket.openDownloadStream(fileId);
+
+      downloadStream.on('error', (err) => {
+        console.error('[PsirController] [downloadPsirBook] GridFS stream error:', err);
+        if (!res.headersSent) res.status(500).json({ error: 'Failed to stream PDF.' });
+      });
+
+      downloadStream.pipe(res);
+
+      res.on('finish', async () => {
+        try {
+          await bucket.delete(fileId);
+          await PsirBook.findByIdAndUpdate(id, { $unset: { pdfFileId: '' } });
+          console.log(`[PsirController] [downloadPsirBook] GridFS file ${fileId} deleted after successful download.`);
+        } catch (delErr) {
+          console.error('[PsirController] [downloadPsirBook] Failed to delete GridFS file:', delErr);
+        }
+      });
+
+      return;
+    }
+
+    if (job.pdfUrl) {
+      console.log(`[PsirController] [downloadPsirBook] Fetching PDF from Cloudinary URL and streaming as: ${fileName}`);
+      const cloudRes = await fetch(job.pdfUrl);
+      if (!cloudRes.ok) throw new Error(`Failed to fetch PDF from storage: ${cloudRes.status}`);
+      res.setHeader('Content-Disposition', `attachment; filename="${fileName}"`);
+      res.setHeader('Content-Type', 'application/pdf');
+      cloudRes.body.pipe(res);
+      return;
+    }
+
+    console.log(`[PsirController] [downloadPsirBook] Streaming ${job.pdfData.length} bytes from legacy buffer as: ${fileName}`);
     res.setHeader('Content-Disposition', `attachment; filename="${fileName}"`);
     res.setHeader('Content-Type', 'application/pdf');
     res.send(job.pdfData);
