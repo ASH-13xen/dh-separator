@@ -98,15 +98,21 @@ async function fetchUrlsInParallel(urls, concurrencyLimit = 5) {
 }
 
 export const previewPsirData = async (req, res) => {
+  console.log('[PsirController] [previewPsirData] Preview request received.');
   try {
     const csvPath = path.join(process.cwd(), 'psir_questions_updated (2).csv');
+    console.log(`[PsirController] [previewPsirData] Looking for CSV file at: ${csvPath}`);
     if (!fs.existsSync(csvPath)) {
+      console.warn(`[PsirController] [previewPsirData] CSV file not found at: ${csvPath}`);
       return res.status(404).json({ error: 'PSIR questions CSV file not found.' });
     }
     
+    console.log('[PsirController] [previewPsirData] Reading CSV file...');
     const csvData = fs.readFileSync(csvPath, 'utf8');
+    console.log('[PsirController] [previewPsirData] Parsing CSV rows...');
     const parsed = parseCSV(csvData);
     const rows = parsed.slice(1); // skip headers
+    console.log(`[PsirController] [previewPsirData] Parsed ${rows.length} rows from CSV file.`);
     
     const hierarchy = {};
     
@@ -161,6 +167,7 @@ export const previewPsirData = async (req, res) => {
       }
     });
     
+    console.log('[PsirController] [previewPsirData] Grouping sections and topics...');
     const result = Object.values(hierarchy).map(paperObj => {
       const topicsArray = Object.values(paperObj.topics).map(topObj => {
         const questionsArray = Object.values(topObj.questions);
@@ -186,39 +193,45 @@ export const previewPsirData = async (req, res) => {
       return orderA - orderB;
     });
     
+    console.log('[PsirController] [previewPsirData] Preview hierarchy generated successfully.');
     res.json(result);
   } catch (err) {
-    console.error('[PsirController] Preview error:', err);
+    console.error('[PsirController] [previewPsirData] Error parsing preview data:', err);
     res.status(500).json({ error: 'Failed to parse and group PSIR questions.', details: err.message });
   }
 };
 
 export const generatePsirPdf = async (req, res) => {
+  console.log('[PsirController] [generatePsirPdf] Generate request received.');
   try {
     const { paper, selections, includedQuestionIds } = req.body;
+    console.log(`[PsirController] [generatePsirPdf] Params: Paper='${paper}', SelectionsCount=${selections ? Object.keys(selections).length : 0}, IncludedQuestionsCount=${includedQuestionIds ? includedQuestionIds.length : 0}`);
 
     if (!paper) {
+      console.warn('[PsirController] [generatePsirPdf] Validation failed: Missing paper.');
       return res.status(400).json({ error: 'Paper name is required to generate PDF.' });
     }
 
     if (!includedQuestionIds || !Array.isArray(includedQuestionIds) || includedQuestionIds.length === 0) {
+      console.warn('[PsirController] [generatePsirPdf] Validation failed: Included questions array empty or missing.');
       return res.status(400).json({ error: 'Please select at least one question to include in the book.' });
     }
 
     // 1. Create a new PsirBook job record in database
+    console.log('[PsirController] [generatePsirPdf] Step 1: Creating database compilation job tracking record...');
     const job = await PsirBook.create({
       paper,
       status: 'pending'
     });
-
-    console.log(`[PsirController] Created compilation job record in DB. ID: ${job._id}`);
+    console.log(`[PsirController] [generatePsirPdf] Database record created successfully. Job ID: ${job._id}`);
 
     // 2. Dispatch GitHub Action Workflow Run
+    console.log('[PsirController] [generatePsirPdf] Step 2: Retrieving GitHub credentials from environment variables...');
     const { GITHUB_PAT, GITHUB_REPO_OWNER, GITHUB_REPO_NAME, GITHUB_WORKFLOW_NAME, GITHUB_REF } = process.env;
 
     if (!GITHUB_PAT || !GITHUB_REPO_OWNER || !GITHUB_REPO_NAME || !GITHUB_WORKFLOW_NAME) {
-      const errorMsg = 'GitHub Actions environment variables are missing from server configuration.';
-      console.error(`[PsirController] ${errorMsg}`);
+      const errorMsg = 'GitHub Actions environment variables are missing from server configuration (.env).';
+      console.error(`[PsirController] [generatePsirPdf] Configuration Error: ${errorMsg}`);
       job.status = 'failed';
       job.error = errorMsg;
       await job.save();
@@ -226,8 +239,18 @@ export const generatePsirPdf = async (req, res) => {
     }
 
     const githubUrl = `https://api.github.com/repos/${GITHUB_REPO_OWNER}/${GITHUB_REPO_NAME}/actions/workflows/${GITHUB_WORKFLOW_NAME}/dispatches`;
+    console.log(`[PsirController] [generatePsirPdf] Triggering GitHub workflow API dispatch. URL: ${githubUrl}`);
 
-    console.log(`[PsirController] Dispatching GitHub Workflow at URL: ${githubUrl}`);
+    const payload = {
+      ref: GITHUB_REF || 'main',
+      inputs: {
+        paper: paper,
+        selections: JSON.stringify(selections || {}),
+        includedQuestionIds: JSON.stringify(includedQuestionIds),
+        jobId: job._id.toString()
+      }
+    };
+    console.log(`[PsirController] [generatePsirPdf] Payload inputs prepared. Ref: '${payload.ref}', Job ID: '${payload.inputs.jobId}'`);
 
     const response = await fetch(githubUrl, {
       method: 'POST',
@@ -237,16 +260,10 @@ export const generatePsirPdf = async (req, res) => {
         'X-GitHub-Api-Version': '2022-11-28',
         'User-Agent': 'DH-Separator-Backend'
       },
-      body: JSON.stringify({
-        ref: GITHUB_REF || 'main',
-        inputs: {
-          paper: paper,
-          selections: JSON.stringify(selections || {}),
-          includedQuestionIds: JSON.stringify(includedQuestionIds),
-          jobId: job._id.toString()
-        }
-      })
+      body: JSON.stringify(payload)
     });
+
+    console.log(`[PsirController] [generatePsirPdf] GitHub API Response status: ${response.status} (${response.statusText})`);
 
     if (response.status !== 204) {
       let responseBody = '';
@@ -256,36 +273,41 @@ export const generatePsirPdf = async (req, res) => {
         responseBody = 'Failed to read response body.';
       }
       const errorDetails = `GitHub API returned status code ${response.status}: ${responseBody}`;
-      console.error(`[PsirController] GitHub Action dispatch failed. ${errorDetails}`);
+      console.error(`[PsirController] [generatePsirPdf] Action trigger failed. Error details: ${errorDetails}`);
+      
       job.status = 'failed';
       job.error = errorDetails;
       await job.save();
+      console.log('[PsirController] [generatePsirPdf] Database job status marked as failed.');
+      
       return res.status(500).json({ error: 'Failed to trigger compilation runner.', details: errorDetails });
     }
 
-    console.log(`[PsirController] GitHub Actions workflow dispatched successfully for Job ID: ${job._id}`);
-
+    console.log(`[PsirController] [generatePsirPdf] GitHub Action workflow dispatched successfully. Job ID: ${job._id}`);
     res.status(202).json({
       message: 'PDF generation has been successfully offloaded and queued in GitHub Actions.',
       jobId: job._id
     });
 
   } catch (error) {
-    console.error(`[PsirController] Error initiating PDF generation:`, error);
+    console.error(`[PsirController] [generatePsirPdf] Unexpected execution error occurred:`, error);
     res.status(500).json({ error: 'Failed to initiate PDF book generation.', details: error.message });
   }
 };
 
 export const getPsirBookStatus = async (req, res) => {
+  const { id } = req.params;
+  console.log(`[PsirController] [getPsirBookStatus] Request status polling for Job ID: ${id}`);
   try {
-    const { id } = req.params;
     const job = await PsirBook.findById(id);
     if (!job) {
+      console.warn(`[PsirController] [getPsirBookStatus] Job ID not found in database: ${id}`);
       return res.status(404).json({ error: 'Compilation job not found.' });
     }
+    console.log(`[PsirController] [getPsirBookStatus] Job record retrieved. Status: '${job.status}', PDF URL: '${job.pdfUrl || 'N/A'}'`);
     res.json(job);
   } catch (err) {
-    console.error('[PsirController] Get status error:', err);
+    console.error(`[PsirController] [getPsirBookStatus] Error fetching status for Job ID ${id}:`, err);
     res.status(500).json({ error: 'Failed to retrieve compilation job status.', details: err.message });
   }
 };

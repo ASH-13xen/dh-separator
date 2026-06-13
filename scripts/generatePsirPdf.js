@@ -8,17 +8,19 @@ import mongoose from 'mongoose';
 import dotenv from 'dotenv';
 import { PsirBook } from '../models/PsirBook.js';
 
+console.log('[Runner] Script loaded. Starting PDF generation pipeline...');
 dotenv.config();
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// Cloudinary Configuration
+console.log('[Runner] Cloudinary initialization...');
 cloudinary.config({ 
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME, 
   api_key: process.env.CLOUDINARY_API_KEY, 
   api_secret: process.env.CLOUDINARY_API_SECRET 
 });
+console.log('[Runner] Cloudinary configured successfully.');
 
 // RFC 4180 compliant CSV Parser
 function parseCSV(text) {
@@ -90,9 +92,11 @@ function sanitizeForPdf(str) {
 async function fetchUrlsInParallel(urls, concurrencyLimit = 5) {
   const results = {};
   const uniqueUrls = [...new Set(urls.filter(Boolean))];
+  console.log(`[Runner] [fetchUrlsInParallel] Total unique URLs to pre-fetch: ${uniqueUrls.length} (Concurrency limit: ${concurrencyLimit})`);
   
   for (let i = 0; i < uniqueUrls.length; i += concurrencyLimit) {
     const chunk = uniqueUrls.slice(i, i + concurrencyLimit);
+    console.log(`[Runner] [fetchUrlsInParallel] Fetching chunk: ${i + 1} to ${Math.min(uniqueUrls.length, i + concurrencyLimit)}`);
     const promises = chunk.map(async (url) => {
       const cleanUrl = url.replace('https//', 'https://').replace('http//', 'http://');
       try {
@@ -100,8 +104,9 @@ async function fetchUrlsInParallel(urls, concurrencyLimit = 5) {
         if (!res.ok) throw new Error(`Status ${res.status}`);
         const buffer = await res.arrayBuffer();
         results[url] = buffer;
+        console.log(`[Runner] [fetchUrlsInParallel] Successfully pre-fetched: ${cleanUrl} (${buffer.byteLength} bytes)`);
       } catch (err) {
-        console.error(`Failed to pre-fetch URL: ${cleanUrl}`, err);
+        console.error(`[Runner] [fetchUrlsInParallel] Failed to pre-fetch URL: ${cleanUrl}`, err);
         results[url] = null;
       }
     });
@@ -111,13 +116,16 @@ async function fetchUrlsInParallel(urls, concurrencyLimit = 5) {
 }
 
 const uploadToCloudinary = (buffer, fileName) => {
+  console.log(`[Runner] [uploadToCloudinary] Uploading raw buffer to Cloudinary folder 'psir_books' with name: ${fileName}`);
   return new Promise((resolve, reject) => {
     const stream = cloudinary.uploader.upload_chunked_stream(
       { resource_type: 'raw', folder: 'psir_books', public_id: fileName, chunk_size: 6000000 },
       (error, result) => {
         if (error) {
+          console.error('[Runner] [uploadToCloudinary] Cloudinary upload stream error:', error);
           reject(error);
         } else if (result) {
+          console.log(`[Runner] [uploadToCloudinary] Cloudinary upload successful. secure_url: ${result.secure_url}`);
           resolve(result.secure_url);
         }
       }
@@ -127,7 +135,7 @@ const uploadToCloudinary = (buffer, fileName) => {
 };
 
 async function main() {
-  // Parse command line arguments
+  console.log('[Runner] Parsing command-line CLI arguments...');
   const args = process.argv.slice(2);
   const getArgValue = (flag) => {
     const index = args.indexOf(flag);
@@ -139,12 +147,14 @@ async function main() {
   const includedQuestionIdsStr = getArgValue('--includedQuestionIds');
   const jobId = getArgValue('--jobId');
 
-  console.log('Script arguments parsed:');
-  console.log(`- paper: ${paper}`);
-  console.log(`- jobId: ${jobId}`);
+  console.log(`[Runner] Extracted CLI arguments:`);
+  console.log(`  - Paper: '${paper}'`);
+  console.log(`  - Job ID: '${jobId}'`);
+  console.log(`  - Selections JSON: '${selectionsStr ? (selectionsStr.length > 100 ? selectionsStr.substring(0, 100) + '...' : selectionsStr) : 'N/A'}'`);
+  console.log(`  - Included Question IDs: '${includedQuestionIdsStr ? (includedQuestionIdsStr.length > 100 ? includedQuestionIdsStr.substring(0, 100) + '...' : includedQuestionIdsStr) : 'N/A'}'`);
 
   if (!paper || !jobId) {
-    console.error('Error: --paper and --jobId are required arguments.');
+    console.error('[Runner] Error: --paper and --jobId are required arguments. Terminating execution.');
     process.exit(1);
   }
 
@@ -153,35 +163,42 @@ async function main() {
 
   // Connect to DB
   if (!process.env.MONGO_URI) {
-    console.error('MONGO_URI is missing from environment.');
+    console.error('[Runner] MONGO_URI is missing from environment. Terminating execution.');
     process.exit(1);
   }
 
-  console.log('Connecting to MongoDB...');
+  console.log('[Runner] Connecting to MongoDB database...');
   await mongoose.connect(process.env.MONGO_URI);
-  console.log('MongoDB connected successfully.');
+  console.log('[Runner] MongoDB connected successfully.');
 
+  console.log(`[Runner] Querying database for job record ID: ${jobId}...`);
   const job = await PsirBook.findById(jobId);
   if (!job) {
-    console.error(`PsirBook job not found in DB: ${jobId}`);
+    console.error(`[Runner] Error: PsirBook job not found in DB: ${jobId}. Terminating execution.`);
     process.exit(1);
   }
 
   try {
+    console.log('[Runner] Updating job status in DB to "processing"...');
     job.status = 'processing';
     await job.save();
+    console.log('[Runner] Job status saved as processing.');
 
     const csvPath = path.join(__dirname, '..', 'psir_questions_updated (2).csv');
+    console.log(`[Runner] Looking for PSIR CSV database at path: ${csvPath}`);
     if (!fs.existsSync(csvPath)) {
       throw new Error(`PSIR questions CSV file not found at: ${csvPath}`);
     }
     
-    console.log('Reading and parsing PSIR CSV hierarchy...');
+    console.log('[Runner] Reading CSV file contents...');
     const csvData = fs.readFileSync(csvPath, 'utf8');
+    console.log('[Runner] Parsing CSV rows...');
     const parsed = parseCSV(csvData);
     const rows = parsed.slice(1);
+    console.log(`[Runner] Total CSV rows parsed: ${rows.length}`);
 
     // Grouping mapping from ID to question details
+    console.log(`[Runner] Filtering and grouping questions for paper '${paper}'...`);
     const questionsMap = {};
     
     rows.forEach(r => {
@@ -223,7 +240,10 @@ async function main() {
       }
     });
 
+    console.log(`[Runner] Found ${Object.keys(questionsMap).length} total questions belonging to '${paper}' in the CSV.`);
+
     // Get selected questions in order
+    console.log('[Runner] Ordering selected questions...');
     const orderedQuestions = [];
     if (includedQuestionIds && Array.isArray(includedQuestionIds)) {
       includedQuestionIds.forEach(id => {
@@ -232,9 +252,11 @@ async function main() {
         }
       });
     } else {
+      console.log('[Runner] No custom question ordering provided, falling back to database default order.');
       Object.values(questionsMap).forEach(q => orderedQuestions.push(q));
     }
 
+    console.log(`[Runner] Total questions to include in the compiled book: ${orderedQuestions.length}`);
     if (orderedQuestions.length === 0) {
       throw new Error('No matched/selected questions found for this paper.');
     }
@@ -242,6 +264,7 @@ async function main() {
     // Structure selected questions hierarchically for PDF generation
     const docData = [];
     const sectionName = orderedQuestions[0].section;
+    console.log(`[Runner] Formatting section structure. Section Name: '${sectionName}'`);
 
     const topicMap = {};
     orderedQuestions.forEach(q => {
@@ -258,6 +281,7 @@ async function main() {
       };
     });
     topicsArray.sort((a, b) => a.title.localeCompare(b.title));
+    console.log(`[Runner] Grouped into ${topicsArray.length} sorted topics.`);
 
     docData.push({
       section: sectionName,
@@ -265,6 +289,7 @@ async function main() {
     });
 
     // Pre-fetch topper PDFs concurrently
+    console.log('[Runner] Compiling urls to pre-fetch...');
     const urlsToFetch = [];
     docData.forEach(secNode => {
       secNode.topics.forEach(topNode => {
@@ -288,16 +313,18 @@ async function main() {
       });
     });
 
-    console.log(`Pre-fetching ${urlsToFetch.length} topper answer PDFs in parallel...`);
+    console.log(`[Runner] Found ${urlsToFetch.length} topper sheet URL references. Initiating pre-fetch...`);
     const fetchedBuffers = await fetchUrlsInParallel(urlsToFetch, 10);
 
     // 1. Initialize Master PDF Document
-    console.log('Initializing PDF creation with pdf-lib...');
+    console.log('[Runner] Initializing Master PDF Document via pdf-lib...');
     const pdfDoc = await PDFDocument.create();
+    console.log('[Runner] Embedding fonts...');
     const fontNormal = await pdfDoc.embedFont(StandardFonts.Helvetica);
     const fontBold = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
 
     // 2. Create Premium Cover Page
+    console.log('[Runner] Adding Cover Page...');
     const titlePage = pdfDoc.addPage();
     const { width: tw, height: th } = titlePage.getSize();
     
@@ -357,8 +384,9 @@ async function main() {
     const indexData = [];
 
     // 3. Document Building
-    console.log('Generating chapters, topics and embedding topper PDFs...');
+    console.log('[Runner] Starting core document building pass...');
     for (const secNode of docData) {
+        console.log(`[Runner] Processing Section: ${secNode.section}`);
         indexData.push({
             type: 'section',
             text: `${paper} - ${secNode.section}`,
@@ -392,6 +420,7 @@ async function main() {
 
         // Topics
         for (const topNode of secNode.topics) {
+            console.log(`  - Topic: ${topNode.title}`);
             indexData.push({
                 type: 'topic',
                 text: topNode.title,
@@ -426,6 +455,7 @@ async function main() {
             // Questions
             for (let qIdx = 0; qIdx < topNode.questions.length; qIdx++) {
                 const item = topNode.questions[qIdx];
+                console.log(`    * Question ${qIdx + 1}/${topNode.questions.length}: ID='${item._id}'`);
                 
                 let activeFileObjects = [];
                 if (item.file_urls && item.file_urls.length > 0) {
@@ -467,13 +497,16 @@ async function main() {
                 }
 
                 if (activeFileObjects.length > 0) {
+                    console.log(`      Found ${activeFileObjects.length} active topper sheets for this question.`);
                     for (const activeFileObj of activeFileObjects) {
                         const cloudUrl = activeFileObj.url.replace('https//', 'https://').replace('http//', 'http://');
+                        console.log(`      Embedding topper note: ${activeFileObj.topper_name} (${cloudUrl})`);
                         try {
                             const arrayBuffer = fetchedBuffers[activeFileObj.url];
-                            if (!arrayBuffer) throw new Error(`Failed to pre-fetch from ${cloudUrl}`);
+                            if (!arrayBuffer) throw new Error(`Buffer not found for pre-fetched URL: ${cloudUrl}`);
                             const sourcePdfDoc = await PDFDocument.load(arrayBuffer);
                             const sourcePageIndices = sourcePdfDoc.getPageIndices();
+                            console.log(`      Loaded PDF document successfully. Total pages: ${sourcePageIndices.length}`);
                             
                             if (sourcePageIndices.length > 0) {
                                 // Embed first page
@@ -553,6 +586,7 @@ async function main() {
                                 // Add subsequent pages
                                 const restPageIndices = sourcePageIndices.slice(1);
                                 if (restPageIndices.length > 0) {
+                                    console.log(`      Copying ${restPageIndices.length} subsequent pages...`);
                                     const sourcePages = await pdfDoc.copyPages(sourcePdfDoc, restPageIndices);
                                     sourcePages.forEach(p => pdfDoc.addPage(p));
                                 }
@@ -560,7 +594,8 @@ async function main() {
                                 throw new Error("Answer PDF contains no pages.");
                             }
                         } catch (pdfErr) {
-                            console.error(`Error appending PDF ${cloudUrl}:`, pdfErr);
+                            console.error(`      Error appending PDF ${cloudUrl}:`, pdfErr);
+                            // Error fallback page
                             const errPage = pdfDoc.addPage([tw, th]);
                             errPage.drawRectangle({
                                 x: 0, y: 0, width: tw, height: th,
@@ -616,7 +651,7 @@ async function main() {
                         }
                     }
                 } else {
-                    // Placeholder page
+                    console.log('      No toppers selected for this question. Drawing placeholder page.');
                     const qPage = pdfDoc.addPage([tw, th]);
                     qPage.drawRectangle({
                         x: 0, y: 0, width: tw, height: th, color: rgb(0.97, 0.98, 0.99)
@@ -673,7 +708,7 @@ async function main() {
     }
 
     // 4. Generate Table of Contents
-    console.log('Generating Table of Contents...');
+    console.log('[Runner] Generating Table of Contents pages...');
     const indexPdfDoc = await PDFDocument.create();
     let idxPage = indexPdfDoc.addPage();
     let idxY = idxPage.getSize().height - 80;
@@ -721,6 +756,7 @@ async function main() {
         idxY -= rowH;
     }
 
+    console.log(`[Runner] Injecting ${indexPdfDoc.getPageCount()} Table of Contents pages into Master PDF...`);
     const indexPages = await pdfDoc.copyPages(indexPdfDoc, indexPdfDoc.getPageIndices());
     const totalIndexPages = indexPages.length;
     
@@ -729,6 +765,7 @@ async function main() {
     }
 
     // Numbering pass
+    console.log('[Runner] Performing page numbering calculations...');
     let currentDataRow = 0;
     for (let k = 0; k < totalIndexPages; k++) {
         const injectedIdxPage = pdfDoc.getPage(1 + k);
@@ -752,32 +789,37 @@ async function main() {
         }
     }
 
-    console.log('Saving final PDF doc to memory buffer...');
+    console.log('[Runner] Saving final Master PDF bytes to memory...');
     const pdfBytes = await pdfDoc.save();
+    console.log(`[Runner] PDF successfully built. File size: ${pdfBytes.length} bytes.`);
 
-    console.log('Uploading compiled PDF to Cloudinary...');
+    console.log('[Runner] Preparing Cloudinary upload stream...');
     const fileName = `Formal_PSIR_${paper.replace(/[^a-z0-9]/gi, '_')}_${Date.now()}.pdf`;
     const secureUrl = await uploadToCloudinary(pdfBytes, fileName);
-    console.log(`Cloudinary upload complete! URL: ${secureUrl}`);
+    
+    console.log(`[Runner] Cloudinary upload finished. Link: ${secureUrl}`);
 
     // Update job status in MongoDB
+    console.log('[Runner] Saving secure_url and status: "completed" to MongoDB...');
     job.status = 'completed';
     job.pdfUrl = secureUrl;
     await job.save();
-    console.log('MongoDB compilation job status updated to: completed');
+    console.log('[Runner] MongoDB update succeeded.');
 
+    console.log('[Runner] Script finished successfully. Exiting process with code 0.');
     process.exit(0);
 
   } catch (err) {
-    console.error('An error occurred during PDF compilation or upload:', err);
+    console.error('[Runner] Severe Error occurred during runner execution:', err);
     job.status = 'failed';
     job.error = err.message;
     await job.save();
+    console.log('[Runner] Database updated with status: failed and error logged.');
     process.exit(1);
   }
 }
 
 main().catch(err => {
-  console.error('Unhandled script error:', err);
+  console.error('[Runner] Unhandled runner script error:', err);
   process.exit(1);
 });
