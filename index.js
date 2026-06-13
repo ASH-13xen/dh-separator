@@ -10,6 +10,7 @@ import dataRoutes from './routes/dataRoutes.js';
 import collectiveRoutes from './routes/collectiveRoutes.js';
 import quesPdfRoutes from './routes/quesPdfRoutes.js';
 import reorderRoutes from './routes/reorderRoutes.js';
+import psirRoutes from './routes/psirRoutes.js';
 
 dotenv.config();
 
@@ -19,7 +20,8 @@ const MONGO_URI = process.env.MONGO_URI || 'mongodb://127.0.0.1:27017/upsc_db';
 
 // Middleware
 app.use(cors({ origin: '*' }))
-app.use(express.json());
+app.use(express.json({ limit: '50mb' }));
+app.use(express.urlencoded({ limit: '50mb', extended: true }));
 app.use('/public', express.static(path.join(process.cwd(), 'public')));
 
 // Daily clean-up cron job for local extracted PDFs
@@ -48,6 +50,7 @@ app.use('/api/data', dataRoutes);
 app.use('/api/collective', collectiveRoutes);
 app.use('/api/quespdf', quesPdfRoutes);
 app.use('/api/reorder', reorderRoutes);
+app.use('/api/psir', psirRoutes);
 
 // Database Connection
 mongoose.connect(MONGO_URI)

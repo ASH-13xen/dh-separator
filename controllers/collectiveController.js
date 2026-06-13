@@ -7,6 +7,40 @@ import { fileURLToPath } from 'url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
+function sanitizeForPdf(str) {
+  if (!str) return "";
+  return str
+      .replace(/[\u201c\u201d]/g, '"') // smart double quotes
+      .replace(/[\u2018\u2019]/g, "'") // smart single quotes
+      .replace(/[\u2014\u2013]/g, '-') // dashes
+      .replace(/\u00a0/g, ' ')         // non-breaking space
+      .replace(/\u2026/g, '...')       // ellipsis
+      .replace(/[^\x00-\xff]/g, '');   // strip anything else outside ISO-8859-1
+}
+
+async function fetchUrlsInParallel(urls, concurrencyLimit = 5) {
+  const results = {};
+  const uniqueUrls = [...new Set(urls.filter(Boolean))];
+  
+  for (let i = 0; i < uniqueUrls.length; i += concurrencyLimit) {
+    const chunk = uniqueUrls.slice(i, i + concurrencyLimit);
+    const promises = chunk.map(async (url) => {
+      const cleanUrl = url.replace('https//', 'https://').replace('http//', 'http://');
+      try {
+        const res = await fetch(cleanUrl);
+        if (!res.ok) throw new Error(`Status ${res.status}`);
+        const buffer = await res.arrayBuffer();
+        results[url] = buffer;
+      } catch (err) {
+        console.error(`Failed to pre-fetch URL: ${cleanUrl}`, err);
+        results[url] = null;
+      }
+    });
+    await Promise.all(promises);
+  }
+  return results;
+}
+
 async function loadModuleHierarchy(moduleName) {
     const hierarchyPath = path.join(__dirname, '../syllabus_hierarchy.json');
     if (!fs.existsSync(hierarchyPath)) {
@@ -90,47 +124,32 @@ export const previewSubjectData = async (req, res) => {
     }
 
     const matchedQuestionIds = new Set();
-
-    const isOptional = moduleName.startsWith('OptionalSubject');
-    
-    // Process hierarchy
     const resultData = [];
-    const processHierarchy = (paperFilter) => {
-        for (const sec of hierarchy) {
-            if (!sec.section) continue;
-            
-            const secObj = {
-                section: paperFilter ? `${paperFilter}: ${sec.section}` : sec.section,
-                topics: []
-            };
-            
-            if (sec.topics && Array.isArray(sec.topics)) {
-                for (const top of sec.topics) {
-                    if (!top.title) continue;
-                    
-                    let matchedQ = questions.filter(q => q.tags && q.tags.includes(top.title));
-                    if (paperFilter) {
-                        matchedQ = matchedQ.filter(q => q.tags.includes(paperFilter));
-                    }
-                    
-                    if (matchedQ.length > 0) {
-                        matchedQ.forEach(q => matchedQuestionIds.add(q._id.toString()));
-                        secObj.topics.push({ title: top.title, questions: matchedQ });
-                    }
+
+    // Process hierarchy in natural order (GS & Optionals)
+    for (const sec of hierarchy) {
+        if (!sec.section) continue;
+        
+        const secObj = {
+            section: sec.section,
+            topics: []
+        };
+        
+        if (sec.topics && Array.isArray(sec.topics)) {
+            for (const top of sec.topics) {
+                if (!top.title) continue;
+                
+                const matchedQ = questions.filter(q => q.tags && q.tags.includes(top.title));
+                
+                if (matchedQ.length > 0) {
+                    matchedQ.forEach(q => matchedQuestionIds.add(q._id.toString()));
+                    secObj.topics.push({ title: top.title, questions: matchedQ });
                 }
             }
-            if (secObj.topics.length > 0) resultData.push(secObj);
         }
-    };
-
-    if (isOptional) {
-        const knownTags = await getKnownHierarchyTags();
-        const paperTags = getPaperTagsForSubject(questions, knownTags);
-        for (const paper of paperTags) {
-            processHierarchy(paper);
+        if (secObj.topics.length > 0) {
+            resultData.push(secObj);
         }
-    } else {
-        processHierarchy(null);
     }
 
     // Collect questions that are mapped to the module but lack specific inner topic tags
@@ -173,52 +192,37 @@ export const generateCollectivePdf = async (req, res) => {
       return res.status(404).json({ error: 'No matched/selected questions found.' });
     }
 
-    const isOptional = moduleName.startsWith('OptionalSubject');
     const matchedQuestionIds = new Set();
     const docData = [];
 
-    const processHierarchy = (paperFilter) => {
-        for (const sec of hierarchy) {
-            if (!sec.section) continue;
-            const mappedTopics = [];
-            if (sec.topics && Array.isArray(sec.topics)) {
-                for (const top of sec.topics) {
-                    if (!top.title) continue;
-                    let matchedQ = questionsResponse.filter(q => q.tags && q.tags.includes(top.title));
-                    if (paperFilter) {
-                        matchedQ = matchedQ.filter(q => q.tags.includes(paperFilter));
+    // Process hierarchy in natural order
+    for (const sec of hierarchy) {
+        if (!sec.section) continue;
+        const mappedTopics = [];
+        if (sec.topics && Array.isArray(sec.topics)) {
+            for (const top of sec.topics) {
+                if (!top.title) continue;
+                let matchedQ = questionsResponse.filter(q => q.tags && q.tags.includes(top.title));
+                if (matchedQ.length > 0) {
+                    if (includedQuestionIds && Array.isArray(includedQuestionIds)) {
+                        // Sort by the exact order provided in includedQuestionIds
+                        matchedQ.sort((a, b) => {
+                            const idxA = includedQuestionIds.indexOf(a._id.toString());
+                            const idxB = includedQuestionIds.indexOf(b._id.toString());
+                            return idxA - idxB;
+                        });
                     }
-                    if (matchedQ.length > 0) {
-                        if (includedQuestionIds && Array.isArray(includedQuestionIds)) {
-                            // Sort by the exact order provided in includedQuestionIds
-                            matchedQ.sort((a, b) => {
-                                const idxA = includedQuestionIds.indexOf(a._id.toString());
-                                const idxB = includedQuestionIds.indexOf(b._id.toString());
-                                return idxA - idxB;
-                            });
-                        }
-                        matchedQ.forEach(q => matchedQuestionIds.add(q._id.toString()));
-                        mappedTopics.push({ title: top.title, questions: matchedQ });
-                    }
+                    matchedQ.forEach(q => matchedQuestionIds.add(q._id.toString()));
+                    mappedTopics.push({ title: top.title, questions: matchedQ });
                 }
             }
-            if (mappedTopics.length > 0) {
-                docData.push({ 
-                    section: paperFilter ? `${paperFilter}: ${sec.section}` : sec.section, 
-                    topics: mappedTopics 
-                });
-            }
         }
-    };
-
-    if (isOptional) {
-        const knownTags = await getKnownHierarchyTags();
-        const paperTags = getPaperTagsForSubject(questionsResponse, knownTags);
-        for (const paper of paperTags) {
-            processHierarchy(paper);
+        if (mappedTopics.length > 0) {
+            docData.push({ 
+                section: sec.section, 
+                topics: mappedTopics 
+            });
         }
-    } else {
-        processHierarchy(null);
     }
 
     const unmatchedQuestions = questionsResponse.filter(q => !matchedQuestionIds.has(q._id.toString()));
@@ -228,6 +232,30 @@ export const generateCollectivePdf = async (req, res) => {
             topics: [{ title: "General Questions", questions: unmatchedQuestions }]
         });
     }
+
+    // Pre-fetch topper PDFs concurrently to avoid sequential timeouts and network delays
+    const urlsToFetch = [];
+    docData.forEach(secNode => {
+      secNode.topics.forEach(topNode => {
+        topNode.questions.forEach(item => {
+          let activeFileObj = null;
+          if (item.file_urls && item.file_urls.length > 0) {
+            if (selections && selections[item._id]) {
+              activeFileObj = item.file_urls.find(f => f.url === selections[item._id]);
+            }
+            if (!activeFileObj && item.file_urls.length > 0) {
+              activeFileObj = item.file_urls[0];
+            }
+          }
+          if (activeFileObj && activeFileObj.url) {
+            urlsToFetch.push(activeFileObj.url);
+          }
+        });
+      });
+    });
+
+    console.log(`[CollectiveController] Pre-fetching ${urlsToFetch.length} topper answer PDFs in parallel...`);
+    const fetchedBuffers = await fetchUrlsInParallel(urlsToFetch, 10);
 
     // 1. Initialize Master PDF Document
     const pdfDoc = await PDFDocument.create();
@@ -251,7 +279,7 @@ export const generateCollectivePdf = async (req, res) => {
         x: 0, y: th - 180, width: tw * 0.6, height: 10, color: rgb(0.96, 0.35, 0.14) // Vibrant Orange
     });
     titlePage.drawRectangle({
-        x: tw * 0.6, y: th - 180, width: tw * 0.4, height: 10, color: rgb(0.25, 0.51, 0.96) // Vibrant Blue
+        x: 0, y: th - 180, width: tw * 0.4, height: 10, color: rgb(0.25, 0.51, 0.96) // Vibrant Blue
     });
     
     titlePage.drawText(`UPSC DOCUMENT LIBRARY`, {
@@ -263,7 +291,7 @@ export const generateCollectivePdf = async (req, res) => {
     });
 
     // Module Name Processing (with dynamic sizing / word wrap)
-    const moduleText = `${moduleName.replace(/([a-z])([A-Z])/g, '$1 $2').replace('OptionalSubject', 'Optional Subject: ').toUpperCase()} MODULE`;
+    const moduleText = sanitizeForPdf(`${moduleName.replace(/([a-z])([A-Z])/g, '$1 $2').replace('OptionalSubject', 'Optional Subject: ').toUpperCase()} MODULE`);
     
     let fontSize = 48;
     let textWidth = fontBold.widthOfTextAtSize(moduleText, fontSize);
@@ -331,19 +359,19 @@ export const generateCollectivePdf = async (req, res) => {
         });
 
         let sY = th - 200;
-        const sWords = secNode.section.toUpperCase().split(' ');
+        const sWords = sanitizeForPdf(secNode.section).toUpperCase().split(' ');
         let sLine = '';
         for (const word of sWords) {
             const testLine = sLine + word + ' ';
             if (fontBold.widthOfTextAtSize(testLine, 18) > tw - 100) {
-                sPage.drawText(sLine, { x: 50, y: sY, size: 18, font: fontBold, color: rgb(1, 1, 1) });
+                sPage.drawText(sanitizeForPdf(sLine), { x: 50, y: sY, size: 18, font: fontBold, color: rgb(1, 1, 1) });
                 sLine = word + ' ';
                 sY -= 25;
             } else {
                 sLine = testLine;
             }
         }
-        sPage.drawText(sLine, { x: 50, y: sY, size: 18, font: fontBold, color: rgb(1, 1, 1) });
+        sPage.drawText(sanitizeForPdf(sLine), { x: 50, y: sY, size: 18, font: fontBold, color: rgb(1, 1, 1) });
 
         // Iterate over Topics under this Section
         for (const topNode of secNode.topics) {
@@ -361,97 +389,148 @@ export const generateCollectivePdf = async (req, res) => {
                 let activeFileObj = null;
                 if (item.file_urls && item.file_urls.length > 0) {
                      if (selections && selections[item._id]) {
-                         activeFileObj = item.file_urls.find(f => f.url === selections[item._id]);
+                          activeFileObj = item.file_urls.find(f => f.url === selections[item._id]);
                      }
                      if (!activeFileObj && item.file_urls.length > 0) {
-                         activeFileObj = item.file_urls[0];
+                          activeFileObj = item.file_urls[0];
                      }
                 }
 
-                if (activeFileObj) {
-                    const cloudUrl = activeFileObj.url.replace('https//', 'https://').replace('http//', 'http://');
+                // Helper function to wrap text
+                const wrapText = (text, size, maxW) => {
+                    const sanitized = sanitizeForPdf(text);
+                    const words = sanitized.replace(/\n/g, ' ').split(' ');
+                    const lines = [];
+                    let currentLine = '';
+                    for (const word of words) {
+                        const testLine = currentLine ? `${currentLine} ${word}` : word;
+                        const w = fontBold.widthOfTextAtSize(testLine, size);
+                        if (w > maxW) {
+                            lines.push(currentLine);
+                            currentLine = word;
+                        } else {
+                            currentLine = testLine;
+                        }
+                    }
+                    if (currentLine) lines.push(currentLine);
+                    return lines;
+                };
 
+                // Create dedicated page for the Question & Topper details
+                const qPage = pdfDoc.addPage();
+                const { width: qpw, height: qph } = qPage.getSize();
+
+                // Soft background for a premium look
+                qPage.drawRectangle({
+                    x: 0, y: 0, width: qpw, height: qph,
+                    color: rgb(0.97, 0.98, 0.99)
+                });
+
+                // Top Accent bar
+                qPage.drawRectangle({
+                    x: 0, y: qph - 20, width: qpw, height: 20,
+                    color: rgb(0.14, 0.16, 0.28)
+                });
+
+                // Section and Topic names
+                qPage.drawText(sanitizeForPdf(`SECTION: ${secNode.section.toUpperCase()}`), {
+                    x: 40, y: qph - 60, size: 10, font: fontBold, color: rgb(0.4, 0.5, 0.6)
+                });
+                qPage.drawText(sanitizeForPdf(`TOPIC: ${topNode.title.toUpperCase()}`), {
+                    x: 40, y: qph - 80, size: 10, font: fontNormal, color: rgb(0.4, 0.4, 0.5)
+                });
+
+                // Divider line
+                qPage.drawLine({
+                    start: { x: 40, y: qph - 95 },
+                    end: { x: qpw - 40, y: qph - 95 },
+                    thickness: 1,
+                    color: rgb(0.8, 0.8, 0.8)
+                });
+
+                // Question Card
+                const cardY = qph - 280;
+                const cardH = 170;
+                qPage.drawRectangle({
+                    x: 40, y: cardY, width: qpw - 80, height: cardH,
+                    color: rgb(1, 1, 1),
+                    borderColor: rgb(0.85, 0.88, 0.92),
+                    borderWidth: 1
+                });
+
+                qPage.drawText("QUESTION TEXT", {
+                    x: 55, y: cardY + cardH - 25, size: 11, font: fontBold, color: rgb(0.96, 0.35, 0.14)
+                });
+
+                const rawText = item.question_text || "Question text unavailable.";
+                const prefixMatch = rawText.match(/^(?:Q\s*\d+|Q\.\s*\d+|Question\s*\d+)[.)\s:-]*/i);
+                let cleanText = rawText;
+                if (prefixMatch) {
+                    cleanText = rawText.substring(prefixMatch[0].length).trim();
+                }
+
+                const maxQWidth = qpw - 110;
+                const qLines = wrapText(cleanText, 12, maxQWidth);
+                let qTextY = cardY + cardH - 50;
+                const qLineHeight = 18;
+
+                for (let l = 0; l < Math.min(qLines.length, 7); l++) {
+                    let line = qLines[l];
+                    if (l === 6 && qLines.length > 7) line += '...';
+                    qPage.drawText(line, {
+                        x: 55, y: qTextY, size: 12, font: fontNormal, color: rgb(0.1, 0.1, 0.1)
+                    });
+                    qTextY -= qLineHeight;
+                }
+
+                // Topper / Answer Details Card
+                const topperCardY = cardY - 120;
+                const topperCardH = 95;
+                qPage.drawRectangle({
+                    x: 40, y: topperCardY, width: qpw - 80, height: topperCardH,
+                    color: rgb(0.94, 0.96, 0.98),
+                    borderColor: rgb(0.8, 0.85, 0.9),
+                    borderWidth: 1
+                });
+
+                qPage.drawText("ANSWER METADATA", {
+                    x: 55, y: topperCardY + topperCardH - 20, size: 9, font: fontBold, color: rgb(0.14, 0.16, 0.28)
+                });
+
+                if (activeFileObj) {
+                    const tName = activeFileObj.topper_name || 'Unknown Topper';
+                    const tYear = activeFileObj.topper_year || 'N/A';
+                    const tRank = activeFileObj.topper_rank || 'N/A';
+                    const tMarks = activeFileObj.topper_marks || 'N/A';
+
+                    qPage.drawText(sanitizeForPdf(`Topper:  ${tName.toUpperCase()}`), {
+                        x: 55, y: topperCardY + topperCardH - 40, size: 11, font: fontBold, color: rgb(0.1, 0.1, 0.2)
+                    });
+                    qPage.drawText(sanitizeForPdf(`Year:  ${tYear}   |   Rank:  ${tRank}   |   Marks:  ${tMarks}`), {
+                        x: 55, y: topperCardY + topperCardH - 60, size: 10, font: fontNormal, color: rgb(0.3, 0.3, 0.4)
+                    });
+                    qPage.drawText("The following pages contain the handwritten responses scanned directly from the topper's answer booklet.", {
+                        x: 55, y: topperCardY + 15, size: 8, font: fontNormal, color: rgb(0.5, 0.5, 0.6)
+                    });
+
+                    const cloudUrl = activeFileObj.url.replace('https//', 'https://').replace('http//', 'http://');
                     try {
-                        const response = await fetch(cloudUrl);
-                        if (!response.ok) throw new Error(`Failed to fetch from ${cloudUrl}`);
-                        
-                        const arrayBuffer = await response.arrayBuffer();
+                        const arrayBuffer = fetchedBuffers[activeFileObj.url];
+                        if (!arrayBuffer) throw new Error(`Failed to pre-fetch from ${cloudUrl}`);
                         const sourcePdfDoc = await PDFDocument.load(arrayBuffer);
                         const sourcePages = await pdfDoc.copyPages(sourcePdfDoc, sourcePdfDoc.getPageIndices());
-                            
-                        if (sourcePages.length > 0) {
-                            const p0 = sourcePages[0];
-                            const { width: p0w, height: p0h } = p0.getSize();
-
-                            // Professional Full-Width Header
-                            const barHeight = 110;
-                            const barY = p0h - barHeight;
-
-                            // Draw a clean background to cover existing top content and act as header background
-                            p0.drawRectangle({
-                                x: 0, y: barY, width: p0w, height: barHeight, 
-                                color: rgb(0.97, 0.98, 0.99)
-                            });
-
-                            // Bottom border for the header
-                            p0.drawLine({
-                                start: { x: 0, y: barY },
-                                end: { x: p0w, y: barY },
-                                thickness: 2,
-                                color: rgb(0.2, 0.4, 0.6)
-                            });
-
-                            const tName = activeFileObj.topper_name || 'Unknown Name';
-                            let details = [tName.toUpperCase()];
-                            if (activeFileObj.topper_year) details.push(`YEAR: ${activeFileObj.topper_year}`);
-                            if (activeFileObj.topper_rank) details.push(`RANK: ${activeFileObj.topper_rank}`);
-                            if (activeFileObj.topper_marks) details.push(`MARKS: ${activeFileObj.topper_marks}`);
-                            const docHeader = `[TOPIC: ${topNode.title}]  |  TOPPER: ${details.join(' | ')}`;
-
-                            // Center alignment for topper details
-                            const docHeaderWidth = fontNormal.widthOfTextAtSize(docHeader, 9);
-                            p0.drawText(docHeader, {
-                                x: (p0w - docHeaderWidth) / 2, // Center aligned
-                                y: p0h - 20, 
-                                size: 9, 
-                                font: fontNormal, 
-                                color: rgb(0.4, 0.4, 0.4)
-                            });
-
-                            let qY = p0h - 45;
-                            const rawText = item.question_text || "Question text unavailable.";
-                            // Match Q1, Q.1, Question 1, etc., including optional punctuation and spaces
-                            const prefixMatch = rawText.match(/^(?:Q\s*\d+|Q\.\s*\d+|Question\s*\d+)[.)\s:-]*/i);
-                            let cleanText = rawText;
-                            
-                            if (prefixMatch) {
-                                cleanText = rawText.substring(prefixMatch[0].length).trim();
-                            }
-
-                            // Wrap and draw the question text with full breadth
-                            const textMargin = 20; // Modest padding
-                            const maxTextWidth = p0w - (textMargin * 2);
-                            
-                            const qWords = cleanText.replace(/\n/g, ' ').split(' ');
-                            let qLine = '';
-                            
-                            for (const word of qWords) {
-                                const testLine = qLine + word + ' ';
-                                if (fontBold.widthOfTextAtSize(testLine, 12) > maxTextWidth) {
-                                    p0.drawText(qLine, { x: textMargin, y: qY, size: 12, font: fontBold, color: rgb(0.1, 0.1, 0.1) });
-                                    qLine = word + ' ';
-                                    qY -= 18; // slightly more line height for readability
-                                } else {
-                                    qLine = testLine;
-                                }
-                            }
-                            p0.drawText(qLine, { x: textMargin, y: qY, size: 12, font: fontBold, color: rgb(0.1, 0.1, 0.1) });
-                        }
-
+                        
                         sourcePages.forEach(p => pdfDoc.addPage(p));
                     } catch (pdfErr) {
                         console.error(`Error appending PDF ${cloudUrl}:`, pdfErr);
                     }
+                } else {
+                    qPage.drawText("No topper answer sheets are currently uploaded for this question.", {
+                        x: 55, y: topperCardY + topperCardH - 45, size: 11, font: fontBold, color: rgb(0.6, 0.2, 0.2)
+                    });
+                    qPage.drawText("Once a topper paper is linked to this question, the split pages will be compiled directly following this layout page.", {
+                        x: 55, y: topperCardY + 25, size: 8, font: fontNormal, color: rgb(0.5, 0.5, 0.6)
+                    });
                 }
             }
         }
@@ -500,7 +579,7 @@ export const generateCollectivePdf = async (req, res) => {
         }
 
         // Truncate logic
-        let dText = row.text;
+        let dText = sanitizeForPdf(row.text);
         const maxLen = isSection ? 60 : 65;
         if (dText.length > maxLen) dText = dText.substring(0, maxLen - 3) + '...';
         

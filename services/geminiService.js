@@ -235,40 +235,54 @@ RULES:
 
 export const processQuesPdfWithGemini = async (pdfBuffer) => {
   const tempFilePath = path.join(os.tmpdir(), `ques-doc-${Date.now()}.pdf`);
+  console.log(`[GeminiService] [processQuesPdfWithGemini] Starting process. Buffer size: ${pdfBuffer ? pdfBuffer.length : 0} bytes. Temp file path: ${tempFilePath}`);
   try {
     fs.writeFileSync(tempFilePath, pdfBuffer);
+    console.log(`[GeminiService] [processQuesPdfWithGemini] Temp file written successfully.`);
     
-    console.log(`[GeminiService] Uploading file for QuesPDF to Google AI...`);
+    console.log(`[GeminiService] [processQuesPdfWithGemini] Uploading file to Google AI...`);
     let uploadResult;
     try {
       uploadResult = await withRetry(() => fileManager.uploadFile(tempFilePath, {
         mimeType: 'application/pdf',
         displayName: `QuesPDF Document`,
       }), 3, 3000);
+      console.log(`[GeminiService] [processQuesPdfWithGemini] Upload complete. File Name: ${uploadResult.file.name}, URI: ${uploadResult.file.uri}`);
     } catch (uploadError) {
+      console.error(`[GeminiService] [processQuesPdfWithGemini] Upload failed:`, uploadError);
       if (uploadError.message && uploadError.message.includes('User location is not supported')) {
         throw new Error('LOCATION_NOT_SUPPORTED');
       }
       throw uploadError;
     }
 
+    console.log(`[GeminiService] [processQuesPdfWithGemini] Retrieving initial file info for: ${uploadResult.file.name}`);
     let fileInfo = await fileManager.getFile(uploadResult.file.name);
+    console.log(`[GeminiService] [processQuesPdfWithGemini] Initial state: ${fileInfo.state}`);
     while (fileInfo.state === 'PROCESSING') {
-      console.log(`[GeminiService] QuesPDF File is processing... waiting 5 seconds.`);
+      console.log(`[GeminiService] [processQuesPdfWithGemini] QuesPDF File is processing... waiting 5 seconds.`);
       await new Promise((resolve) => setTimeout(resolve, 5000));
       fileInfo = await fileManager.getFile(uploadResult.file.name);
+      console.log(`[GeminiService] [processQuesPdfWithGemini] Polled state: ${fileInfo.state}`);
     }
 
     if (fileInfo.state === 'FAILED') {
+      console.error(`[GeminiService] [processQuesPdfWithGemini] File processing state is FAILED on Gemini's servers.`);
       throw new Error(`File processing failed on Gemini's servers for file: ${uploadResult.file.name}`);
     }
 
+    console.log(`[GeminiService] [processQuesPdfWithGemini] File is ready. Prompting Gemini model...`);
     const prompt = `You are an expert UPSC document analyzer.
 Scan the attached answer sheet PDF page-by-page.
 For each physical page (1-based index, starting from Page 1):
 1. Detect if there is a printed or written question on this page. Note that a question is typically at the top of the page.
-2. If a question is present on this page, extract the FULL text of the question exactly as written or printed.
+2. If a question is present on this page, extract the FULL text of the question.
 3. Return a JSON array where each item represents a question found on a page.
+
+CRITICAL RULES FOR LANGUAGES:
+- IGNORE ALL Hindi text/characters and any other non-English languages. Keep ONLY English text.
+- If a question is bilingual (printed in both Hindi and English), extract ONLY the English portion of the question and completely ignore the Hindi translation/characters.
+- Ensure the extracted question text contains ONLY standard English alphanumeric characters, punctuation, and whitespace.
 
 CRITICAL RULES:
 - The PDF contains text questions and handwritten answers.
@@ -296,7 +310,7 @@ CRITICAL RULES:
       }
     };
 
-    console.log(`[GeminiService] Initializing QuesPDF AI analysis...`);
+    console.log(`[GeminiService] [processQuesPdfWithGemini] Initializing QuesPDF AI analysis request...`);
     const result = await withRetry(() => model.generateContent({
       contents: [{ 
         role: 'user', 
@@ -312,18 +326,86 @@ CRITICAL RULES:
       }
     }), 4, 5000);
     
+    console.log(`[GeminiService] [processQuesPdfWithGemini] Gemini AI analysis completed. Parsing response...`);
     const responseText = result.response.text();
+    console.log(`[GeminiService] [processQuesPdfWithGemini] Raw response text length: ${responseText ? responseText.length : 0} characters.`);
+    console.log(`[GeminiService] [processQuesPdfWithGemini] Raw response text sample: ${responseText ? responseText.substring(0, 500) : ''}`);
     const jsonArray = JSON.parse(responseText);
+    console.log(`[GeminiService] [processQuesPdfWithGemini] Parsed JSON successfully. Found ${jsonArray ? jsonArray.length : 0} questions.`);
     
     // Clean up
-    try { await fileManager.deleteFile(uploadResult.file.name); } catch (e) {}
+    console.log(`[GeminiService] [processQuesPdfWithGemini] Deleting uploaded file from Google AI Storage...`);
+    try { 
+      await fileManager.deleteFile(uploadResult.file.name); 
+      console.log(`[GeminiService] [processQuesPdfWithGemini] Google AI file deleted successfully.`);
+    } catch (e) {
+      console.warn(`[GeminiService] [processQuesPdfWithGemini] Non-fatal error deleting file from Google AI Storage:`, e.message);
+    }
     
     return jsonArray;
   } catch (error) {
-    console.error("[GeminiService] QuesPDF Error:", error);
+    console.error("[GeminiService] [processQuesPdfWithGemini] QuesPDF Error:", error);
     throw error;
   } finally {
-    if (fs.existsSync(tempFilePath)) fs.unlinkSync(tempFilePath);
+    if (fs.existsSync(tempFilePath)) {
+      console.log(`[GeminiService] [processQuesPdfWithGemini] Cleaning up local temp file: ${tempFilePath}`);
+      fs.unlinkSync(tempFilePath);
+    }
+  }
+};
+
+export const processQuesPdfInChunks = async (pdfBuffer, chunkPageCount = 100, startPageParam = 1, endPageParam = null) => {
+  console.log(`[GeminiService] [processQuesPdfInChunks] Starting chunked PDF process. Buffer size: ${pdfBuffer ? pdfBuffer.length : 0} bytes. Chunk size: ${chunkPageCount} pages. Custom Range: ${startPageParam} to ${endPageParam || 'end'}`);
+  try {
+    const mainPdfDoc = await PDFDocument.load(pdfBuffer);
+    const totalPages = mainPdfDoc.getPageCount();
+    console.log(`[GeminiService] [processQuesPdfInChunks] Total pages in source PDF: ${totalPages}`);
+
+    const startPage = Math.max(1, parseInt(startPageParam) || 1);
+    const endPage = Math.min(totalPages, parseInt(endPageParam) || totalPages);
+    console.log(`[GeminiService] [processQuesPdfInChunks] Targeted operation range: Page ${startPage} to Page ${endPage}`);
+
+    const allQuestions = [];
+
+    for (let chunkStart = startPage; chunkStart <= endPage; chunkStart += chunkPageCount) {
+      const chunkEnd = Math.min(chunkStart + chunkPageCount - 1, endPage);
+      console.log(`[GeminiService] [processQuesPdfInChunks] Processing chunk: pages ${chunkStart} to ${chunkEnd} (${chunkEnd - chunkStart + 1} pages)`);
+
+      // Create a sub-pdf for this chunk
+      const subPdf = await PDFDocument.create();
+      const pagesToCopy = Array.from({ length: chunkEnd - chunkStart + 1 }, (_, index) => chunkStart - 1 + index);
+      const copiedPages = await subPdf.copyPages(mainPdfDoc, pagesToCopy);
+      copiedPages.forEach((page) => subPdf.addPage(page));
+
+      const subPdfBytes = await subPdf.save();
+
+      // Process this chunk with Gemini
+      const chunkQuestions = await processQuesPdfWithGemini(Buffer.from(subPdfBytes));
+
+      if (chunkQuestions && Array.isArray(chunkQuestions)) {
+        console.log(`[GeminiService] [processQuesPdfInChunks] Chunk (pages ${chunkStart}-${chunkEnd}) returned ${chunkQuestions.length} questions.`);
+        for (const q of chunkQuestions) {
+          // Adjust page number relative to the original document:
+          // The page number returned from Gemini is relative to the sub-PDF chunk (1-based index).
+          const absolutePageNumber = chunkStart + q.page_number - 1;
+          console.log(`[GeminiService] [processQuesPdfInChunks] Mapping page_number ${q.page_number} in chunk to absolute page_number ${absolutePageNumber}`);
+          allQuestions.push({
+            page_number: Math.min(absolutePageNumber, totalPages),
+            question_text: q.question_text
+          });
+        }
+      } else {
+        console.warn(`[GeminiService] [processQuesPdfInChunks] Chunk (pages ${chunkStart}-${chunkEnd}) returned no valid questions list.`);
+      }
+    }
+
+    // Sort by page_number to ensure sequence
+    allQuestions.sort((a, b) => a.page_number - b.page_number);
+    console.log(`[GeminiService] [processQuesPdfInChunks] Finished processing all chunks. Consolidated questions count: ${allQuestions.length}`);
+    return allQuestions;
+  } catch (error) {
+    console.error("[GeminiService] [processQuesPdfInChunks] Error in chunked PDF processing:", error);
+    throw error;
   }
 };
 
