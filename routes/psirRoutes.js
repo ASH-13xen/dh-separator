@@ -1,5 +1,5 @@
 import express from 'express';
-import { previewPsirData, generatePsirPdf } from '../controllers/psirController.js';
+import { previewPsirData, generatePsirPdf, getPsirBookStatus } from '../controllers/psirController.js';
 
 const router = express.Router();
 
@@ -8,5 +8,8 @@ router.get('/preview', previewPsirData);
 
 // POST /api/psir/generate
 router.post('/generate', generatePsirPdf);
+
+// GET /api/psir/status/:id
+router.get('/status/:id', getPsirBookStatus);
 
 export default router;
