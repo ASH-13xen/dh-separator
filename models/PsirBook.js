@@ -21,6 +21,9 @@ const psirBookSchema = new mongoose.Schema({
   pdfUrl: { 
     type: String 
   },
+  pdfData: {
+    type: Buffer
+  },
   error: { 
     type: String 
   }

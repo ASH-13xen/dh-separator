@@ -300,15 +300,38 @@ export const getPsirBookStatus = async (req, res) => {
   const { id } = req.params;
   console.log(`[PsirController] [getPsirBookStatus] Request status polling for Job ID: ${id}`);
   try {
-    const job = await PsirBook.findById(id);
+    // Project out the pdfData buffer field to avoid fetching/sending large payloads during polling checks
+    const job = await PsirBook.findById(id).select('-pdfData');
     if (!job) {
       console.warn(`[PsirController] [getPsirBookStatus] Job ID not found in database: ${id}`);
       return res.status(404).json({ error: 'Compilation job not found.' });
     }
-    console.log(`[PsirController] [getPsirBookStatus] Job record retrieved. Status: '${job.status}', PDF URL: '${job.pdfUrl || 'N/A'}'`);
+    console.log(`[PsirController] [getPsirBookStatus] Job record retrieved. Status: '${job.status}'`);
     res.json(job);
   } catch (err) {
     console.error(`[PsirController] [getPsirBookStatus] Error fetching status for Job ID ${id}:`, err);
     res.status(500).json({ error: 'Failed to retrieve compilation job status.', details: err.message });
+  }
+};
+
+export const downloadPsirBook = async (req, res) => {
+  const { id } = req.params;
+  console.log(`[PsirController] [downloadPsirBook] Serving direct download for Job ID: ${id}`);
+  try {
+    const job = await PsirBook.findById(id);
+    if (!job || !job.pdfData) {
+      console.warn(`[PsirController] [downloadPsirBook] PDF not found or not yet generated for Job ID: ${id}`);
+      return res.status(404).json({ error: 'PDF book not found or compilation not finished yet.' });
+    }
+
+    const fileName = `Formal_PSIR_${job.paper.replace(/[^a-z0-9]/gi, '_')}.pdf`;
+    
+    console.log(`[PsirController] [downloadPsirBook] Streaming ${job.pdfData.length} bytes to user's browser as: ${fileName}`);
+    res.setHeader('Content-Disposition', `attachment; filename="${fileName}"`);
+    res.setHeader('Content-Type', 'application/pdf');
+    res.send(job.pdfData);
+  } catch (err) {
+    console.error(`[PsirController] [downloadPsirBook] Download error:`, err);
+    res.status(500).json({ error: 'Failed to download PDF book.', details: err.message });
   }
 };

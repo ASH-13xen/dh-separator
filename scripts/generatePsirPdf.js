@@ -116,10 +116,16 @@ async function fetchUrlsInParallel(urls, concurrencyLimit = 5) {
 }
 
 const uploadToCloudinary = (buffer, fileName) => {
-  console.log(`[Runner] [uploadToCloudinary] Uploading raw buffer to Cloudinary folder 'psir_books' with name: ${fileName}`);
+  console.log(`[Runner] [uploadToCloudinary] Uploading buffer to Cloudinary as image/pdf. Folder: 'psir_books', public_id: ${fileName}`);
   return new Promise((resolve, reject) => {
     const stream = cloudinary.uploader.upload_chunked_stream(
-      { resource_type: 'raw', folder: 'psir_books', public_id: fileName, chunk_size: 6000000 },
+      { 
+        resource_type: 'image', 
+        format: 'pdf',
+        folder: 'psir_books', 
+        public_id: fileName.replace('.pdf', ''), 
+        chunk_size: 6000000 
+      },
       (error, result) => {
         if (error) {
           console.error('[Runner] [uploadToCloudinary] Cloudinary upload stream error:', error);
@@ -793,18 +799,12 @@ async function main() {
     const pdfBytes = await pdfDoc.save();
     console.log(`[Runner] PDF successfully built. File size: ${pdfBytes.length} bytes.`);
 
-    console.log('[Runner] Preparing Cloudinary upload stream...');
-    const fileName = `Formal_PSIR_${paper.replace(/[^a-z0-9]/gi, '_')}_${Date.now()}.pdf`;
-    const secureUrl = await uploadToCloudinary(pdfBytes, fileName);
-    
-    console.log(`[Runner] Cloudinary upload finished. Link: ${secureUrl}`);
-
-    // Update job status in MongoDB
-    console.log('[Runner] Saving secure_url and status: "completed" to MongoDB...');
+    // Update job status and store the compiled binary PDF directly in MongoDB
+    console.log('[Runner] Saving binary PDF data and status: "completed" to MongoDB...');
     job.status = 'completed';
-    job.pdfUrl = secureUrl;
+    job.pdfData = Buffer.from(pdfBytes);
     await job.save();
-    console.log('[Runner] MongoDB update succeeded.');
+    console.log('[Runner] MongoDB update succeeded. Job completed.');
 
     console.log('[Runner] Script finished successfully. Exiting process with code 0.');
     process.exit(0);
