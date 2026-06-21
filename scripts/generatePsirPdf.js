@@ -145,7 +145,9 @@ function drawPaginatedTable(doc, fontBold, fontNormal, pageWidth, pageHeight, ti
     page.drawRectangle({ x: tableX, y: y - headerRowHeight, width: tableW, height: headerRowHeight, color: rgb(0.15, 0.18, 0.32) });
     let colX = tableX;
     columns.forEach(col => {
-      page.drawText(col.header, { x: colX + 8, y: y - 17, size: 9, font: fontBold, color: rgb(1, 1, 1) });
+      const headerW = fontBold.widthOfTextAtSize(col.header, 9);
+      const headerX = col.align === 'right' ? colX + col.width - 8 - headerW : colX + 8;
+      page.drawText(col.header, { x: headerX, y: y - 17, size: 9, font: fontBold, color: rgb(1, 1, 1) });
       colX += col.width;
     });
     y -= headerRowHeight;
@@ -205,16 +207,19 @@ function drawPaginatedTable(doc, fontBold, fontNormal, pageWidth, pageHeight, ti
 
     let colX = tableX;
     wrappedCells.forEach((lines, ci) => {
+      const col = columns[ci];
       lines.forEach((line, li) => {
+        const lineW = fontNormal.widthOfTextAtSize(line, 8);
+        const lineX = col.align === 'right' ? colX + col.width - 8 - lineW : colX + 8;
         page.drawText(line, {
-          x: colX + 8,
+          x: lineX,
           y: y - (li + 1) * lineHeight + 1,
           size: 8,
           font: fontNormal,
           color: rgb(0.15, 0.15, 0.2)
         });
       });
-      colX += columns[ci].width;
+      colX += col.width;
     });
 
     page.drawLine({
@@ -969,7 +974,7 @@ async function main() {
             { header: '#', width: (tw - 100) * 0.05 },
             { header: 'Topic', width: (tw - 100) * 0.16 },
             { header: 'Question', width: (tw - 100) * 0.44 },
-            { header: 'Topper(s)', width: (tw - 100) * 0.35 }
+            { header: 'Topper(s)', width: (tw - 100) * 0.35, align: 'right' }
         ],
         questionSummaryTableRows
     );
