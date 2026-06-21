@@ -157,7 +157,20 @@ function drawPaginatedTable(doc, fontBold, fontNormal, pageWidth, pageHeight, ti
     const lines = [];
     let current = '';
     const maxW = width - 16;
-    for (const word of words) {
+
+    for (let word of words) {
+      // Hard-break any single token wider than the column so it can never bleed into
+      // the next column (e.g. long names, joined topper lists, unspaced text).
+      while (font.widthOfTextAtSize(word, size) > maxW) {
+        if (current) {
+          lines.push(current);
+          current = '';
+        }
+        let cut = 1;
+        while (cut < word.length && font.widthOfTextAtSize(word.slice(0, cut + 1), size) <= maxW) cut++;
+        lines.push(word.slice(0, cut));
+        word = word.slice(cut);
+      }
       const test = current ? `${current} ${word}` : word;
       if (font.widthOfTextAtSize(test, size) > maxW && current) {
         lines.push(current);
@@ -167,7 +180,7 @@ function drawPaginatedTable(doc, fontBold, fontNormal, pageWidth, pageHeight, ti
       }
     }
     if (current) lines.push(current);
-    return lines;
+    return lines.length ? lines : [''];
   };
 
   drawHeading();
@@ -937,21 +950,26 @@ async function main() {
         topperSummaryTableRows.length > 0 ? topperSummaryTableRows : [['-', 'No toppers selected for this book', '-', '-', '-', '-']]
     );
 
-    const questionSummaryTableRows = summaryRows.map((row, idx) => [
-        String(idx + 1),
-        row.topic,
-        row.questionText,
-        row.toppers.length > 0 ? row.toppers.map(t => t.name).join(', ') : 'No topper selected'
-    ]);
+    const QUESTION_SUMMARY_MAX_LEN = 110;
+    const questionSummaryTableRows = summaryRows.map((row, idx) => {
+        let qText = row.questionText;
+        if (qText.length > QUESTION_SUMMARY_MAX_LEN) qText = qText.substring(0, QUESTION_SUMMARY_MAX_LEN - 3) + '...';
+        return [
+            String(idx + 1),
+            row.topic,
+            qText,
+            row.toppers.length > 0 ? row.toppers.map(t => t.name).join(', ') : 'No topper selected'
+        ];
+    });
 
     drawPaginatedTable(
         summaryPdfDoc, fontBold, fontNormal, tw, th,
         'QUESTION-WISE TOPPER SUMMARY',
         [
             { header: '#', width: (tw - 100) * 0.05 },
-            { header: 'Topic', width: (tw - 100) * 0.18 },
-            { header: 'Question', width: (tw - 100) * 0.52 },
-            { header: 'Topper(s)', width: (tw - 100) * 0.25 }
+            { header: 'Topic', width: (tw - 100) * 0.16 },
+            { header: 'Question', width: (tw - 100) * 0.44 },
+            { header: 'Topper(s)', width: (tw - 100) * 0.35 }
         ],
         questionSummaryTableRows
     );
