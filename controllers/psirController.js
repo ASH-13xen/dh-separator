@@ -390,3 +390,29 @@ export const downloadPsirBook = async (req, res) => {
     res.status(500).json({ error: 'Failed to download PDF book.', details: err.message });
   }
 };
+
+// Wipes only the PSIR compiled-book file storage (GridFS bucket 'psir_books' files + chunks,
+// including any orphaned chunks left behind by failed uploads) and clears file references on
+// job records. Does not touch job metadata (selections, status, etc.) or any other collection.
+export const cleanupPsirStorage = async (req, res) => {
+  console.log('[PsirController] [cleanupPsirStorage] Cleanup request received.');
+  try {
+    const db = mongoose.connection.db;
+    const filesResult = await db.collection('psir_books.files').deleteMany({});
+    const chunksResult = await db.collection('psir_books.chunks').deleteMany({});
+    const jobsUpdateResult = await PsirBook.updateMany(
+      {},
+      { $unset: { pdfFileId: '', pdfUrl: '', pdfData: '' } }
+    );
+    console.log(`[PsirController] [cleanupPsirStorage] Deleted ${filesResult.deletedCount} GridFS files, ${chunksResult.deletedCount} chunks. Cleared references on ${jobsUpdateResult.modifiedCount} job(s).`);
+    res.json({
+      message: 'PSIR file storage cleaned successfully.',
+      deletedFiles: filesResult.deletedCount,
+      deletedChunks: chunksResult.deletedCount,
+      jobsUpdated: jobsUpdateResult.modifiedCount
+    });
+  } catch (err) {
+    console.error('[PsirController] [cleanupPsirStorage] Cleanup error:', err);
+    res.status(500).json({ error: 'Failed to clean up PSIR file storage.', details: err.message });
+  }
+};
