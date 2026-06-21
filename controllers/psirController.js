@@ -375,9 +375,10 @@ export const downloadPsirBook = async (req, res) => {
       console.log(`[PsirController] [downloadPsirBook] Fetching PDF from Cloudinary URL and streaming as: ${fileName}`);
       const cloudRes = await fetch(job.pdfUrl);
       if (!cloudRes.ok) throw new Error(`Failed to fetch PDF from storage: ${cloudRes.status}`);
+      const cloudBuffer = Buffer.from(await cloudRes.arrayBuffer());
       res.setHeader('Content-Disposition', `${disposition}; filename="${fileName}"`);
       res.setHeader('Content-Type', 'application/pdf');
-      cloudRes.body.pipe(res);
+      res.send(cloudBuffer);
       return;
     }
 
@@ -414,5 +415,40 @@ export const cleanupPsirStorage = async (req, res) => {
   } catch (err) {
     console.error('[PsirController] [cleanupPsirStorage] Cleanup error:', err);
     res.status(500).json({ error: 'Failed to clean up PSIR file storage.', details: err.message });
+  }
+};
+
+// Proxies a Cloudinary-hosted topper sheet so it can be previewed inline in an <iframe>.
+// Cloudinary serves 'raw' resource_type files with Content-Disposition: attachment by
+// default, which forces a download instead of an inline preview; re-serving it ourselves
+// lets us override that to inline with the correct PDF content type.
+export const previewTopperFile = async (req, res) => {
+  const { url } = req.query;
+  try {
+    if (!url || typeof url !== 'string') {
+      return res.status(400).json({ error: 'Missing url parameter.' });
+    }
+    let parsed;
+    try {
+      parsed = new URL(url);
+    } catch {
+      return res.status(400).json({ error: 'Invalid url parameter.' });
+    }
+    if (!parsed.hostname.endsWith('cloudinary.com')) {
+      return res.status(400).json({ error: 'Only Cloudinary URLs are supported for preview.' });
+    }
+
+    const upstream = await fetch(url);
+    if (!upstream.ok) {
+      return res.status(upstream.status).json({ error: `Failed to fetch source file: ${upstream.status}` });
+    }
+    const buffer = Buffer.from(await upstream.arrayBuffer());
+
+    res.setHeader('Content-Type', 'application/pdf');
+    res.setHeader('Content-Disposition', 'inline');
+    res.send(buffer);
+  } catch (err) {
+    console.error('[PsirController] [previewTopperFile] Proxy error:', err);
+    res.status(500).json({ error: 'Failed to proxy preview file.', details: err.message });
   }
 };

@@ -1,5 +1,5 @@
 import express from 'express';
-import { previewPsirData, generatePsirPdf, getPsirBookStatus, downloadPsirBook, cleanupPsirStorage } from '../controllers/psirController.js';
+import { previewPsirData, generatePsirPdf, getPsirBookStatus, downloadPsirBook, cleanupPsirStorage, previewTopperFile } from '../controllers/psirController.js';
 
 const router = express.Router();
 
@@ -17,5 +17,8 @@ router.get('/download/:id', downloadPsirBook);
 
 // POST /api/psir/cleanup-storage
 router.post('/cleanup-storage', cleanupPsirStorage);
+
+// GET /api/psir/preview-file
+router.get('/preview-file', previewTopperFile);
 
 export default router;
