@@ -28,6 +28,9 @@ jobs:
         run: |
           npm ci
 
+      - name: Install poppler-utils (pdftoppm)
+        run: sudo apt-get update && sudo apt-get install -y poppler-utils
+
       - name: Compile and Upload PDF
         env:
           MONGO_URI: ${{ secrets.MONGO_URI }}

@@ -1,6 +1,9 @@
 import fs from 'fs';
+import os from 'os';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import { execFile } from 'child_process';
+import { promisify } from 'util';
 import { PDFDocument, rgb, StandardFonts } from 'pdf-lib';
 import { GridFSBucket } from 'mongodb';
 import mongoose from 'mongoose';
@@ -12,6 +15,46 @@ dotenv.config();
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+
+const execFileAsync = promisify(execFile);
+
+// Topper sheets are scanned documents; rasterizing them at a reduced DPI/JPEG quality
+// before embedding shrinks the compiled book drastically vs. copying the original
+// full-resolution scan pages.
+const RASTER_DPI = 120;
+const RASTER_QUALITY = 70;
+
+// Rasterizes every page of a source PDF to a compressed JPEG buffer using pdftoppm
+// (poppler-utils), returning one Buffer per page in order.
+async function rasterizePdfToJpegs(pdfBuffer, dpi, quality) {
+  const uniqueId = `${Date.now()}-${Math.random().toString(36).slice(2)}`;
+  const tempPdfPath = path.join(os.tmpdir(), `psir-src-${uniqueId}.pdf`);
+  const outPrefix = path.join(os.tmpdir(), `psir-out-${uniqueId}`);
+
+  fs.writeFileSync(tempPdfPath, pdfBuffer);
+  try {
+    await execFileAsync('pdftoppm', ['-jpeg', '-r', String(dpi), '-jpegopt', `quality=${quality}`, tempPdfPath, outPrefix]);
+
+    const dir = path.dirname(outPrefix);
+    const baseName = path.basename(outPrefix);
+    const outputFiles = fs.readdirSync(dir)
+      .filter(f => f.startsWith(baseName) && f.endsWith('.jpg'))
+      .sort((a, b) => {
+        const numA = parseInt(a.match(/-(\d+)\.jpg$/)?.[1] || '0', 10);
+        const numB = parseInt(b.match(/-(\d+)\.jpg$/)?.[1] || '0', 10);
+        return numA - numB;
+      });
+
+    return outputFiles.map(f => {
+      const fullPath = path.join(dir, f);
+      const buf = fs.readFileSync(fullPath);
+      fs.unlinkSync(fullPath);
+      return buf;
+    });
+  } finally {
+    if (fs.existsSync(tempPdfPath)) fs.unlinkSync(tempPdfPath);
+  }
+}
 
 // RFC 4180 compliant CSV Parser
 function parseCSV(text) {
@@ -78,6 +121,98 @@ function sanitizeForPdf(str) {
       .replace(/\u00a0/g, ' ')         // non-breaking space
       .replace(/\u2026/g, '...')       // ellipsis
       .replace(/[^\x00-\xff]/g, '');   // strip anything else outside ISO-8859-1
+}
+
+// Draws a paginated table (with text-wrapped cells) onto a PDFDocument, adding pages as needed.
+function drawPaginatedTable(doc, fontBold, fontNormal, pageWidth, pageHeight, title, columns, rows) {
+  const tableX = 50;
+  const tableW = pageWidth - 100;
+  const lineHeight = 11;
+  const cellPaddingY = 6;
+  const headerRowHeight = 26;
+
+  let page = doc.addPage([pageWidth, pageHeight]);
+  let y = pageHeight - 80;
+  let isFirstPage = true;
+
+  const drawHeading = () => {
+    const text = isFirstPage ? title : `${title} (Cont.)`;
+    page.drawText(text, { x: 50, y, size: isFirstPage ? 20 : 16, font: fontBold, color: rgb(0.1, 0.1, 0.3) });
+    y -= isFirstPage ? 40 : 30;
+  };
+
+  const drawHeaderRow = () => {
+    page.drawRectangle({ x: tableX, y: y - headerRowHeight, width: tableW, height: headerRowHeight, color: rgb(0.15, 0.18, 0.32) });
+    let colX = tableX;
+    columns.forEach(col => {
+      page.drawText(col.header, { x: colX + 8, y: y - 17, size: 9, font: fontBold, color: rgb(1, 1, 1) });
+      colX += col.width;
+    });
+    y -= headerRowHeight;
+  };
+
+  const wrapCellText = (text, width, size, font) => {
+    const words = sanitizeForPdf(String(text ?? '')).replace(/\n/g, ' ').split(' ').filter(Boolean);
+    if (words.length === 0) return [''];
+    const lines = [];
+    let current = '';
+    const maxW = width - 16;
+    for (const word of words) {
+      const test = current ? `${current} ${word}` : word;
+      if (font.widthOfTextAtSize(test, size) > maxW && current) {
+        lines.push(current);
+        current = word;
+      } else {
+        current = test;
+      }
+    }
+    if (current) lines.push(current);
+    return lines;
+  };
+
+  drawHeading();
+  drawHeaderRow();
+
+  rows.forEach((row, rowIdx) => {
+    const wrappedCells = row.map((cellText, ci) => wrapCellText(cellText, columns[ci].width, 8, fontNormal));
+    const maxLines = Math.max(...wrappedCells.map(l => l.length));
+    const rowHeight = maxLines * lineHeight + cellPaddingY;
+
+    if (y - rowHeight < 50) {
+      page = doc.addPage([pageWidth, pageHeight]);
+      y = pageHeight - 80;
+      isFirstPage = false;
+      drawHeading();
+      drawHeaderRow();
+    }
+
+    if (rowIdx % 2 === 0) {
+      page.drawRectangle({ x: tableX, y: y - rowHeight, width: tableW, height: rowHeight, color: rgb(0.96, 0.97, 0.99) });
+    }
+
+    let colX = tableX;
+    wrappedCells.forEach((lines, ci) => {
+      lines.forEach((line, li) => {
+        page.drawText(line, {
+          x: colX + 8,
+          y: y - (li + 1) * lineHeight + 1,
+          size: 8,
+          font: fontNormal,
+          color: rgb(0.15, 0.15, 0.2)
+        });
+      });
+      colX += columns[ci].width;
+    });
+
+    page.drawLine({
+      start: { x: tableX, y: y - rowHeight },
+      end: { x: tableX + tableW, y: y - rowHeight },
+      thickness: 0.5,
+      color: rgb(0.85, 0.85, 0.85)
+    });
+
+    y -= rowHeight;
+  });
 }
 
 async function fetchUrlsInParallel(urls, concurrencyLimit = 5) {
@@ -368,6 +503,7 @@ async function main() {
     });
 
     const indexData = [];
+    const summaryRows = [];
 
     // 3. Document Building
     console.log('[Runner] Starting core document building pass...');
@@ -482,6 +618,17 @@ async function main() {
                     cleanText = rawText.substring(prefixMatch[0].length).trim();
                 }
 
+                summaryRows.push({
+                    topic: topNode.title,
+                    questionText: cleanText,
+                    toppers: activeFileObjects.map(f => ({
+                        name: f.topper_name || 'Unknown Topper',
+                        year: f.topper_year || '',
+                        rank: f.topper_rank || '',
+                        marks: f.topper_marks || ''
+                    }))
+                });
+
                 if (activeFileObjects.length > 0) {
                     console.log(`      Found ${activeFileObjects.length} active topper sheets for this question.`);
                     for (const activeFileObj of activeFileObjects) {
@@ -490,15 +637,15 @@ async function main() {
                         try {
                             const arrayBuffer = fetchedBuffers[activeFileObj.url];
                             if (!arrayBuffer) throw new Error(`Buffer not found for pre-fetched URL: ${cloudUrl}`);
-                            const sourcePdfDoc = await PDFDocument.load(arrayBuffer);
-                            const sourcePageIndices = sourcePdfDoc.getPageIndices();
-                            console.log(`      Loaded PDF document successfully. Total pages: ${sourcePageIndices.length}`);
-                            
-                            if (sourcePageIndices.length > 0) {
-                                // Embed first page
-                                const firstPage = sourcePdfDoc.getPage(0);
-                                const { width: sw, height: sh } = firstPage.getSize();
-                                
+                            const jpegPages = await rasterizePdfToJpegs(Buffer.from(arrayBuffer), RASTER_DPI, RASTER_QUALITY);
+                            console.log(`      Rasterized source PDF to ${jpegPages.length} compressed page(s) (${RASTER_DPI}dpi, q${RASTER_QUALITY}).`);
+
+                            if (jpegPages.length > 0) {
+                                // Embed first page with header overlay
+                                const firstJpeg = await pdfDoc.embedJpg(jpegPages[0]);
+                                const sw = firstJpeg.width;
+                                const sh = firstJpeg.height;
+
                                 const maxQWidth = tw - 60;
                                 const qLines = wrapText(cleanText, 9, maxQWidth, fontNormal);
                                 const maxVisibleLines = Math.min(qLines.length, 5);
@@ -548,33 +695,50 @@ async function main() {
                                     qTextY -= qLineHeight;
                                 }
                                 
-                                const embeddedPage = await pdfDoc.embedPage(firstPage);
                                 const remainingWidth = tw - 40;
                                 const remainingHeight = th - headerHeight - 25;
-                                
+
                                 const scaleX = remainingWidth / sw;
                                 const scaleY = remainingHeight / sh;
                                 const scale = Math.min(scaleX, scaleY);
-                                
+
                                 const drawWidth = sw * scale;
                                 const drawHeight = sh * scale;
-                                
+
                                 const drawX = 20 + (remainingWidth - drawWidth) / 2;
                                 const drawY = 15 + (remainingHeight - drawHeight) / 2;
-                                
-                                newPage.drawPage(embeddedPage, {
+
+                                newPage.drawImage(firstJpeg, {
                                     x: drawX,
                                     y: drawY,
                                     width: drawWidth,
                                     height: drawHeight
                                 });
-                                
-                                // Add subsequent pages
-                                const restPageIndices = sourcePageIndices.slice(1);
-                                if (restPageIndices.length > 0) {
-                                    console.log(`      Copying ${restPageIndices.length} subsequent pages...`);
-                                    const sourcePages = await pdfDoc.copyPages(sourcePdfDoc, restPageIndices);
-                                    sourcePages.forEach(p => pdfDoc.addPage(p));
+
+                                // Add subsequent pages as plain full-bleed images
+                                if (jpegPages.length > 1) {
+                                    console.log(`      Embedding ${jpegPages.length - 1} subsequent page(s)...`);
+                                    for (let pIdx = 1; pIdx < jpegPages.length; pIdx++) {
+                                        const pageJpeg = await pdfDoc.embedJpg(jpegPages[pIdx]);
+                                        const pw = pageJpeg.width;
+                                        const ph = pageJpeg.height;
+
+                                        const pRemainingWidth = tw - 40;
+                                        const pRemainingHeight = th - 40;
+                                        const pScale = Math.min(pRemainingWidth / pw, pRemainingHeight / ph);
+                                        const pDrawWidth = pw * pScale;
+                                        const pDrawHeight = ph * pScale;
+                                        const pDrawX = (tw - pDrawWidth) / 2;
+                                        const pDrawY = (th - pDrawHeight) / 2;
+
+                                        const subsequentPage = pdfDoc.addPage([tw, th]);
+                                        subsequentPage.drawImage(pageJpeg, {
+                                            x: pDrawX,
+                                            y: pDrawY,
+                                            width: pDrawWidth,
+                                            height: pDrawHeight
+                                        });
+                                    }
                                 }
                             } else {
                                 throw new Error("Answer PDF contains no pages.");
@@ -742,12 +906,71 @@ async function main() {
         idxY -= rowH;
     }
 
+    // 5. Generate Summary Tables (Topper Performance Summary & Question-wise Topper Summary)
+    console.log('[Runner] Generating summary table pages...');
+    const summaryPdfDoc = await PDFDocument.create();
+
+    const topperMap = {};
+    summaryRows.forEach(row => {
+        row.toppers.forEach(t => {
+            if (!topperMap[t.name]) {
+                topperMap[t.name] = { name: t.name, year: t.year || 'N/A', rank: t.rank || 'N/A', marks: t.marks || 'N/A', count: 0 };
+            }
+            topperMap[t.name].count += 1;
+        });
+    });
+    const topperSummaryTableRows = Object.values(topperMap)
+        .sort((a, b) => b.count - a.count)
+        .map((t, idx) => [String(idx + 1), t.name, t.year, t.rank, t.marks, String(t.count)]);
+
+    drawPaginatedTable(
+        summaryPdfDoc, fontBold, fontNormal, tw, th,
+        'TOPPER PERFORMANCE SUMMARY',
+        [
+            { header: '#', width: (tw - 100) * 0.06 },
+            { header: 'Topper Name', width: (tw - 100) * 0.32 },
+            { header: 'Year', width: (tw - 100) * 0.12 },
+            { header: 'Rank', width: (tw - 100) * 0.12 },
+            { header: 'Marks', width: (tw - 100) * 0.13 },
+            { header: 'Qs Answered', width: (tw - 100) * 0.25 }
+        ],
+        topperSummaryTableRows.length > 0 ? topperSummaryTableRows : [['-', 'No toppers selected for this book', '-', '-', '-', '-']]
+    );
+
+    const questionSummaryTableRows = summaryRows.map((row, idx) => [
+        String(idx + 1),
+        row.topic,
+        row.questionText,
+        row.toppers.length > 0 ? row.toppers.map(t => t.name).join(', ') : 'No topper selected'
+    ]);
+
+    drawPaginatedTable(
+        summaryPdfDoc, fontBold, fontNormal, tw, th,
+        'QUESTION-WISE TOPPER SUMMARY',
+        [
+            { header: '#', width: (tw - 100) * 0.05 },
+            { header: 'Topic', width: (tw - 100) * 0.18 },
+            { header: 'Question', width: (tw - 100) * 0.52 },
+            { header: 'Topper(s)', width: (tw - 100) * 0.25 }
+        ],
+        questionSummaryTableRows
+    );
+    console.log(`[Runner] Summary tables generated: ${summaryPdfDoc.getPageCount()} pages.`);
+
     console.log(`[Runner] Injecting ${indexPdfDoc.getPageCount()} Table of Contents pages into Master PDF...`);
     const indexPages = await pdfDoc.copyPages(indexPdfDoc, indexPdfDoc.getPageIndices());
     const totalIndexPages = indexPages.length;
-    
+
     for (let k = 0; k < totalIndexPages; k++) {
         pdfDoc.insertPage(1 + k, indexPages[k]);
+    }
+
+    console.log(`[Runner] Injecting ${summaryPdfDoc.getPageCount()} Summary Table pages into Master PDF...`);
+    const summaryPages = await pdfDoc.copyPages(summaryPdfDoc, summaryPdfDoc.getPageIndices());
+    const totalSummaryPages = summaryPages.length;
+
+    for (let k = 0; k < totalSummaryPages; k++) {
+        pdfDoc.insertPage(1 + totalIndexPages + k, summaryPages[k]);
     }
 
     // Numbering pass
@@ -755,20 +978,20 @@ async function main() {
     let currentDataRow = 0;
     for (let k = 0; k < totalIndexPages; k++) {
         const injectedIdxPage = pdfDoc.getPage(1 + k);
-        let drawY = k === 0 
-           ? (injectedIdxPage.getSize().height - 130 - rowH) 
+        let drawY = k === 0
+           ? (injectedIdxPage.getSize().height - 130 - rowH)
            : (injectedIdxPage.getSize().height - 80 - rowH);
-        
+
         while (currentDataRow < indexData.length && drawY >= 50) {
-             const truePageNum = 1 + totalIndexPages + indexData[currentDataRow].targetPageInternal;
+             const truePageNum = 1 + totalIndexPages + totalSummaryPages + indexData[currentDataRow].targetPageInternal;
              const isSec = indexData[currentDataRow].type === 'section';
-             
-             injectedIdxPage.drawText(`${truePageNum}`, { 
-                 x: tableX + tableW - 40, 
-                 y: drawY + 10, 
-                 size: isSec ? 11 : 9, 
-                 font: isSec ? fontBold : fontNormal, 
-                 color: rgb(0.1, 0.1, 0.1) 
+
+             injectedIdxPage.drawText(`${truePageNum}`, {
+                 x: tableX + tableW - 40,
+                 y: drawY + 10,
+                 size: isSec ? 11 : 9,
+                 font: isSec ? fontBold : fontNormal,
+                 color: rgb(0.1, 0.1, 0.1)
              });
              drawY -= rowH;
              currentDataRow++;

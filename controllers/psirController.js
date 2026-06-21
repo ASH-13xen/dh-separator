@@ -318,7 +318,11 @@ export const getPsirBookStatus = async (req, res) => {
 
 export const downloadPsirBook = async (req, res) => {
   const { id } = req.params;
-  console.log(`[PsirController] [downloadPsirBook] Serving direct download for Job ID: ${id}`);
+  // Preview (iframe) requests omit ?download=true and get an inline disposition that
+  // does not consume the GridFS file. Only an explicit download deletes it after streaming.
+  const isDownload = req.query.download === 'true';
+  const disposition = isDownload ? 'attachment' : 'inline';
+  console.log(`[PsirController] [downloadPsirBook] Serving ${isDownload ? 'download' : 'preview'} for Job ID: ${id}`);
   try {
     const job = await PsirBook.findById(id);
     if (!job || (!job.pdfFileId && !job.pdfUrl && !job.pdfData)) {
@@ -339,7 +343,7 @@ export const downloadPsirBook = async (req, res) => {
       }
 
       console.log(`[PsirController] [downloadPsirBook] Streaming ${files[0].length} bytes from GridFS as: ${fileName}`);
-      res.setHeader('Content-Disposition', `attachment; filename="${fileName}"`);
+      res.setHeader('Content-Disposition', `${disposition}; filename="${fileName}"`);
       res.setHeader('Content-Type', 'application/pdf');
       res.setHeader('Content-Length', files[0].length);
 
@@ -352,15 +356,17 @@ export const downloadPsirBook = async (req, res) => {
 
       downloadStream.pipe(res);
 
-      res.on('finish', async () => {
-        try {
-          await bucket.delete(fileId);
-          await PsirBook.findByIdAndUpdate(id, { $unset: { pdfFileId: '' } });
-          console.log(`[PsirController] [downloadPsirBook] GridFS file ${fileId} deleted after successful download.`);
-        } catch (delErr) {
-          console.error('[PsirController] [downloadPsirBook] Failed to delete GridFS file:', delErr);
-        }
-      });
+      if (isDownload) {
+        res.on('finish', async () => {
+          try {
+            await bucket.delete(fileId);
+            await PsirBook.findByIdAndUpdate(id, { $unset: { pdfFileId: '' } });
+            console.log(`[PsirController] [downloadPsirBook] GridFS file ${fileId} deleted after successful download.`);
+          } catch (delErr) {
+            console.error('[PsirController] [downloadPsirBook] Failed to delete GridFS file:', delErr);
+          }
+        });
+      }
 
       return;
     }
@@ -369,14 +375,14 @@ export const downloadPsirBook = async (req, res) => {
       console.log(`[PsirController] [downloadPsirBook] Fetching PDF from Cloudinary URL and streaming as: ${fileName}`);
       const cloudRes = await fetch(job.pdfUrl);
       if (!cloudRes.ok) throw new Error(`Failed to fetch PDF from storage: ${cloudRes.status}`);
-      res.setHeader('Content-Disposition', `attachment; filename="${fileName}"`);
+      res.setHeader('Content-Disposition', `${disposition}; filename="${fileName}"`);
       res.setHeader('Content-Type', 'application/pdf');
       cloudRes.body.pipe(res);
       return;
     }
 
     console.log(`[PsirController] [downloadPsirBook] Streaming ${job.pdfData.length} bytes from legacy buffer as: ${fileName}`);
-    res.setHeader('Content-Disposition', `attachment; filename="${fileName}"`);
+    res.setHeader('Content-Disposition', `${disposition}; filename="${fileName}"`);
     res.setHeader('Content-Type', 'application/pdf');
     res.send(job.pdfData);
   } catch (err) {
