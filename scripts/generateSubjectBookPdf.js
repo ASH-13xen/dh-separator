@@ -8,7 +8,9 @@ import { PDFDocument, rgb, StandardFonts } from 'pdf-lib';
 import { GridFSBucket } from 'mongodb';
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
-import { PsirBook } from '../models/PsirBook.js';
+import { SubjectBook } from '../models/SubjectBook.js';
+import { Subject } from '../models/Subject.js';
+import { parseCSV } from '../utils/csv.js';
 
 console.log('[Runner] Script loaded. Starting PDF generation pipeline...');
 dotenv.config();
@@ -28,8 +30,8 @@ const RASTER_QUALITY = 70;
 // (poppler-utils), returning one Buffer per page in order.
 async function rasterizePdfToJpegs(pdfBuffer, dpi, quality) {
   const uniqueId = `${Date.now()}-${Math.random().toString(36).slice(2)}`;
-  const tempPdfPath = path.join(os.tmpdir(), `psir-src-${uniqueId}.pdf`);
-  const outPrefix = path.join(os.tmpdir(), `psir-out-${uniqueId}`);
+  const tempPdfPath = path.join(os.tmpdir(), `book-src-${uniqueId}.pdf`);
+  const outPrefix = path.join(os.tmpdir(), `book-out-${uniqueId}`);
 
   fs.writeFileSync(tempPdfPath, pdfBuffer);
   try {
@@ -54,62 +56,6 @@ async function rasterizePdfToJpegs(pdfBuffer, dpi, quality) {
   } finally {
     if (fs.existsSync(tempPdfPath)) fs.unlinkSync(tempPdfPath);
   }
-}
-
-// RFC 4180 compliant CSV Parser
-function parseCSV(text) {
-  const lines = [];
-  let i = 0;
-  const len = text.length;
-  
-  while (i < len) {
-    const row = [];
-    while (i < len) {
-      let field = "";
-      if (text[i] === '"') {
-        // Quoted field
-        i++; // skip opening quote
-        while (i < len) {
-          if (text[i] === '"') {
-            if (text[i + 1] === '"') {
-              field += '"';
-              i += 2;
-            } else {
-              i++; // skip closing quote
-              break;
-            }
-          } else {
-            field += text[i];
-            i++;
-          }
-        }
-      } else {
-        // Unquoted field
-        while (i < len && text[i] !== ',' && text[i] !== '\n' && text[i] !== '\r') {
-          field += text[i];
-          i++;
-        }
-      }
-      row.push(field);
-      
-      if (i < len && text[i] === ',') {
-        i++; // skip comma
-      } else {
-        // End of row
-        if (i < len && text[i] === '\r') {
-          i++;
-          if (i < len && text[i] === '\n') {
-            i++;
-          }
-        } else if (i < len && text[i] === '\n') {
-          i++;
-        }
-        break;
-      }
-    }
-    lines.push(row);
-  }
-  return lines;
 }
 
 function sanitizeForPdf(str) {
@@ -266,10 +212,10 @@ async function fetchUrlsInParallel(urls, concurrencyLimit = 5) {
   return results;
 }
 
-const saveToGridFS = (db, buffer, filename) => {
-  console.log(`[Runner] [saveToGridFS] Uploading '${filename}' to GridFS bucket 'psir_books'...`);
+const saveToGridFS = (db, buffer, filename, bucketName) => {
+  console.log(`[Runner] [saveToGridFS] Uploading '${filename}' to GridFS bucket '${bucketName}'...`);
   return new Promise((resolve, reject) => {
-    const bucket = new GridFSBucket(db, { bucketName: 'psir_books' });
+    const bucket = new GridFSBucket(db, { bucketName });
     const uploadStream = bucket.openUploadStream(filename, { contentType: 'application/pdf' });
     uploadStream.on('error', reject);
     uploadStream.on('finish', () => {
@@ -288,15 +234,17 @@ async function main() {
     return index !== -1 && args[index + 1] ? args[index + 1] : null;
   };
 
+  const subjectSlug = getArgValue('--subject');
   const paper = getArgValue('--paper');
   const jobId = getArgValue('--jobId');
 
   console.log(`[Runner] Extracted CLI arguments:`);
+  console.log(`  - Subject: '${subjectSlug}'`);
   console.log(`  - Paper: '${paper}'`);
   console.log(`  - Job ID: '${jobId}'`);
 
-  if (!paper || !jobId) {
-    console.error('[Runner] Error: --paper and --jobId are required arguments. Terminating execution.');
+  if (!subjectSlug || !paper || !jobId) {
+    console.error('[Runner] Error: --subject, --paper and --jobId are required arguments. Terminating execution.');
     process.exit(1);
   }
 
@@ -310,10 +258,17 @@ async function main() {
   await mongoose.connect(process.env.MONGO_URI);
   console.log('[Runner] MongoDB connected successfully.');
 
+  console.log(`[Runner] Querying database for subject record: ${subjectSlug}...`);
+  const subjectDoc = await Subject.findOne({ slug: subjectSlug });
+  if (!subjectDoc || !subjectDoc.csvData) {
+    console.error(`[Runner] Error: Subject not found or has no classified questions: ${subjectSlug}. Terminating execution.`);
+    process.exit(1);
+  }
+
   console.log(`[Runner] Querying database for job record ID: ${jobId}...`);
-  const job = await PsirBook.findById(jobId);
+  const job = await SubjectBook.findById(jobId);
   if (!job) {
-    console.error(`[Runner] Error: PsirBook job not found in DB: ${jobId}. Terminating execution.`);
+    console.error(`[Runner] Error: SubjectBook job not found in DB: ${jobId}. Terminating execution.`);
     process.exit(1);
   }
 
@@ -330,14 +285,11 @@ async function main() {
     await job.save();
     console.log('[Runner] Job status saved as processing.');
 
-    const csvPath = path.join(__dirname, '..', 'psir_questions_updated (2).csv');
-    console.log(`[Runner] Looking for PSIR CSV database at path: ${csvPath}`);
-    if (!fs.existsSync(csvPath)) {
-      throw new Error(`PSIR questions CSV file not found at: ${csvPath}`);
-    }
-    
-    console.log('[Runner] Reading CSV file contents...');
-    const csvData = fs.readFileSync(csvPath, 'utf8');
+    // The CSV content is read from MongoDB (Subject.csvData), not from local disk: this
+    // GitHub Actions runner does a fresh checkout and shares no filesystem with the live
+    // server that generated the CSV during Subject Setup.
+    console.log(`[Runner] Reading CSV content from Subject document (Mongo is the source of truth)...`);
+    const csvData = subjectDoc.csvData;
     console.log('[Runner] Parsing CSV rows...');
     const parsed = parseCSV(csvData);
     const rows = parsed.slice(1);
@@ -490,11 +442,11 @@ async function main() {
         x: 0, y: th - 180, width: tw * 0.4, height: 10, color: rgb(0.25, 0.51, 0.96)
     });
     
-    titlePage.drawText(`UPSC PSIR SERIES`, {
+    titlePage.drawText(sanitizeForPdf(`${subjectDoc.name.toUpperCase()} SERIES`), {
       x: 50, y: th - 85, size: 32, font: fontBold, color: rgb(1, 1, 1)
     });
-    
-    titlePage.drawText(`Political Science & International Relations (Optional)`, {
+
+    titlePage.drawText(sanitizeForPdf(subjectDoc.name), {
       x: 50, y: th - 125, size: 15, font: fontNormal, color: rgb(0.8, 0.8, 0.9)
     });
 
@@ -1034,8 +986,8 @@ async function main() {
     console.log(`[Runner] PDF successfully built. File size: ${pdfBytes.length} bytes.`);
 
     // Update job status and store the compiled binary PDF directly in MongoDB
-    const fileName = `PSIR_${paper.replace(/[^a-z0-9]/gi, '_')}_${jobId}.pdf`;
-    const gridFsFileId = await saveToGridFS(mongoose.connection.db, Buffer.from(pdfBytes), fileName);
+    const fileName = `${subjectSlug}_${paper.replace(/[^a-z0-9]/gi, '_')}_${jobId}.pdf`;
+    const gridFsFileId = await saveToGridFS(mongoose.connection.db, Buffer.from(pdfBytes), fileName, `${subjectSlug}_books`);
 
     console.log('[Runner] Saving GridFS file ID and status: "completed" to MongoDB...');
     job.status = 'completed';

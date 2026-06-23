@@ -11,6 +11,7 @@ import collectiveRoutes from './routes/collectiveRoutes.js';
 import quesPdfRoutes from './routes/quesPdfRoutes.js';
 import reorderRoutes from './routes/reorderRoutes.js';
 import psirRoutes from './routes/psirRoutes.js';
+import subjectRoutes from './routes/subjectRoutes.js';
 
 dotenv.config();
 
@@ -51,6 +52,7 @@ app.use('/api/collective', collectiveRoutes);
 app.use('/api/quespdf', quesPdfRoutes);
 app.use('/api/reorder', reorderRoutes);
 app.use('/api/psir', psirRoutes);
+app.use('/api/subjects', subjectRoutes);
 
 // Database Connection
 mongoose.connect(MONGO_URI)

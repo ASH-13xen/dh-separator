@@ -26,6 +26,9 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 
+# Generated per-subject CSV artifacts (Mongo Subject.csvData is the source of truth)
+data/subjects/
+
 # IDEs and text editors
 .vscode/
 .idea/

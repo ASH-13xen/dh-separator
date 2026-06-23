@@ -17,14 +17,24 @@ const uploadToCloudinary = (buffer, fileName) => {
 };
 
 export const handlePdfUpload = async (req, res) => {
+  console.log('[UploadController] [handlePdfUpload] Request received.');
   try {
     if (!req.file) {
+      console.warn('[UploadController] [handlePdfUpload] Validation failed: no file uploaded.');
       return res.status(400).json({ error: 'No PDF file uploaded.' });
     }
 
     if (req.file.mimetype !== 'application/pdf') {
+      console.warn(`[UploadController] [handlePdfUpload] Validation failed: invalid mimetype '${req.file.mimetype}'.`);
       return res.status(400).json({ error: 'Please upload a valid PDF file.' });
     }
+
+    const subject = req.body.subject ? String(req.body.subject).trim() : '';
+    if (!subject) {
+      console.warn('[UploadController] [handlePdfUpload] Validation failed: missing subject.');
+      return res.status(400).json({ error: 'Subject is required.' });
+    }
+    console.log(`[UploadController] [handlePdfUpload] Subject: '${subject}'.`);
 
     let parsedMetadataList = [{ topperName: 'Unknown Topper' }];
     if (req.body.metadataList) {
@@ -39,7 +49,7 @@ export const handlePdfUpload = async (req, res) => {
     console.log(`[UploadController] Initiating processPdf...`);
     
     // Pass the memory buffer and metadata array to the service layer
-    const results = await processPdf(req.file.buffer, parsedMetadataList);
+    const results = await processPdf(req.file.buffer, parsedMetadataList, subject);
 
     console.log(`[UploadController] processPdf completed successfully. Total records generated: ${results.length}`);
 
@@ -61,33 +71,35 @@ export const handlePdfUpload = async (req, res) => {
 };
 
 export const handleManualUpload = async (req, res) => {
+  console.log('[UploadController] [handleManualUpload] Request received.');
   try {
     if (!req.file) {
+      console.warn('[UploadController] [handleManualUpload] Validation failed: no file uploaded.');
       return res.status(400).json({ error: 'No PDF file uploaded.' });
     }
 
-    const { question_text, topper_name, topper_year, topper_rank, topper_marks, tags } = req.body;
+    const { question_text, topper_name, topper_year, topper_rank, topper_marks, subject } = req.body;
     if (!question_text) {
+      console.warn('[UploadController] [handleManualUpload] Validation failed: missing question text.');
       return res.status(400).json({ error: 'Question text is required.' });
     }
-
-    let parsedTags = [];
-    if (tags) {
-      try {
-        parsedTags = JSON.parse(tags);
-      } catch (e) {
-        // fallback
-      }
+    if (!subject || !String(subject).trim()) {
+      console.warn('[UploadController] [handleManualUpload] Validation failed: missing subject.');
+      return res.status(400).json({ error: 'Subject is required.' });
     }
+    console.log(`[UploadController] [handleManualUpload] Subject: '${subject}'. Question: "${String(question_text).slice(0, 60)}..."`);
 
-    const fileNameObj = `Manual_${Date.now()}`; 
+    console.log('[UploadController] [handleManualUpload] Uploading answer sheet to Cloudinary...');
+    const fileNameObj = `Manual_${Date.now()}`;
     const file_url = await uploadToCloudinary(req.file.buffer, fileNameObj);
+    console.log(`[UploadController] [handleManualUpload] Cloudinary upload complete: ${file_url}`);
 
+    console.log('[UploadController] [handleManualUpload] Upserting question record in MongoDB...');
     const result = await UPSCQA.findOneAndUpdate(
       { question_text },
       {
         $setOnInsert: {
-          tags: parsedTags,
+          subject: String(subject).trim(),
           start_page: 1,
           end_page: 1
         },
@@ -103,6 +115,7 @@ export const handleManualUpload = async (req, res) => {
       },
       { upsert: true, new: true }
     );
+    console.log(`[UploadController] [handleManualUpload] Saved successfully. Record ID: ${result._id}`);
 
     res.status(200).json({
       message: 'Manual question uploaded successfully.',
@@ -115,11 +128,14 @@ export const handleManualUpload = async (req, res) => {
 };
 
 export const updateTopperDetails = async (req, res) => {
+  console.log('[UploadController] [updateTopperDetails] Request received.');
   try {
     const { updates } = req.body;
     if (!updates || !Array.isArray(updates)) {
+      console.warn('[UploadController] [updateTopperDetails] Validation failed: missing updates array.');
       return res.status(400).json({ error: 'Updates array is required.' });
     }
+    console.log(`[UploadController] [updateTopperDetails] Applying ${updates.length} topper detail update(s)...`);
 
     const bulkOps = updates.map(update => ({
       updateMany: {
@@ -139,6 +155,7 @@ export const updateTopperDetails = async (req, res) => {
     if (bulkOps.length > 0) {
       await UPSCQA.bulkWrite(bulkOps);
     }
+    console.log('[UploadController] [updateTopperDetails] Updates applied successfully.');
 
     res.status(200).json({ message: 'Topper details updated successfully.' });
   } catch (error) {

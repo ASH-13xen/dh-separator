@@ -1,0 +1,44 @@
+name: Generate Subject Book
+
+on:
+  workflow_dispatch:
+    inputs:
+      subject:
+        description: 'Subject slug'
+        required: true
+      paper:
+        description: 'Paper Name (e.g., Paper 1)'
+        required: true
+      jobId:
+        description: 'The MongoDB document ID tracking this build job'
+        required: true
+
+jobs:
+  generate-pdf:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+          cache-dependency-path: 'package-lock.json'
+
+      - name: Install Dependencies
+        run: |
+          npm ci
+
+      - name: Install poppler-utils (pdftoppm)
+        run: sudo apt-get update && sudo apt-get install -y poppler-utils
+
+      - name: Compile and Upload PDF
+        env:
+          MONGO_URI: ${{ secrets.MONGO_URI }}
+        run: |
+          node scripts/generateSubjectBookPdf.js \
+            --subject "${{ github.event.inputs.subject }}" \
+            --paper "${{ github.event.inputs.paper }}" \
+            --jobId "${{ github.event.inputs.jobId }}"
