@@ -123,6 +123,13 @@ function sanitizeForPdf(str) {
       .replace(/[^\x00-\xff]/g, '');   // strip anything else outside ISO-8859-1
 }
 
+// CSV exports from spreadsheets often store year as a decimal (e.g. "2023.00");
+// strip a trailing .0/.00 so it reads as a plain year.
+function cleanYear(str) {
+  if (!str) return str;
+  return str.replace(/\.0+$/, '');
+}
+
 // Draws a paginated table (with text-wrapped cells) onto a PDFDocument, adding pages as needed.
 function drawPaginatedTable(doc, fontBold, fontNormal, pageWidth, pageHeight, title, columns, rows) {
   const tableX = 50;
@@ -346,7 +353,7 @@ async function main() {
       const topic = r[1].trim();
       const questionText = r[2].trim();
       const topperName = r[3].trim();
-      const topperYear = r[4].trim();
+      const topperYear = cleanYear(r[4].trim());
       const topperRank = r[5].trim();
       const topperMarks = r[6].trim();
       const url = r[7].trim();
@@ -684,7 +691,7 @@ async function main() {
                                 const tName = activeFileObj.topper_name || 'Unknown Topper';
                                 const tYear = activeFileObj.topper_year || 'N/A';
                                 const tRank = activeFileObj.topper_rank || 'N/A';
-                                const topperTagStr = sanitizeForPdf(`Topper: ${tName} (${tYear}, Rank ${tRank})`);
+                                const topperTagStr = sanitizeForPdf(`${tName} (${tYear}, Rank ${tRank})`);
                                 
                                 const tagWidth = fontBold.widthOfTextAtSize(topperTagStr, 10);
                                 newPage.drawText(topperTagStr, {
@@ -781,7 +788,7 @@ async function main() {
                             });
                             
                             const tName = activeFileObj.topper_name || 'Unknown Topper';
-                            const topperTagStr = `Topper: ${tName} (ANSWER SHEET LOAD ERROR)`;
+                            const topperTagStr = `${tName} (ANSWER SHEET LOAD ERROR)`;
                             const tagWidth = fontBold.widthOfTextAtSize(topperTagStr, 10);
                             errPage.drawText(topperTagStr, {
                                 x: (tw - tagWidth) / 2, y: th - 30, size: 10, font: fontBold, color: rgb(0.8, 0.2, 0.2)
