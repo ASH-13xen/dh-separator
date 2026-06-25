@@ -215,7 +215,7 @@ export const previewPsirData = async (req, res) => {
 // Upserts the saved customization layout (topic order/renames, question order, included/
 // excluded questions, topper selections, topper detail overrides) for a single PSIR paper.
 export const saveBookLayout = async (req, res) => {
-  const { paper, topicOrder, topicRenames, questionOrder, excludedQuestionIds, selections, topperOverrides, expandedTopics } = req.body;
+  const { paper, topicOrder, topicRenames, questionOrder, excludedQuestionIds, selections, topperOverrides, expandedTopics, questionTextOverrides } = req.body;
   console.log(`[PsirController] [saveBookLayout] Saving layout for paper '${paper}'...`);
   try {
     if (!paper) {
@@ -223,7 +223,7 @@ export const saveBookLayout = async (req, res) => {
     }
     const doc = await BookLayout.findOneAndUpdate(
       { subject: 'psir', paper },
-      { $set: { topicOrder, topicRenames, questionOrder, excludedQuestionIds, selections, topperOverrides, expandedTopics } },
+      { $set: { topicOrder, topicRenames, questionOrder, excludedQuestionIds, selections, topperOverrides, expandedTopics, questionTextOverrides } },
       { upsert: true, new: true }
     );
     console.log(`[PsirController] [saveBookLayout] Layout saved for paper '${paper}'.`);

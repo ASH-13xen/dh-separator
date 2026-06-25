@@ -17,6 +17,7 @@ const BookLayoutSchema = new mongoose.Schema({
   excludedQuestionIds: { type: [String], default: [] },
   selections: { type: mongoose.Schema.Types.Mixed, default: {} },
   topperOverrides: { type: mongoose.Schema.Types.Mixed, default: {} },
+  questionTextOverrides: { type: mongoose.Schema.Types.Mixed, default: {} },
 }, { timestamps: true });
 
 BookLayoutSchema.index({ subject: 1, paper: 1 }, { unique: true });

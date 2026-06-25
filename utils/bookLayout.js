@@ -14,6 +14,7 @@ export function applyBookLayout(hierarchy, layoutsByPaper) {
     const renames = layout.topicRenames || {};
     const questionOrders = layout.questionOrder || {};
     const topperOverrides = layout.topperOverrides || {};
+    const questionTextOverrides = layout.questionTextOverrides || {};
 
     let topics = paperNode.topics.map((topic) => {
       const order = questionOrders[topic._key];
@@ -28,6 +29,7 @@ export function applyBookLayout(hierarchy, layoutsByPaper) {
 
       questions = questions.map((q) => ({
         ...q,
+        question_text: questionTextOverrides[q._id] || q.question_text,
         file_urls: (q.file_urls || []).map((f) => {
           const override = topperOverrides[f.url];
           return override ? { ...f, ...override } : f;

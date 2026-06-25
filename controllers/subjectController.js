@@ -311,7 +311,7 @@ export const previewSubjectBookData = async (req, res) => {
 // single subject. Mirrors psirController.js's saveBookLayout, keyed by the subject's slug.
 export const saveSubjectBookLayout = async (req, res) => {
   const { slug } = req.params;
-  const { paper, topicOrder, topicRenames, questionOrder, excludedQuestionIds, selections, topperOverrides, expandedTopics } = req.body;
+  const { paper, topicOrder, topicRenames, questionOrder, excludedQuestionIds, selections, topperOverrides, expandedTopics, questionTextOverrides } = req.body;
   console.log(`[SubjectController] [saveSubjectBookLayout] Saving layout for subject '${slug}', paper '${paper}'...`);
   try {
     if (!paper) {
@@ -319,7 +319,7 @@ export const saveSubjectBookLayout = async (req, res) => {
     }
     const doc = await BookLayout.findOneAndUpdate(
       { subject: slug, paper },
-      { $set: { topicOrder, topicRenames, questionOrder, excludedQuestionIds, selections, topperOverrides, expandedTopics } },
+      { $set: { topicOrder, topicRenames, questionOrder, excludedQuestionIds, selections, topperOverrides, expandedTopics, questionTextOverrides } },
       { upsert: true, new: true }
     );
     console.log(`[SubjectController] [saveSubjectBookLayout] Layout saved for subject '${slug}', paper '${paper}'.`);
