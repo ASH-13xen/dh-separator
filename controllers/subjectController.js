@@ -296,10 +296,10 @@ export const previewSubjectBookData = async (req, res) => {
     const layoutDocs = await BookLayout.find({ subject: slug }).lean();
     const layoutsByPaper = Object.fromEntries(layoutDocs.map(l => [l.paper, l]));
     const mergedHierarchy = applyBookLayout(hierarchy, layoutsByPaper);
-    const { excludedQuestionIds, selections } = deriveIncludedAndSelections(mergedHierarchy, layoutsByPaper);
+    const { excludedQuestionIds, selections, expandedTopicTitles } = deriveIncludedAndSelections(mergedHierarchy, layoutsByPaper);
 
     console.log(`[SubjectController] [previewSubjectBookData] Preview hierarchy generated successfully for '${slug}'. ${layoutDocs.length} saved layout(s) applied.`);
-    res.json({ hierarchy: mergedHierarchy, excludedQuestionIds, selections });
+    res.json({ hierarchy: mergedHierarchy, excludedQuestionIds, selections, expandedTopicTitles });
   } catch (err) {
     console.error('[SubjectController] [previewSubjectBookData] Error:', err);
     res.status(500).json({ error: 'Failed to parse and group subject questions.', details: err.message });
@@ -311,7 +311,7 @@ export const previewSubjectBookData = async (req, res) => {
 // single subject. Mirrors psirController.js's saveBookLayout, keyed by the subject's slug.
 export const saveSubjectBookLayout = async (req, res) => {
   const { slug } = req.params;
-  const { paper, topicOrder, topicRenames, questionOrder, excludedQuestionIds, selections, topperOverrides } = req.body;
+  const { paper, topicOrder, topicRenames, questionOrder, excludedQuestionIds, selections, topperOverrides, expandedTopics } = req.body;
   console.log(`[SubjectController] [saveSubjectBookLayout] Saving layout for subject '${slug}', paper '${paper}'...`);
   try {
     if (!paper) {
@@ -319,7 +319,7 @@ export const saveSubjectBookLayout = async (req, res) => {
     }
     const doc = await BookLayout.findOneAndUpdate(
       { subject: slug, paper },
-      { $set: { topicOrder, topicRenames, questionOrder, excludedQuestionIds, selections, topperOverrides } },
+      { $set: { topicOrder, topicRenames, questionOrder, excludedQuestionIds, selections, topperOverrides, expandedTopics } },
       { upsert: true, new: true }
     );
     console.log(`[SubjectController] [saveSubjectBookLayout] Layout saved for subject '${slug}', paper '${paper}'.`);

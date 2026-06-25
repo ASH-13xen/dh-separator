@@ -12,6 +12,7 @@ const BookLayoutSchema = new mongoose.Schema({
   paper: { type: String, required: true },
   topicOrder: { type: [String], default: [] },
   topicRenames: { type: mongoose.Schema.Types.Mixed, default: {} },
+  expandedTopics: { type: [String], default: [] },
   questionOrder: { type: mongoose.Schema.Types.Mixed, default: {} },
   excludedQuestionIds: { type: [String], default: [] },
   selections: { type: mongoose.Schema.Types.Mixed, default: {} },

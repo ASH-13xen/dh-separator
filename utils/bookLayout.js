@@ -52,13 +52,16 @@ export function applyBookLayout(hierarchy, layoutsByPaper) {
 export function deriveIncludedAndSelections(hierarchy, layoutsByPaper) {
   const excludedQuestionIds = [];
   const selections = {};
+  const expandedTopicTitles = [];
 
   hierarchy.forEach((paperNode) => {
     const layout = layoutsByPaper[paperNode.paper];
     const excludedSet = new Set(layout?.excludedQuestionIds || []);
+    const expandedKeySet = new Set(layout?.expandedTopics || []);
     const savedSelections = layout?.selections || {};
 
     paperNode.topics.forEach((topic) => {
+      if (expandedKeySet.has(topic._key)) expandedTopicTitles.push(topic.title);
       topic.questions.forEach((q) => {
         if (excludedSet.has(q._id)) excludedQuestionIds.push(q._id);
         const saved = savedSelections[q._id];
@@ -67,5 +70,5 @@ export function deriveIncludedAndSelections(hierarchy, layoutsByPaper) {
     });
   });
 
-  return { excludedQuestionIds, selections };
+  return { excludedQuestionIds, selections, expandedTopicTitles };
 }

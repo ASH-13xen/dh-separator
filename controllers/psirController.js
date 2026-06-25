@@ -202,10 +202,10 @@ export const previewPsirData = async (req, res) => {
     const layoutDocs = await BookLayout.find({ subject: 'psir' }).lean();
     const layoutsByPaper = Object.fromEntries(layoutDocs.map(l => [l.paper, l]));
     const mergedHierarchy = applyBookLayout(result, layoutsByPaper);
-    const { excludedQuestionIds, selections } = deriveIncludedAndSelections(mergedHierarchy, layoutsByPaper);
+    const { excludedQuestionIds, selections, expandedTopicTitles } = deriveIncludedAndSelections(mergedHierarchy, layoutsByPaper);
 
     console.log(`[PsirController] [previewPsirData] Preview hierarchy generated successfully. ${layoutDocs.length} saved layout(s) applied.`);
-    res.json({ hierarchy: mergedHierarchy, excludedQuestionIds, selections });
+    res.json({ hierarchy: mergedHierarchy, excludedQuestionIds, selections, expandedTopicTitles });
   } catch (err) {
     console.error('[PsirController] [previewPsirData] Error parsing preview data:', err);
     res.status(500).json({ error: 'Failed to parse and group PSIR questions.', details: err.message });
@@ -215,7 +215,7 @@ export const previewPsirData = async (req, res) => {
 // Upserts the saved customization layout (topic order/renames, question order, included/
 // excluded questions, topper selections, topper detail overrides) for a single PSIR paper.
 export const saveBookLayout = async (req, res) => {
-  const { paper, topicOrder, topicRenames, questionOrder, excludedQuestionIds, selections, topperOverrides } = req.body;
+  const { paper, topicOrder, topicRenames, questionOrder, excludedQuestionIds, selections, topperOverrides, expandedTopics } = req.body;
   console.log(`[PsirController] [saveBookLayout] Saving layout for paper '${paper}'...`);
   try {
     if (!paper) {
@@ -223,7 +223,7 @@ export const saveBookLayout = async (req, res) => {
     }
     const doc = await BookLayout.findOneAndUpdate(
       { subject: 'psir', paper },
-      { $set: { topicOrder, topicRenames, questionOrder, excludedQuestionIds, selections, topperOverrides } },
+      { $set: { topicOrder, topicRenames, questionOrder, excludedQuestionIds, selections, topperOverrides, expandedTopics } },
       { upsert: true, new: true }
     );
     console.log(`[PsirController] [saveBookLayout] Layout saved for paper '${paper}'.`);
