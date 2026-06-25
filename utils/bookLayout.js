@@ -64,8 +64,11 @@ export function deriveIncludedAndSelections(hierarchy, layoutsByPaper) {
       if (expandedKeySet.has(topic._key)) expandedTopicTitles.push(topic.title);
       topic.questions.forEach((q) => {
         if (excludedSet.has(q._id)) excludedQuestionIds.push(q._id);
+        // A saved selection of [] means the user deliberately deselected every topper for
+        // this question — that must be respected, not treated as "no saved selection".
+        // Only fall back to the default (first topper) when nothing was ever saved at all.
         const saved = savedSelections[q._id];
-        selections[q._id] = saved && saved.length ? saved : (q.file_urls?.length > 0 ? [q.file_urls[0].url] : []);
+        selections[q._id] = saved !== undefined ? saved : (q.file_urls?.length > 0 ? [q.file_urls[0].url] : []);
       });
     });
   });
