@@ -6,8 +6,10 @@ import mongoose from 'mongoose';
 import { UPSCQA } from '../models/UPSCQA.js';
 import { Subject } from '../models/Subject.js';
 import { SubjectBook } from '../models/SubjectBook.js';
+import { BookLayout } from '../models/BookLayout.js';
 import { classifyQuestionsForSubject } from '../services/geminiService.js';
 import { parseCSV, escapeCSV } from '../utils/csv.js';
+import { applyBookLayout, deriveIncludedAndSelections } from '../utils/bookLayout.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -101,6 +103,7 @@ function buildHierarchyFromRows(rows) {
   const result = Object.values(hierarchy).map(paperObj => {
     const topicsArray = Object.values(paperObj.topics).map(topObj => ({
       title: topObj.title,
+      _key: topObj.title,
       questions: Object.values(topObj.questions)
     }));
     topicsArray.sort((a, b) => a.title.localeCompare(b.title));
@@ -289,11 +292,41 @@ export const previewSubjectBookData = async (req, res) => {
     console.log(`[SubjectController] [previewSubjectBookData] Parsed ${rows.length} CSV row(s).`);
     const hierarchy = buildHierarchyFromRows(rows);
 
-    console.log(`[SubjectController] [previewSubjectBookData] Preview hierarchy generated successfully for '${slug}'.`);
-    res.json(hierarchy);
+    console.log(`[SubjectController] [previewSubjectBookData] Applying any saved book layout customizations for '${slug}'...`);
+    const layoutDocs = await BookLayout.find({ subject: slug }).lean();
+    const layoutsByPaper = Object.fromEntries(layoutDocs.map(l => [l.paper, l]));
+    const mergedHierarchy = applyBookLayout(hierarchy, layoutsByPaper);
+    const { excludedQuestionIds, selections } = deriveIncludedAndSelections(mergedHierarchy, layoutsByPaper);
+
+    console.log(`[SubjectController] [previewSubjectBookData] Preview hierarchy generated successfully for '${slug}'. ${layoutDocs.length} saved layout(s) applied.`);
+    res.json({ hierarchy: mergedHierarchy, excludedQuestionIds, selections });
   } catch (err) {
     console.error('[SubjectController] [previewSubjectBookData] Error:', err);
     res.status(500).json({ error: 'Failed to parse and group subject questions.', details: err.message });
+  }
+};
+
+// Upserts the saved customization layout (topic order/renames, question order, included/
+// excluded questions, topper selections, topper detail overrides) for a single paper of a
+// single subject. Mirrors psirController.js's saveBookLayout, keyed by the subject's slug.
+export const saveSubjectBookLayout = async (req, res) => {
+  const { slug } = req.params;
+  const { paper, topicOrder, topicRenames, questionOrder, excludedQuestionIds, selections, topperOverrides } = req.body;
+  console.log(`[SubjectController] [saveSubjectBookLayout] Saving layout for subject '${slug}', paper '${paper}'...`);
+  try {
+    if (!paper) {
+      return res.status(400).json({ error: 'Paper name is required to save a layout.' });
+    }
+    const doc = await BookLayout.findOneAndUpdate(
+      { subject: slug, paper },
+      { $set: { topicOrder, topicRenames, questionOrder, excludedQuestionIds, selections, topperOverrides } },
+      { upsert: true, new: true }
+    );
+    console.log(`[SubjectController] [saveSubjectBookLayout] Layout saved for subject '${slug}', paper '${paper}'.`);
+    res.json({ message: 'Layout saved.', paper: doc.paper });
+  } catch (err) {
+    console.error('[SubjectController] [saveSubjectBookLayout] Error:', err);
+    res.status(500).json({ error: 'Failed to save book layout.', details: err.message });
   }
 };
 

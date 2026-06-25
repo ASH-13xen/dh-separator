@@ -1,10 +1,13 @@
 import express from 'express';
-import { previewPsirData, generatePsirPdf, getPsirBookStatus, downloadPsirBook, cleanupPsirStorage, previewTopperFile } from '../controllers/psirController.js';
+import { previewPsirData, generatePsirPdf, getPsirBookStatus, downloadPsirBook, cleanupPsirStorage, previewTopperFile, saveBookLayout } from '../controllers/psirController.js';
 
 const router = express.Router();
 
 // GET /api/psir/preview
 router.get('/preview', previewPsirData);
+
+// POST /api/psir/layout
+router.post('/layout', saveBookLayout);
 
 // POST /api/psir/generate
 router.post('/generate', generatePsirPdf);

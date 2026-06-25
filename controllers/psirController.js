@@ -5,6 +5,8 @@ import { PDFDocument, rgb, StandardFonts } from 'pdf-lib';
 import { GridFSBucket } from 'mongodb';
 import mongoose from 'mongoose';
 import { PsirBook } from '../models/PsirBook.js';
+import { BookLayout } from '../models/BookLayout.js';
+import { applyBookLayout, deriveIncludedAndSelections } from '../utils/bookLayout.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -175,6 +177,7 @@ export const previewPsirData = async (req, res) => {
         const questionsArray = Object.values(topObj.questions);
         return {
           title: topObj.title,
+          _key: topObj.title,
           questions: questionsArray
         };
       });
@@ -195,11 +198,39 @@ export const previewPsirData = async (req, res) => {
       return orderA - orderB;
     });
     
-    console.log('[PsirController] [previewPsirData] Preview hierarchy generated successfully.');
-    res.json(result);
+    console.log('[PsirController] [previewPsirData] Applying any saved book layout customizations...');
+    const layoutDocs = await BookLayout.find({ subject: 'psir' }).lean();
+    const layoutsByPaper = Object.fromEntries(layoutDocs.map(l => [l.paper, l]));
+    const mergedHierarchy = applyBookLayout(result, layoutsByPaper);
+    const { excludedQuestionIds, selections } = deriveIncludedAndSelections(mergedHierarchy, layoutsByPaper);
+
+    console.log(`[PsirController] [previewPsirData] Preview hierarchy generated successfully. ${layoutDocs.length} saved layout(s) applied.`);
+    res.json({ hierarchy: mergedHierarchy, excludedQuestionIds, selections });
   } catch (err) {
     console.error('[PsirController] [previewPsirData] Error parsing preview data:', err);
     res.status(500).json({ error: 'Failed to parse and group PSIR questions.', details: err.message });
+  }
+};
+
+// Upserts the saved customization layout (topic order/renames, question order, included/
+// excluded questions, topper selections, topper detail overrides) for a single PSIR paper.
+export const saveBookLayout = async (req, res) => {
+  const { paper, topicOrder, topicRenames, questionOrder, excludedQuestionIds, selections, topperOverrides } = req.body;
+  console.log(`[PsirController] [saveBookLayout] Saving layout for paper '${paper}'...`);
+  try {
+    if (!paper) {
+      return res.status(400).json({ error: 'Paper name is required to save a layout.' });
+    }
+    const doc = await BookLayout.findOneAndUpdate(
+      { subject: 'psir', paper },
+      { $set: { topicOrder, topicRenames, questionOrder, excludedQuestionIds, selections, topperOverrides } },
+      { upsert: true, new: true }
+    );
+    console.log(`[PsirController] [saveBookLayout] Layout saved for paper '${paper}'.`);
+    res.json({ message: 'Layout saved.', paper: doc.paper });
+  } catch (err) {
+    console.error('[PsirController] [saveBookLayout] Error:', err);
+    res.status(500).json({ error: 'Failed to save book layout.', details: err.message });
   }
 };
 

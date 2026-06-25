@@ -9,7 +9,8 @@ import {
   getSubjectBookStatus,
   downloadSubjectBook,
   cleanupSubjectBookStorage,
-  previewSubjectTopperFile
+  previewSubjectTopperFile,
+  saveSubjectBookLayout
 } from '../controllers/subjectController.js';
 
 const router = express.Router();
@@ -22,6 +23,7 @@ router.post('/:slug/activate', activateSubject);
 
 // Generic book-compilation pipeline (parameterized clone of /api/psir)
 router.get('/:slug/preview', previewSubjectBookData);
+router.post('/:slug/layout', saveSubjectBookLayout);
 router.post('/:slug/generate', generateSubjectBookPdf);
 router.get('/:slug/status/:id', getSubjectBookStatus);
 router.get('/:slug/download/:id', downloadSubjectBook);
