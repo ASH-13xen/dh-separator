@@ -574,6 +574,12 @@ async function main() {
         sPage.drawText("SECTION", {
             x: 50, y: th - 150, size: 24, font: fontNormal, color: rgb(0.7, 0.8, 0.95)
         });
+        sPage.drawLine({
+            start: { x: 50, y: th - 158 },
+            end: { x: 50 + fontNormal.widthOfTextAtSize("SECTION", 24), y: th - 158 },
+            thickness: 1.5,
+            color: rgb(0.7, 0.8, 0.95)
+        });
 
         let sY = th - 200;
         const sWords = sanitizeForPdf(`${paper}: ${secNode.section}`).toUpperCase().split(' ');
@@ -608,6 +614,12 @@ async function main() {
             tPage.drawText("TOPIC", {
                 x: 50, y: th - 150, size: 24, font: fontNormal, color: rgb(0.8, 0.85, 0.95)
             });
+            tPage.drawLine({
+                start: { x: 50, y: th - 158 },
+                end: { x: 50 + fontNormal.widthOfTextAtSize("TOPIC", 24), y: th - 158 },
+                thickness: 1.5,
+                color: rgb(0.8, 0.85, 0.95)
+            });
 
             let tY = th - 200;
             const tWords = sanitizeForPdf(topNode.title).toUpperCase().split(' ');
@@ -639,26 +651,33 @@ async function main() {
                     // Subsection Divider Page — same family as the Topic Divider above, but
                     // visually one level down (lighter background, smaller category label).
                     const dPage = pdfDoc.addPage();
+                    const dBlue = rgb(0.07, 0.18, 0.62);
                     dPage.drawRectangle({
-                        x: 0, y: 0, width: tw, height: th, color: rgb(0.30, 0.34, 0.48)
+                        x: 0, y: 0, width: tw, height: th, color: rgb(1, 1, 1)
                     });
                     dPage.drawText("SUBSECTION", {
-                        x: 50, y: th - 140, size: 14, font: fontNormal, color: rgb(0.82, 0.86, 0.95)
+                        x: 50, y: th - 140, size: 16, font: fontBold, color: dBlue
                     });
-                    let dY = th - 185;
+                    dPage.drawLine({
+                        start: { x: 50, y: th - 148 },
+                        end: { x: 50 + fontBold.widthOfTextAtSize("SUBSECTION", 16), y: th - 148 },
+                        thickness: 1.5,
+                        color: dBlue
+                    });
+                    let dY = th - 190;
                     const dWords = sanitizeForPdf(item.subtitle).toUpperCase().split(' ');
                     let dLine = '';
                     for (const word of dWords) {
                         const testLine = dLine + word + ' ';
-                        if (fontBold.widthOfTextAtSize(testLine, 18) > tw - 100) {
-                            dPage.drawText(sanitizeForPdf(dLine), { x: 50, y: dY, size: 18, font: fontBold, color: rgb(1, 1, 1) });
+                        if (fontBold.widthOfTextAtSize(testLine, 20) > tw - 100) {
+                            dPage.drawText(sanitizeForPdf(dLine), { x: 50, y: dY, size: 20, font: fontBold, color: dBlue });
                             dLine = word + ' ';
-                            dY -= 24;
+                            dY -= 26;
                         } else {
                             dLine = testLine;
                         }
                     }
-                    dPage.drawText(sanitizeForPdf(dLine), { x: 50, y: dY, size: 18, font: fontBold, color: rgb(1, 1, 1) });
+                    dPage.drawText(sanitizeForPdf(dLine), { x: 50, y: dY, size: 20, font: fontBold, color: dBlue });
                     continue;
                 }
 
