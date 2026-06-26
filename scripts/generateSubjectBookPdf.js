@@ -607,12 +607,12 @@ async function main() {
                     dPage.drawRectangle({
                         x: 0, y: 0, width: tw, height: th, color: rgb(1, 1, 1)
                     });
-                    dPage.drawText("SUBSECTION", {
+                    dPage.drawText("SUBTOPIC", {
                         x: 50, y: th - 140, size: 16, font: fontBold, color: dBlue
                     });
                     dPage.drawLine({
                         start: { x: 50, y: th - 148 },
-                        end: { x: 50 + fontBold.widthOfTextAtSize("SUBSECTION", 16), y: th - 148 },
+                        end: { x: 50 + fontBold.widthOfTextAtSize("SUBTOPIC", 16), y: th - 148 },
                         thickness: 1.5,
                         color: dBlue
                     });
