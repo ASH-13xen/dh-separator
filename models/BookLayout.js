@@ -18,6 +18,10 @@ const BookLayoutSchema = new mongoose.Schema({
   selections: { type: mongoose.Schema.Types.Mixed, default: {} },
   topperOverrides: { type: mongoose.Schema.Types.Mixed, default: {} },
   questionTextOverrides: { type: mongoose.Schema.Types.Mixed, default: {} },
+  // User-inserted divider/subsection pages: { [titlePageId]: { subtitle, topicKey } }.
+  // titlePageId values also appear interspersed inside questionOrder[topicKey] arrays,
+  // which is what encodes their position — this map only holds their own content.
+  titlePages: { type: mongoose.Schema.Types.Mixed, default: {} },
 }, { timestamps: true });
 
 BookLayoutSchema.index({ subject: 1, paper: 1 }, { unique: true });

@@ -54,6 +54,14 @@ export function parseCSV(text) {
   return lines;
 }
 
+// Strips a trailing ".0" (or ".00", etc.) from a year value, e.g. "2023.0" -> "2023".
+// Spreadsheet exports often store year columns as floats; this is purely a display-time
+// fix and never mutates anything in storage.
+export function cleanYear(str) {
+  if (!str) return str;
+  return String(str).replace(/\.0+$/, '');
+}
+
 // Escapes a single value for safe inclusion in a CSV file.
 export function escapeCSV(val) {
   if (val === undefined || val === null) return '';

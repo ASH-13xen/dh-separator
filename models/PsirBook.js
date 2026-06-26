@@ -30,6 +30,10 @@ const psirBookSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.Mixed,
     default: {}
   },
+  titlePages: {
+    type: mongoose.Schema.Types.Mixed,
+    default: {}
+  },
   pdfFileId: {
     type: String
   },

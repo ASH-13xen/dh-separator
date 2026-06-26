@@ -278,10 +278,11 @@ async function main() {
   const topicRenames = job.topicRenames || {};
   const topperOverrides = job.topperOverrides || {};
   const questionTextOverrides = job.questionTextOverrides || {};
+  const titlePages = job.titlePages || {};
   console.log(`[Runner] Extracted inputs from database record:`);
   console.log(`  - Selections Count: ${Object.keys(selections).length}`);
   console.log(`  - Included Questions Count: ${includedQuestionIds.length}`);
-  console.log(`  - Topic Renames: ${Object.keys(topicRenames).length}, Topper Overrides: ${Object.keys(topperOverrides).length}, Question Text Overrides: ${Object.keys(questionTextOverrides).length}`);
+  console.log(`  - Topic Renames: ${Object.keys(topicRenames).length}, Topper Overrides: ${Object.keys(topperOverrides).length}, Question Text Overrides: ${Object.keys(questionTextOverrides).length}, Title Pages: ${Object.keys(titlePages).length}`);
 
   try {
     console.log('[Runner] Updating job status in DB to "processing"...');
@@ -302,7 +303,11 @@ async function main() {
     // Grouping mapping from ID to question details
     console.log(`[Runner] Filtering and grouping questions for paper '${paper}'...`);
     const questionsMap = {};
-    
+    // All rows for a given paper share the same section name in this CSV — capture it
+    // once here instead of reading it off orderedQuestions[0], which would break if a
+    // user-inserted title page (which has no real CSV section) ends up first.
+    let csvSectionForPaper = null;
+
     rows.forEach(r => {
       if (r.length < 10) return;
       const section = r[0].trim();
@@ -314,9 +319,10 @@ async function main() {
       const topperMarks = r[6].trim();
       const url = r[7].trim();
       const rowPaper = r[9].trim();
-      
+
       if (!questionText || rowPaper !== paper) return;
-      
+      if (!csvSectionForPaper) csvSectionForPaper = section;
+
       const qKey = `${paper}||${section}||${topic}||${questionText}`;
       const qId = Buffer.from(qKey).toString('base64');
       
@@ -336,7 +342,7 @@ async function main() {
         questionsMap[qId].file_urls.push({
           url: url,
           topper_name: topperOverride.topper_name || topperName || 'Unknown Topper',
-          topper_year: topperOverride.topper_year || topperYear || '',
+          topper_year: cleanYear(topperOverride.topper_year || topperYear) || '',
           topper_rank: topperOverride.topper_rank || topperRank || '',
           topper_marks: topperOverride.topper_marks || topperMarks || ''
         });
@@ -352,6 +358,16 @@ async function main() {
       includedQuestionIds.forEach(id => {
         if (questionsMap[id]) {
           orderedQuestions.push(questionsMap[id]);
+        } else if (titlePages[id]) {
+          orderedQuestions.push({
+            _id: id,
+            isTitlePage: true,
+            subtitle: titlePages[id].subtitle,
+            paper,
+            section: csvSectionForPaper,
+            topic: titlePages[id].topicKey,
+            file_urls: []
+          });
         }
       });
     } else {
@@ -366,7 +382,7 @@ async function main() {
 
     // Structure selected questions hierarchically for PDF generation
     const docData = [];
-    const sectionName = orderedQuestions[0].section;
+    const sectionName = csvSectionForPaper || orderedQuestions[0].section;
     console.log(`[Runner] Formatting section structure. Section Name: '${sectionName}'`);
 
     const topicMap = {};
@@ -563,6 +579,41 @@ async function main() {
             // Questions
             for (let qIdx = 0; qIdx < topNode.questions.length; qIdx++) {
                 const item = topNode.questions[qIdx];
+
+                if (item.isTitlePage) {
+                    console.log(`    * Subsection divider ${qIdx + 1}/${topNode.questions.length}: "${item.subtitle}"`);
+                    indexData.push({
+                        type: 'topic',
+                        text: item.subtitle,
+                        targetPageInternal: pdfDoc.getPageCount()
+                    });
+
+                    // Subsection Divider Page — same family as the Topic Divider above, but
+                    // visually one level down (lighter background, smaller category label).
+                    const dPage = pdfDoc.addPage();
+                    dPage.drawRectangle({
+                        x: 0, y: 0, width: tw, height: th, color: rgb(0.30, 0.34, 0.48)
+                    });
+                    dPage.drawText("SUBSECTION", {
+                        x: 50, y: th - 140, size: 14, font: fontNormal, color: rgb(0.82, 0.86, 0.95)
+                    });
+                    let dY = th - 185;
+                    const dWords = sanitizeForPdf(item.subtitle).toUpperCase().split(' ');
+                    let dLine = '';
+                    for (const word of dWords) {
+                        const testLine = dLine + word + ' ';
+                        if (fontBold.widthOfTextAtSize(testLine, 18) > tw - 100) {
+                            dPage.drawText(sanitizeForPdf(dLine), { x: 50, y: dY, size: 18, font: fontBold, color: rgb(1, 1, 1) });
+                            dLine = word + ' ';
+                            dY -= 24;
+                        } else {
+                            dLine = testLine;
+                        }
+                    }
+                    dPage.drawText(sanitizeForPdf(dLine), { x: 50, y: dY, size: 18, font: fontBold, color: rgb(1, 1, 1) });
+                    continue;
+                }
+
                 console.log(`    * Question ${qIdx + 1}/${topNode.questions.length}: ID='${item._id}'`);
                 
                 let activeFileObjects = [];
@@ -924,29 +975,6 @@ async function main() {
         topperSummaryTableRows.length > 0 ? topperSummaryTableRows : [['-', 'No toppers selected for this book', '-', '-', '-', '-']]
     );
 
-    const QUESTION_SUMMARY_MAX_LEN = 110;
-    const questionSummaryTableRows = summaryRows.map((row, idx) => {
-        let qText = row.questionText;
-        if (qText.length > QUESTION_SUMMARY_MAX_LEN) qText = qText.substring(0, QUESTION_SUMMARY_MAX_LEN - 3) + '...';
-        return [
-            String(idx + 1),
-            row.topic,
-            qText,
-            row.toppers.length > 0 ? row.toppers.map(t => t.name).join(', ') : 'No topper selected'
-        ];
-    });
-
-    drawPaginatedTable(
-        summaryPdfDoc, fontBold, fontNormal, tw, th,
-        'QUESTION-WISE TOPPER SUMMARY',
-        [
-            { header: '#', width: (tw - 100) * 0.05 },
-            { header: 'Topic', width: (tw - 100) * 0.16 },
-            { header: 'Question', width: (tw - 100) * 0.44 },
-            { header: 'Topper(s)', width: (tw - 100) * 0.35, align: 'right' }
-        ],
-        questionSummaryTableRows
-    );
     console.log(`[Runner] Summary tables generated: ${summaryPdfDoc.getPageCount()} pages.`);
 
     console.log(`[Runner] Injecting ${indexPdfDoc.getPageCount()} Table of Contents pages into Master PDF...`);

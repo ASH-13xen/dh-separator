@@ -7,6 +7,7 @@ import mongoose from 'mongoose';
 import { PsirBook } from '../models/PsirBook.js';
 import { BookLayout } from '../models/BookLayout.js';
 import { applyBookLayout, deriveIncludedAndSelections } from '../utils/bookLayout.js';
+import { cleanYear } from '../utils/csv.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -126,7 +127,7 @@ export const previewPsirData = async (req, res) => {
       const topic = r[1].trim();
       const questionText = r[2].trim();
       const topperName = r[3].trim();
-      const topperYear = r[4].trim();
+      const topperYear = cleanYear(r[4].trim());
       const topperRank = r[5].trim();
       const topperMarks = r[6].trim();
       const url = r[7].trim();
@@ -215,7 +216,7 @@ export const previewPsirData = async (req, res) => {
 // Upserts the saved customization layout (topic order/renames, question order, included/
 // excluded questions, topper selections, topper detail overrides) for a single PSIR paper.
 export const saveBookLayout = async (req, res) => {
-  const { paper, topicOrder, topicRenames, questionOrder, excludedQuestionIds, selections, topperOverrides, expandedTopics, questionTextOverrides } = req.body;
+  const { paper, topicOrder, topicRenames, questionOrder, excludedQuestionIds, selections, topperOverrides, expandedTopics, questionTextOverrides, titlePages } = req.body;
   console.log(`[PsirController] [saveBookLayout] Saving layout for paper '${paper}'...`);
   try {
     if (!paper) {
@@ -223,7 +224,7 @@ export const saveBookLayout = async (req, res) => {
     }
     const doc = await BookLayout.findOneAndUpdate(
       { subject: 'psir', paper },
-      { $set: { topicOrder, topicRenames, questionOrder, excludedQuestionIds, selections, topperOverrides, expandedTopics, questionTextOverrides } },
+      { $set: { topicOrder, topicRenames, questionOrder, excludedQuestionIds, selections, topperOverrides, expandedTopics, questionTextOverrides, titlePages } },
       { upsert: true, new: true }
     );
     console.log(`[PsirController] [saveBookLayout] Layout saved for paper '${paper}'.`);
@@ -260,7 +261,8 @@ export const generatePsirPdf = async (req, res) => {
       includedQuestionIds,
       topicRenames: layout?.topicRenames || {},
       topperOverrides: layout?.topperOverrides || {},
-      questionTextOverrides: layout?.questionTextOverrides || {}
+      questionTextOverrides: layout?.questionTextOverrides || {},
+      titlePages: layout?.titlePages || {}
     });
     console.log(`[PsirController] [generatePsirPdf] Database record created successfully. Job ID: ${job._id}`);
 

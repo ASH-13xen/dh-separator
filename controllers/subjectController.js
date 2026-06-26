@@ -8,7 +8,7 @@ import { Subject } from '../models/Subject.js';
 import { SubjectBook } from '../models/SubjectBook.js';
 import { BookLayout } from '../models/BookLayout.js';
 import { classifyQuestionsForSubject } from '../services/geminiService.js';
-import { parseCSV, escapeCSV } from '../utils/csv.js';
+import { parseCSV, escapeCSV, cleanYear } from '../utils/csv.js';
 import { applyBookLayout, deriveIncludedAndSelections } from '../utils/bookLayout.js';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -62,7 +62,7 @@ function buildHierarchyFromRows(rows) {
     const topic = r[1].trim();
     const questionText = r[2].trim();
     const topperName = r[3].trim();
-    const topperYear = r[4].trim();
+    const topperYear = cleanYear(r[4].trim());
     const topperRank = r[5].trim();
     const topperMarks = r[6].trim();
     const url = r[7].trim();
@@ -201,7 +201,7 @@ export const classifySubject = async (req, res) => {
         q.file_urls.forEach(f => {
           rows.push([
             classification.section, classification.topic, q.question_text,
-            f.topper_name || 'Unknown Topper', f.topper_year || '', f.topper_rank || '',
+            f.topper_name || 'Unknown Topper', cleanYear(f.topper_year) || '', f.topper_rank || '',
             f.topper_marks || '', f.url || '', allTags, classification.paper
           ]);
         });
@@ -311,7 +311,7 @@ export const previewSubjectBookData = async (req, res) => {
 // single subject. Mirrors psirController.js's saveBookLayout, keyed by the subject's slug.
 export const saveSubjectBookLayout = async (req, res) => {
   const { slug } = req.params;
-  const { paper, topicOrder, topicRenames, questionOrder, excludedQuestionIds, selections, topperOverrides, expandedTopics, questionTextOverrides } = req.body;
+  const { paper, topicOrder, topicRenames, questionOrder, excludedQuestionIds, selections, topperOverrides, expandedTopics, questionTextOverrides, titlePages } = req.body;
   console.log(`[SubjectController] [saveSubjectBookLayout] Saving layout for subject '${slug}', paper '${paper}'...`);
   try {
     if (!paper) {
@@ -319,7 +319,7 @@ export const saveSubjectBookLayout = async (req, res) => {
     }
     const doc = await BookLayout.findOneAndUpdate(
       { subject: slug, paper },
-      { $set: { topicOrder, topicRenames, questionOrder, excludedQuestionIds, selections, topperOverrides, expandedTopics, questionTextOverrides } },
+      { $set: { topicOrder, topicRenames, questionOrder, excludedQuestionIds, selections, topperOverrides, expandedTopics, questionTextOverrides, titlePages } },
       { upsert: true, new: true }
     );
     console.log(`[SubjectController] [saveSubjectBookLayout] Layout saved for subject '${slug}', paper '${paper}'.`);
@@ -361,7 +361,8 @@ export const generateSubjectBookPdf = async (req, res) => {
       includedQuestionIds,
       topicRenames: layout?.topicRenames || {},
       topperOverrides: layout?.topperOverrides || {},
-      questionTextOverrides: layout?.questionTextOverrides || {}
+      questionTextOverrides: layout?.questionTextOverrides || {},
+      titlePages: layout?.titlePages || {}
     });
     console.log(`[SubjectController] [generateSubjectBookPdf] Job record created. Job ID: ${job._id}`);
 
