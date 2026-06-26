@@ -352,12 +352,16 @@ export const generateSubjectBookPdf = async (req, res) => {
     }
 
     console.log('[SubjectController] [generateSubjectBookPdf] Step 1: Creating SubjectBook job tracking record...');
+    const layout = await BookLayout.findOne({ subject: slug, paper }).lean();
     const job = await SubjectBook.create({
       subject: slug,
       paper,
       status: 'pending',
       selections,
-      includedQuestionIds
+      includedQuestionIds,
+      topicRenames: layout?.topicRenames || {},
+      topperOverrides: layout?.topperOverrides || {},
+      questionTextOverrides: layout?.questionTextOverrides || {}
     });
     console.log(`[SubjectController] [generateSubjectBookPdf] Job record created. Job ID: ${job._id}`);
 

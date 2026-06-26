@@ -275,9 +275,13 @@ async function main() {
   // Retrieve selections and included question IDs directly from the database record
   const selections = job.selections || {};
   const includedQuestionIds = job.includedQuestionIds || [];
+  const topicRenames = job.topicRenames || {};
+  const topperOverrides = job.topperOverrides || {};
+  const questionTextOverrides = job.questionTextOverrides || {};
   console.log(`[Runner] Extracted inputs from database record:`);
   console.log(`  - Selections Count: ${Object.keys(selections).length}`);
   console.log(`  - Included Questions Count: ${includedQuestionIds.length}`);
+  console.log(`  - Topic Renames: ${Object.keys(topicRenames).length}, Topper Overrides: ${Object.keys(topperOverrides).length}, Question Text Overrides: ${Object.keys(questionTextOverrides).length}`);
 
   try {
     console.log('[Runner] Updating job status in DB to "processing"...');
@@ -319,21 +323,22 @@ async function main() {
       if (!questionsMap[qId]) {
         questionsMap[qId] = {
           _id: qId,
-          question_text: questionText,
+          question_text: questionTextOverrides[qId] || questionText,
           paper: rowPaper,
           section: section,
           topic: topic,
           file_urls: []
         };
       }
-      
+
       if (url) {
+        const topperOverride = topperOverrides[url] || {};
         questionsMap[qId].file_urls.push({
           url: url,
-          topper_name: topperName || 'Unknown Topper',
-          topper_year: topperYear || '',
-          topper_rank: topperRank || '',
-          topper_marks: topperMarks || ''
+          topper_name: topperOverride.topper_name || topperName || 'Unknown Topper',
+          topper_year: topperOverride.topper_year || topperYear || '',
+          topper_rank: topperOverride.topper_rank || topperRank || '',
+          topper_marks: topperOverride.topper_marks || topperMarks || ''
         });
       }
     });
@@ -372,14 +377,18 @@ async function main() {
       topicMap[q.topic].push(q);
     });
 
+    // Grouping key stays the raw CSV topic so grouping itself never shifts under a rename;
+    // the rename is applied only to the displayed title. No re-sort here on purpose —
+    // topicMap was populated by iterating the already-correctly-ordered orderedQuestions,
+    // so Object.keys(topicMap) is already in the user's customized topic order. Sorting it
+    // (as this used to do) silently discarded any topic reordering done in the editor.
     const topicsArray = Object.keys(topicMap).map(topicTitle => {
       return {
-        title: topicTitle,
+        title: topicRenames[topicTitle] || topicTitle,
         questions: topicMap[topicTitle]
       };
     });
-    topicsArray.sort((a, b) => a.title.localeCompare(b.title));
-    console.log(`[Runner] Grouped into ${topicsArray.length} sorted topics.`);
+    console.log(`[Runner] Grouped into ${topicsArray.length} topics (user's saved order/renames preserved).`);
 
     docData.push({
       section: sectionName,

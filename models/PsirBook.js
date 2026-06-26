@@ -18,6 +18,18 @@ const psirBookSchema = new mongoose.Schema({
     type: [String],
     default: []
   },
+  topicRenames: {
+    type: mongoose.Schema.Types.Mixed,
+    default: {}
+  },
+  topperOverrides: {
+    type: mongoose.Schema.Types.Mixed,
+    default: {}
+  },
+  questionTextOverrides: {
+    type: mongoose.Schema.Types.Mixed,
+    default: {}
+  },
   pdfFileId: {
     type: String
   },

@@ -252,11 +252,15 @@ export const generatePsirPdf = async (req, res) => {
 
     // 1. Create a new PsirBook job record in database with large inputs included
     console.log('[PsirController] [generatePsirPdf] Step 1: Creating database compilation job tracking record...');
+    const layout = await BookLayout.findOne({ subject: 'psir', paper }).lean();
     const job = await PsirBook.create({
       paper,
       status: 'pending',
       selections,
-      includedQuestionIds
+      includedQuestionIds,
+      topicRenames: layout?.topicRenames || {},
+      topperOverrides: layout?.topperOverrides || {},
+      questionTextOverrides: layout?.questionTextOverrides || {}
     });
     console.log(`[PsirController] [generatePsirPdf] Database record created successfully. Job ID: ${job._id}`);
 
