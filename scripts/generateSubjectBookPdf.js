@@ -4,7 +4,7 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import { execFile } from 'child_process';
 import { promisify } from 'util';
-import { PDFDocument, rgb, StandardFonts } from 'pdf-lib';
+import { PDFDocument, rgb, StandardFonts, PDFString } from 'pdf-lib';
 import { GridFSBucket } from 'mongodb';
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
@@ -74,6 +74,25 @@ function sanitizeForPdf(str) {
 function cleanYear(str) {
   if (!str) return str;
   return str.replace(/\.0+$/, '');
+}
+
+// Attaches a clickable URI link annotation over a region of a page (pdf-lib has no
+// high-level drawLink helper, so this registers a low-level Link annotation dict).
+function addLinkAnnotation(doc, page, { x, y, width, height, url }) {
+  const linkAnnotRef = doc.context.register(
+    doc.context.obj({
+      Type: 'Annot',
+      Subtype: 'Link',
+      Rect: [x, y, x + width, y + height],
+      Border: [0, 0, 0],
+      A: {
+        Type: 'Action',
+        S: 'URI',
+        URI: PDFString.of(url)
+      }
+    })
+  );
+  page.node.addAnnot(linkAnnotRef);
 }
 
 // Draws a paginated table (with text-wrapped cells) onto a PDFDocument, adding pages as needed.
@@ -642,16 +661,27 @@ async function main() {
                     }
                     dPage.drawText(sanitizeForPdf(dLine), { x: 50, y: dY, size: 26, font: fontBold, color: dBlue });
 
-                    // Footer — website/telegram contact info.
+                    // Footer — website/telegram contact info (clickable links).
                     const footerSize = 10;
                     const footerY = 40;
-                    dPage.drawText("Website: dashboard.thedarkhorseupsc.com", {
+                    const websiteText = "Website: www.darkhorseupsc.com";
+                    const websiteWidth = fontNormal.widthOfTextAtSize(websiteText, footerSize);
+                    dPage.drawText(websiteText, {
                         x: 50, y: footerY, size: footerSize, font: fontNormal, color: rgb(0.4, 0.4, 0.4)
                     });
-                    const telegramText = "Telegram: @TDHAdmin";
+                    addLinkAnnotation(pdfDoc, dPage, {
+                        x: 50, y: footerY - 2, width: websiteWidth, height: footerSize + 4,
+                        url: 'https://www.darkhorseupsc.com'
+                    });
+
+                    const telegramText = "Telegram: https://t.me/darkhorsecse";
                     const telegramWidth = fontNormal.widthOfTextAtSize(telegramText, footerSize);
                     dPage.drawText(telegramText, {
                         x: tw - 50 - telegramWidth, y: footerY, size: footerSize, font: fontNormal, color: rgb(0.4, 0.4, 0.4)
+                    });
+                    addLinkAnnotation(pdfDoc, dPage, {
+                        x: tw - 50 - telegramWidth, y: footerY - 2, width: telegramWidth, height: footerSize + 4,
+                        url: 'https://t.me/darkhorsecse'
                     });
 
                     continue;
