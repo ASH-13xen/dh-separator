@@ -710,7 +710,7 @@ async function main() {
                     dPage.drawText(sanitizeForPdf(dLine), { x: 50, y: dY, size: 26, font: fontBold, color: dBlue });
 
                     // Footer — website/telegram contact info (clickable links).
-                    const footerSize = 10;
+                    const footerSize = 13;
                     const footerY = 40;
                     const websiteText = "Website: www.darkhorseupsc.com";
                     const websiteWidth = fontNormal.widthOfTextAtSize(websiteText, footerSize);
