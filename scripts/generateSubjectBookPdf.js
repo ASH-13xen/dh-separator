@@ -709,12 +709,6 @@ async function main() {
                     }))
                 });
 
-                indexData.push({
-                    type: 'question',
-                    text: cleanText,
-                    targetPageInternal: pdfDoc.getPageCount()
-                });
-
                 if (activeFileObjects.length > 0) {
                     console.log(`      Found ${activeFileObjects.length} active topper sheets for this question.`);
                     for (const activeFileObj of activeFileObjects) {
@@ -957,13 +951,13 @@ async function main() {
     const tableW = idxPage.getSize().width - 100;
     const rowH = 30;
 
-    // Strict 4-level hierarchy: Section > Topic > Subtopic > Question (bullet).
+    // Hierarchy: Section (plain heading) > Topic (numbered) > Subtopic (indented bullet).
     const tierConfig = {
-        section:  { indent: 10, fontSize: 11, font: fontBold,   maxLen: 55, prefix: '',   box: 'filled'   },
-        topic:    { indent: 30, fontSize: 10, font: fontBold,   maxLen: 58, prefix: '',   box: 'bordered' },
-        subtopic: { indent: 50, fontSize: 9,  font: fontNormal, maxLen: 60, prefix: '',   box: 'none'     },
-        question: { indent: 70, fontSize: 8,  font: fontNormal, maxLen: 58, prefix: '• ', box: 'none' }
+        section:  { indent: 10, fontSize: 11, font: fontBold,   maxLen: 55 },
+        topic:    { indent: 25, fontSize: 10, font: fontBold,   maxLen: 58 },
+        subtopic: { indent: 45, fontSize: 9,  font: fontNormal, maxLen: 60 }
     };
+    let topicCounter = 0;
 
     idxPage.drawRectangle({ x: tableX, y: idxY, width: tableW, height: rowH, color: rgb(0.9, 0.9, 0.95) });
     idxPage.drawText(`Module Layout`, { x: tableX + 15, y: idxY + 10, size: 11, font: fontBold });
@@ -982,15 +976,18 @@ async function main() {
              idxY -= rowH;
         }
 
-        const tier = tierConfig[row.type] || tierConfig.topic;
+        if (row.type === 'section') topicCounter = 0;
 
-        if (tier.box === 'filled') {
-            idxPage.drawRectangle({ x: tableX, y: idxY, width: tableW, height: rowH, color: rgb(0.95, 0.97, 1.0), borderColor: rgb(0.7, 0.7, 0.8), borderWidth: 1 });
-        } else if (tier.box === 'bordered') {
-            idxPage.drawRectangle({ x: tableX, y: idxY, width: tableW, height: rowH, borderColor: rgb(0.85, 0.85, 0.85), borderWidth: 1 });
+        const tier = tierConfig[row.type] || tierConfig.topic;
+        let prefix = '';
+        if (row.type === 'topic') {
+            topicCounter += 1;
+            prefix = `${topicCounter}) `;
+        } else if (row.type === 'subtopic') {
+            prefix = '• ';
         }
 
-        let dText = sanitizeForPdf(tier.prefix + row.text);
+        let dText = sanitizeForPdf(prefix + row.text);
         if (dText.length > tier.maxLen) dText = dText.substring(0, tier.maxLen - 3) + '...';
 
         idxPage.drawText(dText, { x: tableX + tier.indent, y: idxY + 10, size: tier.fontSize, font: tier.font, color: rgb(0.1, 0.1, 0.2) });
