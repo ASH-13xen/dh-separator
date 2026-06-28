@@ -494,6 +494,9 @@ async function main() {
     const fontNormal = await pdfDoc.embedFont(StandardFonts.Helvetica);
     const fontBold = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
 
+    // Watermark logo for subtopic divider pages — embedded once, reused on every divider page.
+    const dhLogoImage = await pdfDoc.embedJpg(fs.readFileSync(path.join(__dirname, '..', 'dhlogo.jpg')));
+
     // 2. Create Premium Cover Page
     console.log('[Runner] Adding Cover Page...');
     const titlePage = pdfDoc.addPage();
@@ -643,7 +646,7 @@ async function main() {
                 if (item.isTitlePage) {
                     console.log(`    * Subsection divider ${qIdx + 1}/${topNode.questions.length}: "${item.subtitle}"`);
                     indexData.push({
-                        type: 'topic',
+                        type: 'subtopic',
                         text: item.subtitle,
                         targetPageInternal: pdfDoc.getPageCount()
                     });
@@ -655,29 +658,50 @@ async function main() {
                     dPage.drawRectangle({
                         x: 0, y: 0, width: tw, height: th, color: rgb(1, 1, 1)
                     });
-                    dPage.drawText("SUBTOPIC", {
-                        x: 50, y: th - 140, size: 16, font: fontBold, color: dBlue
+
+                    // Watermark — centered, behind all text, low opacity.
+                    const wmSize = 300;
+                    dPage.drawImage(dhLogoImage, {
+                        x: (tw - wmSize) / 2, y: (th - wmSize) / 2,
+                        width: wmSize, height: wmSize, opacity: 0.1
+                    });
+
+                    dPage.drawText("SUB-TOPIC", {
+                        x: 50, y: th - 140, size: 20, font: fontBold, color: dBlue
                     });
                     dPage.drawLine({
-                        start: { x: 50, y: th - 148 },
-                        end: { x: 50 + fontBold.widthOfTextAtSize("SUBTOPIC", 16), y: th - 148 },
+                        start: { x: 50, y: th - 150 },
+                        end: { x: 50 + fontBold.widthOfTextAtSize("SUB-TOPIC", 20), y: th - 150 },
                         thickness: 1.5,
                         color: dBlue
                     });
-                    let dY = th - 190;
+                    let dY = th - 196;
                     const dWords = sanitizeForPdf(item.subtitle).toUpperCase().split(' ');
                     let dLine = '';
                     for (const word of dWords) {
                         const testLine = dLine + word + ' ';
-                        if (fontBold.widthOfTextAtSize(testLine, 20) > tw - 100) {
-                            dPage.drawText(sanitizeForPdf(dLine), { x: 50, y: dY, size: 20, font: fontBold, color: dBlue });
+                        if (fontBold.widthOfTextAtSize(testLine, 26) > tw - 100) {
+                            dPage.drawText(sanitizeForPdf(dLine), { x: 50, y: dY, size: 26, font: fontBold, color: dBlue });
                             dLine = word + ' ';
-                            dY -= 26;
+                            dY -= 34;
                         } else {
                             dLine = testLine;
                         }
                     }
-                    dPage.drawText(sanitizeForPdf(dLine), { x: 50, y: dY, size: 20, font: fontBold, color: dBlue });
+                    dPage.drawText(sanitizeForPdf(dLine), { x: 50, y: dY, size: 26, font: fontBold, color: dBlue });
+
+                    // Footer — website/telegram contact info.
+                    const footerSize = 10;
+                    const footerY = 40;
+                    dPage.drawText("Website: dashboard.thedarkhorseupsc.com", {
+                        x: 50, y: footerY, size: footerSize, font: fontNormal, color: rgb(0.4, 0.4, 0.4)
+                    });
+                    const telegramText = "Telegram: @TDHAdmin";
+                    const telegramWidth = fontNormal.widthOfTextAtSize(telegramText, footerSize);
+                    dPage.drawText(telegramText, {
+                        x: tw - 50 - telegramWidth, y: footerY, size: footerSize, font: fontNormal, color: rgb(0.4, 0.4, 0.4)
+                    });
+
                     continue;
                 }
 
@@ -731,6 +755,12 @@ async function main() {
                         rank: f.topper_rank || '',
                         marks: f.topper_marks || ''
                     }))
+                });
+
+                indexData.push({
+                    type: 'question',
+                    text: cleanText,
+                    targetPageInternal: pdfDoc.getPageCount()
                 });
 
                 if (activeFileObjects.length > 0) {
@@ -974,7 +1004,15 @@ async function main() {
     const tableX = 50;
     const tableW = idxPage.getSize().width - 100;
     const rowH = 30;
-    
+
+    // Strict 4-level hierarchy: Section > Topic > Subtopic > Question (bullet).
+    const tierConfig = {
+        section:  { indent: 10, fontSize: 11, font: fontBold,   maxLen: 55, prefix: '',   box: 'filled'   },
+        topic:    { indent: 30, fontSize: 10, font: fontBold,   maxLen: 58, prefix: '',   box: 'bordered' },
+        subtopic: { indent: 50, fontSize: 9,  font: fontNormal, maxLen: 60, prefix: '',   box: 'none'     },
+        question: { indent: 70, fontSize: 8,  font: fontNormal, maxLen: 58, prefix: '• ', box: 'none' }
+    };
+
     idxPage.drawRectangle({ x: tableX, y: idxY, width: tableW, height: rowH, color: rgb(0.9, 0.9, 0.95) });
     idxPage.drawText(`Module Layout`, { x: tableX + 15, y: idxY + 10, size: 11, font: fontBold });
     idxPage.drawText(`PG`, { x: tableX + tableW - 40, y: idxY + 10, size: 11, font: fontBold });
@@ -982,7 +1020,7 @@ async function main() {
 
     for (let j = 0; j < indexData.length; j++) {
         const row = indexData[j];
-        
+
         if (idxY < 50) {
              idxPage = indexPdfDoc.addPage();
              idxY = idxPage.getSize().height - 80;
@@ -992,22 +1030,18 @@ async function main() {
              idxY -= rowH;
         }
 
-        const isSection = row.type === 'section';
-        const indentX = isSection ? 10 : 30;
-        const fontSize = isSection ? 11 : 9;
-        const curFont = isSection ? fontBold : fontNormal;
-        
-        if (!isSection) {
-            idxPage.drawRectangle({ x: tableX, y: idxY, width: tableW, height: rowH, borderColor: rgb(0.85, 0.85, 0.85), borderWidth: 1 });
-        } else {
+        const tier = tierConfig[row.type] || tierConfig.topic;
+
+        if (tier.box === 'filled') {
             idxPage.drawRectangle({ x: tableX, y: idxY, width: tableW, height: rowH, color: rgb(0.95, 0.97, 1.0), borderColor: rgb(0.7, 0.7, 0.8), borderWidth: 1 });
+        } else if (tier.box === 'bordered') {
+            idxPage.drawRectangle({ x: tableX, y: idxY, width: tableW, height: rowH, borderColor: rgb(0.85, 0.85, 0.85), borderWidth: 1 });
         }
 
-        let dText = sanitizeForPdf(row.text);
-        const maxLen = isSection ? 55 : 62;
-        if (dText.length > maxLen) dText = dText.substring(0, maxLen - 3) + '...';
-        
-        idxPage.drawText(dText, { x: tableX + indentX, y: idxY + 10, size: fontSize, font: curFont, color: rgb(0.1, 0.1, 0.2) });
+        let dText = sanitizeForPdf(tier.prefix + row.text);
+        if (dText.length > tier.maxLen) dText = dText.substring(0, tier.maxLen - 3) + '...';
+
+        idxPage.drawText(dText, { x: tableX + tier.indent, y: idxY + 10, size: tier.fontSize, font: tier.font, color: rgb(0.1, 0.1, 0.2) });
         idxY -= rowH;
     }
 
@@ -1071,13 +1105,13 @@ async function main() {
 
         while (currentDataRow < indexData.length && drawY >= 50) {
              const truePageNum = 1 + totalIndexPages + totalSummaryPages + indexData[currentDataRow].targetPageInternal;
-             const isSec = indexData[currentDataRow].type === 'section';
+             const numTier = tierConfig[indexData[currentDataRow].type] || tierConfig.topic;
 
              injectedIdxPage.drawText(`${truePageNum}`, {
                  x: tableX + tableW - 40,
                  y: drawY + 10,
-                 size: isSec ? 11 : 9,
-                 font: isSec ? fontBold : fontNormal,
+                 size: numTier.fontSize,
+                 font: numTier.font,
                  color: rgb(0.1, 0.1, 0.1)
              });
              drawY -= rowH;
