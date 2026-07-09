@@ -4,6 +4,7 @@ import {
   listRegistrySubjects,
   classifySubject,
   activateSubject,
+  reclassifySubject,
   previewSubjectBookData,
   generateSubjectBookPdf,
   getSubjectBookStatus,
@@ -20,6 +21,7 @@ router.get('/used', listUsedSubjects);
 router.get('/registry', listRegistrySubjects);
 router.post('/classify', classifySubject);
 router.post('/:slug/activate', activateSubject);
+router.post('/:slug/reclassify', reclassifySubject);
 
 // Generic book-compilation pipeline (parameterized clone of /api/psir)
 router.get('/:slug/preview', previewSubjectBookData);

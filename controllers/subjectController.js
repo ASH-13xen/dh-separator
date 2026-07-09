@@ -278,6 +278,78 @@ export const activateSubject = async (req, res) => {
   }
 };
 
+// Re-classifies all UPSCQA questions for a subject using its saved syllabusJson/syllabusText.
+// Picks up any questions uploaded since the last classify run without requiring the user to
+// re-enter the syllabus.
+export const reclassifySubject = async (req, res) => {
+  const { slug } = req.params;
+  console.log(`[SubjectController] [reclassifySubject] Request received for slug: '${slug}'.`);
+  try {
+    const subjectDoc = await Subject.findOne({ slug });
+    if (!subjectDoc) {
+      return res.status(404).json({ error: 'Subject not found.' });
+    }
+
+    const hasSyllabusJson = subjectDoc.syllabusJson && Array.isArray(subjectDoc.syllabusJson) && subjectDoc.syllabusJson.length > 0;
+    const hasSyllabusText = subjectDoc.syllabusText && subjectDoc.syllabusText.trim();
+    if (!hasSyllabusJson && !hasSyllabusText) {
+      return res.status(400).json({ error: 'No saved syllabus found for this subject. Please go through Setup again.' });
+    }
+
+    const subjectRegex = new RegExp(`^${escapeRegExp(subjectDoc.name)}$`, 'i');
+    const questions = await UPSCQA.find({ subject: subjectRegex }).lean();
+    console.log(`[SubjectController] [reclassifySubject] Found ${questions.length} question(s) for '${subjectDoc.name}'.`);
+
+    if (questions.length === 0) {
+      return res.status(404).json({ error: 'No uploaded questions found for this subject.' });
+    }
+
+    const distinctTexts = [...new Set(questions.map(q => q.question_text))];
+    console.log(`[SubjectController] [reclassifySubject] Classifying ${distinctTexts.length} distinct question(s)...`);
+
+    const classificationMap = hasSyllabusJson
+      ? await classifyQuestionsForSubjectStructured(distinctTexts, subjectDoc.syllabusJson)
+      : await classifyQuestionsForSubject(distinctTexts, subjectDoc.syllabusText);
+
+    const rows = [];
+    const trimmedName = subjectDoc.name;
+    questions.forEach(q => {
+      const classification = classificationMap.get(q.question_text) || { section: 'Unassigned', topic: 'Unassigned', paper: 'Paper 1' };
+      const allTags = `${trimmedName}, ${classification.paper}, ${classification.section}, ${classification.topic}`;
+      if (q.file_urls && q.file_urls.length > 0) {
+        q.file_urls.forEach(f => {
+          rows.push([
+            classification.section, classification.topic, q.question_text,
+            f.topper_name || 'Unknown Topper', cleanYear(f.topper_year) || '', f.topper_rank || '',
+            f.topper_marks || '', f.url || '', allTags, classification.paper
+          ]);
+        });
+      } else {
+        rows.push([classification.section, classification.topic, q.question_text, '', '', '', '', '', allTags, classification.paper]);
+      }
+    });
+
+    rows.sort((a, b) => {
+      if (a[0] !== b[0]) return a[0].localeCompare(b[0]);
+      if (a[1] !== b[1]) return a[1].localeCompare(b[1]);
+      return a[2].localeCompare(b[2]);
+    });
+
+    let csvContent = CSV_HEADERS.map(escapeCSV).join(',') + '\n';
+    rows.forEach(r => { csvContent += r.map(escapeCSV).join(',') + '\n'; });
+
+    subjectDoc.csvData = csvContent;
+    subjectDoc.questionCount = distinctTexts.length;
+    await subjectDoc.save();
+    console.log(`[SubjectController] [reclassifySubject] Done. ${distinctTexts.length} questions saved.`);
+
+    res.json({ questionCount: distinctTexts.length, message: 'Re-classification complete. Refresh the book builder to see new questions.' });
+  } catch (err) {
+    console.error('[SubjectController] [reclassifySubject] Error:', err);
+    res.status(500).json({ error: 'Re-classification failed.', details: err.message });
+  }
+};
+
 // --- Generic book-compilation pipeline (parameterized clone of psirController.js) ---
 
 export const previewSubjectBookData = async (req, res) => {
