@@ -305,11 +305,32 @@ export const reclassifySubject = async (req, res) => {
     }
 
     const distinctTexts = [...new Set(questions.map(q => q.question_text))];
-    console.log(`[SubjectController] [reclassifySubject] Classifying ${distinctTexts.length} distinct question(s)...`);
 
-    const classificationMap = hasSyllabusJson
-      ? await classifyQuestionsForSubjectStructured(distinctTexts, subjectDoc.syllabusJson)
-      : await classifyQuestionsForSubject(distinctTexts, subjectDoc.syllabusText);
+    // Build a map of already-classified questions from the saved CSV so we don't
+    // re-send them to Gemini — only truly new question texts go through the API.
+    const existingClassifications = new Map();
+    if (subjectDoc.csvData) {
+      const existingRows = parseCSV(subjectDoc.csvData).slice(1);
+      existingRows.forEach(r => {
+        if (r.length >= 10 && r[2] && r[2].trim()) {
+          existingClassifications.set(r[2].trim(), {
+            section: r[0].trim(), topic: r[1].trim(), paper: r[9].trim()
+          });
+        }
+      });
+    }
+
+    const newTexts = distinctTexts.filter(t => !existingClassifications.has(t));
+    console.log(`[SubjectController] [reclassifySubject] ${existingClassifications.size} already classified, ${newTexts.length} new — sending only new to Gemini...`);
+
+    let newClassificationMap = new Map();
+    if (newTexts.length > 0) {
+      newClassificationMap = hasSyllabusJson
+        ? await classifyQuestionsForSubjectStructured(newTexts, subjectDoc.syllabusJson)
+        : await classifyQuestionsForSubject(newTexts, subjectDoc.syllabusText);
+    }
+
+    const classificationMap = new Map([...existingClassifications, ...newClassificationMap]);
 
     const rows = [];
     const trimmedName = subjectDoc.name;
@@ -341,9 +362,9 @@ export const reclassifySubject = async (req, res) => {
     subjectDoc.csvData = csvContent;
     subjectDoc.questionCount = distinctTexts.length;
     await subjectDoc.save();
-    console.log(`[SubjectController] [reclassifySubject] Done. ${distinctTexts.length} questions saved.`);
+    console.log(`[SubjectController] [reclassifySubject] Done. ${distinctTexts.length} total questions (${newTexts.length} newly classified).`);
 
-    res.json({ questionCount: distinctTexts.length, message: 'Re-classification complete. Refresh the book builder to see new questions.' });
+    res.json({ questionCount: distinctTexts.length, newCount: newTexts.length, message: 'Re-classification complete. Refresh the book builder to see new questions.' });
   } catch (err) {
     console.error('[SubjectController] [reclassifySubject] Error:', err);
     res.status(500).json({ error: 'Re-classification failed.', details: err.message });
