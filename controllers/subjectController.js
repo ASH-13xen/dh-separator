@@ -7,7 +7,7 @@ import { UPSCQA } from '../models/UPSCQA.js';
 import { Subject } from '../models/Subject.js';
 import { SubjectBook } from '../models/SubjectBook.js';
 import { BookLayout } from '../models/BookLayout.js';
-import { classifyQuestionsForSubject } from '../services/geminiService.js';
+import { classifyQuestionsForSubject, classifyQuestionsForSubjectStructured } from '../services/geminiService.js';
 import { parseCSV, escapeCSV, cleanYear } from '../utils/csv.js';
 import { applyBookLayout, deriveIncludedAndSelections } from '../utils/bookLayout.js';
 
@@ -150,16 +150,17 @@ export const listRegistrySubjects = async (req, res) => {
 export const classifySubject = async (req, res) => {
   console.log('[SubjectController] [classifySubject] Request received.');
   try {
-    const { name, syllabusText } = req.body;
-    console.log(`[SubjectController] [classifySubject] Params: name='${name}', syllabusText length=${syllabusText ? syllabusText.length : 0} chars.`);
+    const { name, syllabusJson, syllabusText } = req.body;
+    const useStructured = syllabusJson && Array.isArray(syllabusJson) && syllabusJson.length > 0;
+    console.log(`[SubjectController] [classifySubject] Params: name='${name}', mode=${useStructured ? 'structured-JSON' : 'free-text'}.`);
 
     if (!name || !String(name).trim()) {
       console.warn('[SubjectController] [classifySubject] Validation failed: missing subject name.');
       return res.status(400).json({ error: 'Subject name is required.' });
     }
-    if (!syllabusText || !String(syllabusText).trim()) {
-      console.warn('[SubjectController] [classifySubject] Validation failed: missing syllabus text.');
-      return res.status(400).json({ error: 'Syllabus text is required.' });
+    if (!useStructured && (!syllabusText || !String(syllabusText).trim())) {
+      console.warn('[SubjectController] [classifySubject] Validation failed: missing syllabus.');
+      return res.status(400).json({ error: 'Syllabus is required (either syllabusJson or syllabusText).' });
     }
     const trimmedName = String(name).trim();
 
@@ -167,12 +168,13 @@ export const classifySubject = async (req, res) => {
     let subjectDoc = await Subject.findOne({ name: trimmedName });
     if (!subjectDoc) {
       const slug = await generateUniqueSlug(trimmedName);
-      subjectDoc = new Subject({ name: trimmedName, slug, syllabusText, csvData: '' });
+      subjectDoc = new Subject({ name: trimmedName, slug, syllabusText: syllabusText || '', csvData: '' });
       console.log(`[SubjectController] [classifySubject] Created new draft Subject record. Slug: '${slug}'.`);
     } else {
-      subjectDoc.syllabusText = syllabusText;
+      if (syllabusText) subjectDoc.syllabusText = syllabusText;
       console.log(`[SubjectController] [classifySubject] Found existing Subject record. Slug: '${subjectDoc.slug}', Status: '${subjectDoc.status}'. Re-classifying.`);
     }
+    if (useStructured) subjectDoc.syllabusJson = syllabusJson;
 
     console.log(`[SubjectController] [classifySubject] Step 2: Querying UPSCQA for questions tagged subject='${trimmedName}' (case-insensitive)...`);
     const subjectRegex = new RegExp(`^${escapeRegExp(trimmedName)}$`, 'i');
@@ -187,8 +189,10 @@ export const classifySubject = async (req, res) => {
     }
 
     const distinctTexts = [...new Set(questions.map(q => q.question_text))];
-    console.log(`[SubjectController] [classifySubject] Step 3: Classifying ${distinctTexts.length} distinct question(s) against the pasted syllabus via Gemini...`);
-    const classificationMap = await classifyQuestionsForSubject(distinctTexts, syllabusText);
+    console.log(`[SubjectController] [classifySubject] Step 3: Classifying ${distinctTexts.length} distinct question(s) via Gemini (${useStructured ? 'structured JSON syllabus' : 'free-text syllabus'})...`);
+    const classificationMap = useStructured
+      ? await classifyQuestionsForSubjectStructured(distinctTexts, syllabusJson)
+      : await classifyQuestionsForSubject(distinctTexts, syllabusText);
     console.log(`[SubjectController] [classifySubject] Classification complete. Received ${classificationMap.size} classified entr(ies).`);
 
     console.log('[SubjectController] [classifySubject] Step 4: Building CSV rows (one row per topper file, flattened)...');

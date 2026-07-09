@@ -799,3 +799,127 @@ ${JSON.stringify(batchPayload)}`;
   );
   return resultMap;
 };
+
+// Classifies questions using a structured syllabus JSON (Paper > Section > Topic hierarchy).
+// Returns a Map<questionText, { section, topic, paper }>.
+export const classifyQuestionsForSubjectStructured = async (
+  questionTexts,
+  syllabusJson,
+  batchSize = 20,
+) => {
+  const resultMap = new Map();
+  const totalBatches = Math.ceil(questionTexts.length / batchSize);
+  console.log(
+    `[GeminiService] [classifyQuestionsForSubjectStructured] Starting classification of ${questionTexts.length} question(s) in ${totalBatches} batch(es)...`,
+  );
+
+  // Build a flat reference list from the JSON for the prompt so Gemini can see all valid values.
+  const validValues = [];
+  if (Array.isArray(syllabusJson)) {
+    syllabusJson.forEach((paper) => {
+      (paper.sections || []).forEach((section) => {
+        (section.topics || []).forEach((topic) => {
+          validValues.push({ paper: paper.name, section: section.name, topic });
+        });
+      });
+    });
+  }
+
+  const syllabusReference = JSON.stringify(syllabusJson, null, 2);
+
+  const responseSchema = {
+    type: SchemaType.ARRAY,
+    items: {
+      type: SchemaType.OBJECT,
+      properties: {
+        index: { type: SchemaType.INTEGER },
+        section: { type: SchemaType.STRING },
+        topic: { type: SchemaType.STRING },
+        paper: { type: SchemaType.STRING },
+      },
+      required: ["index", "section", "topic", "paper"],
+    },
+  };
+
+  for (let start = 0; start < questionTexts.length; start += batchSize) {
+    const batchNum = Math.floor(start / batchSize) + 1;
+    const batch = questionTexts.slice(start, start + batchSize);
+    const batchPayload = batch.map((question_text, i) => ({ index: i, question_text }));
+    console.log(
+      `[GeminiService] [classifyQuestionsForSubjectStructured] Batch ${batchNum}/${totalBatches}: sending ${batch.length} question(s) to Gemini...`,
+    );
+
+    const prompt = `You are an expert UPSC exam syllabus classifier.
+
+Below is a syllabus structured as a JSON hierarchy of Papers > Sections > Topics.
+
+--- SYLLABUS JSON ---
+${syllabusReference}
+---------------------
+
+For each question, classify it into the BEST matching Paper, Section, and Topic from this syllabus.
+
+STRICT RULES:
+- 'paper' MUST exactly match one of the paper names in the syllabus JSON.
+- 'section' MUST exactly match one of the section names under that paper.
+- 'topic' MUST exactly match one of the topic names under that section.
+- Do NOT invent or paraphrase any paper, section, or topic name — use only exact strings from the JSON.
+- If a question loosely fits multiple sections/topics, pick the closest single best match.
+- Never leave any field blank. Return EXACTLY one result per input question preserving its 'index'.
+- Return ONLY a JSON array.
+
+Questions:
+${JSON.stringify(batchPayload)}`;
+
+    try {
+      const result = await withRetry(
+        () =>
+          model.generateContent({
+            contents: [{ role: "user", parts: [{ text: prompt }] }],
+            generationConfig: {
+              responseMimeType: "application/json",
+              responseSchema: responseSchema,
+              temperature: 0.0,
+            },
+          }),
+        4,
+        5000,
+      );
+
+      const responseText = result.response.text();
+      const jsonArray = JSON.parse(responseText);
+
+      jsonArray.forEach((item) => {
+        const questionText = batch[item.index];
+        if (questionText === undefined) return;
+        resultMap.set(questionText, {
+          section: item.section || "Unassigned",
+          topic: item.topic || "Unassigned",
+          paper: item.paper || (syllabusJson[0]?.name) || "Paper 1",
+        });
+      });
+      console.log(
+        `[GeminiService] [classifyQuestionsForSubjectStructured] Batch ${batchNum}/${totalBatches}: classified ${jsonArray.length} question(s) successfully.`,
+      );
+    } catch (error) {
+      console.error(
+        `[GeminiService] [classifyQuestionsForSubjectStructured] Batch ${batchNum}/${totalBatches} FAILED: ${error.message}`,
+      );
+      const fallbackPaper = (Array.isArray(syllabusJson) && syllabusJson[0]?.name) || "Paper 1";
+      batch.forEach((questionText) => {
+        if (!resultMap.has(questionText)) {
+          resultMap.set(questionText, {
+            section: "Unassigned",
+            topic: "Unassigned",
+            paper: fallbackPaper,
+          });
+        }
+      });
+    }
+  }
+
+  console.log(
+    `[GeminiService] [classifyQuestionsForSubjectStructured] Finished. Classified ${resultMap.size}/${questionTexts.length} question(s) total.`,
+  );
+  return resultMap;
+};
