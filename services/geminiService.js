@@ -923,3 +923,63 @@ ${JSON.stringify(batchPayload)}`;
   );
   return resultMap;
 };
+
+// Takes raw pasted syllabus text and asks Gemini to organize it into the
+// Paper → Section → Topic hierarchy using ONLY the exact words from the input.
+export const generateSyllabusFromText = async (text) => {
+  console.log(`[GeminiService] [generateSyllabusFromText] Organising syllabus text (${text.length} chars)...`);
+
+  const structuredModel = genAI.getGenerativeModel({
+    model: "gemini-2.5-flash",
+    generationConfig: {
+      responseMimeType: "application/json",
+      responseSchema: {
+        type: SchemaType.ARRAY,
+        items: {
+          type: SchemaType.OBJECT,
+          properties: {
+            name: { type: SchemaType.STRING },
+            sections: {
+              type: SchemaType.ARRAY,
+              items: {
+                type: SchemaType.OBJECT,
+                properties: {
+                  name: { type: SchemaType.STRING },
+                  topics: {
+                    type: SchemaType.ARRAY,
+                    items: { type: SchemaType.STRING },
+                  },
+                },
+                required: ["name", "topics"],
+              },
+            },
+          },
+          required: ["name", "sections"],
+        },
+      },
+    },
+  });
+
+  const prompt = `You are organizing a syllabus text into a hierarchy of Papers, Sections, and Topics.
+
+STRICT RULES — you MUST follow these exactly:
+1. Use ONLY the exact words from the provided text. Do NOT add, invent, rephrase, summarize, or change any word.
+2. Every paper name, section name, and topic name must be copied verbatim from the text as-is.
+3. No new content. No explanatory labels. No "Introduction" or "Overview" that isn't in the text.
+4. Identify top-level divisions as Papers (e.g. "Paper I", "Paper II", major numbered/named parts).
+5. Within each Paper, identify sub-divisions as Sections.
+6. Within each Section, list individual topics — each topic is one line or bullet item from the text.
+7. If the text has only one top-level part with no explicit paper label, create a single Paper whose name is the first heading or title in the text.
+
+Syllabus text to organize:
+---
+${text}
+---`;
+
+  const result = await withRetry(() => structuredModel.generateContent(prompt), 3, 4000);
+  const responseText = result.response.text();
+  const papers = JSON.parse(responseText);
+
+  console.log(`[GeminiService] [generateSyllabusFromText] Done. ${papers.length} paper(s) returned.`);
+  return papers;
+};

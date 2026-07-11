@@ -2,6 +2,7 @@ import express from 'express';
 import {
   listUsedSubjects,
   listRegistrySubjects,
+  generateSyllabusText,
   classifySubject,
   activateSubject,
   reclassifySubject,
@@ -19,6 +20,7 @@ const router = express.Router();
 // Subject Setup
 router.get('/used', listUsedSubjects);
 router.get('/registry', listRegistrySubjects);
+router.post('/generate-syllabus', generateSyllabusText);
 router.post('/classify', classifySubject);
 router.post('/:slug/activate', activateSubject);
 router.post('/:slug/reclassify', reclassifySubject);

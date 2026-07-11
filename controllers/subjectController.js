@@ -7,7 +7,7 @@ import { UPSCQA } from '../models/UPSCQA.js';
 import { Subject } from '../models/Subject.js';
 import { SubjectBook } from '../models/SubjectBook.js';
 import { BookLayout } from '../models/BookLayout.js';
-import { classifyQuestionsForSubject, classifyQuestionsForSubjectStructured } from '../services/geminiService.js';
+import { classifyQuestionsForSubject, classifyQuestionsForSubjectStructured, generateSyllabusFromText } from '../services/geminiService.js';
 import { parseCSV, escapeCSV, cleanYear } from '../utils/csv.js';
 import { applyBookLayout, deriveIncludedAndSelections } from '../utils/bookLayout.js';
 
@@ -144,6 +144,18 @@ export const listRegistrySubjects = async (req, res) => {
   } catch (err) {
     console.error('[SubjectController] [listRegistrySubjects] Error:', err);
     res.status(500).json({ error: 'Failed to list subjects.', details: err.message });
+  }
+};
+
+export const generateSyllabusText = async (req, res) => {
+  const { text } = req.body;
+  if (!text || !text.trim()) return res.status(400).json({ error: 'No text provided.' });
+  try {
+    const papers = await generateSyllabusFromText(text.trim());
+    res.json({ papers });
+  } catch (err) {
+    console.error('[SubjectController] [generateSyllabusText] Error:', err);
+    res.status(500).json({ error: err.message || 'Failed to generate syllabus.' });
   }
 };
 
