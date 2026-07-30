@@ -9,7 +9,7 @@ import { SubjectBook } from '../models/SubjectBook.js';
 import { BookLayout } from '../models/BookLayout.js';
 import { classifyQuestionsForSubject, classifyQuestionsForSubjectStructured, generateSyllabusFromText } from '../services/geminiService.js';
 import { parseCSV, escapeCSV, cleanYear } from '../utils/csv.js';
-import { applyBookLayout, deriveIncludedAndSelections } from '../utils/bookLayout.js';
+import { applyBookLayout, deriveIncludedAndSelections, mergeSyllabusIntoHierarchy } from '../utils/bookLayout.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -401,10 +401,13 @@ export const previewSubjectBookData = async (req, res) => {
     console.log(`[SubjectController] [previewSubjectBookData] Parsed ${rows.length} CSV row(s).`);
     const hierarchy = buildHierarchyFromRows(rows);
 
+    console.log(`[SubjectController] [previewSubjectBookData] Merging full syllabus tree so empty topics/sections are visible for '${slug}'...`);
+    const hierarchyWithSyllabus = mergeSyllabusIntoHierarchy(hierarchy, subjectDoc.syllabusJson);
+
     console.log(`[SubjectController] [previewSubjectBookData] Applying any saved book layout customizations for '${slug}'...`);
     const layoutDocs = await BookLayout.find({ subject: slug }).lean();
     const layoutsByPaper = Object.fromEntries(layoutDocs.map(l => [l.paper, l]));
-    const mergedHierarchy = applyBookLayout(hierarchy, layoutsByPaper);
+    const mergedHierarchy = applyBookLayout(hierarchyWithSyllabus, layoutsByPaper);
     const { excludedQuestionIds, selections, expandedTopicTitles } = deriveIncludedAndSelections(mergedHierarchy, layoutsByPaper);
 
     console.log(`[SubjectController] [previewSubjectBookData] Preview hierarchy generated successfully for '${slug}'. ${layoutDocs.length} saved layout(s) applied.`);

@@ -65,6 +65,63 @@ export function applyBookLayout(hierarchy, layoutsByPaper) {
   });
 }
 
+// Ensures every Paper > Section > Topic node from the subject's authored syllabus is
+// visible in the book-builder editor, even when no question has ever been classified
+// into it — the editor should reflect the full syllabus, not just the slice of it that
+// happens to have questions so far. This only ever ADDS placeholder topics/papers (with
+// an empty `questions` array); every CSV-derived paper/topic/question that already exists
+// is kept exactly as-is. It never removes anything, and it runs only on the preview/editor
+// read path — book generation rebuilds its own topic map strictly from the user's selected
+// `includedQuestionIds`, so an empty placeholder topic naturally contributes nothing to the
+// compiled PDF without any changes needed there.
+export function mergeSyllabusIntoHierarchy(hierarchy, syllabusJson) {
+  if (!Array.isArray(syllabusJson) || syllabusJson.length === 0) return hierarchy;
+
+  const hierarchyByPaper = new Map(hierarchy.map((p) => [p.paper, p]));
+  const result = [];
+
+  syllabusJson.forEach((paperDef) => {
+    const paperName = (paperDef.name || '').trim();
+    if (!paperName) return;
+
+    const existingPaper = hierarchyByPaper.get(paperName);
+    const topicsByKey = new Map((existingPaper?.topics || []).map((t) => [t._key, t]));
+    const usedKeys = new Set();
+    const orderedTopics = [];
+
+    (paperDef.sections || []).forEach((sectionDef) => {
+      (sectionDef.topics || []).forEach((topicName) => {
+        const title = (topicName || '').trim();
+        if (!title || usedKeys.has(title)) return;
+        usedKeys.add(title);
+        orderedTopics.push(topicsByKey.get(title) || { title, _key: title, questions: [] });
+      });
+    });
+
+    // Keep any CSV-derived topic the syllabus doesn't (or no longer) account for — e.g.
+    // an "Unassigned" fallback bucket — so a classified question is never hidden.
+    (existingPaper?.topics || []).forEach((t) => {
+      if (!usedKeys.has(t._key)) {
+        usedKeys.add(t._key);
+        orderedTopics.push(t);
+      }
+    });
+
+    result.push({
+      paper: paperName,
+      section: existingPaper?.section || (paperDef.sections || [])[0]?.name || '',
+      topics: orderedTopics,
+    });
+    hierarchyByPaper.delete(paperName);
+  });
+
+  // Any CSV-derived paper the syllabus doesn't mention at all (e.g. renamed after
+  // questions were already classified) — keep it appended rather than losing the data.
+  hierarchyByPaper.forEach((paperNode) => result.push(paperNode));
+
+  return result;
+}
+
 export function deriveIncludedAndSelections(hierarchy, layoutsByPaper) {
   const excludedQuestionIds = [];
   const selections = {};
