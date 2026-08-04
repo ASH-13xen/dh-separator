@@ -383,6 +383,81 @@ export const reclassifySubject = async (req, res) => {
   }
 };
 
+// Lists every distinct topper whose answer sheets have been uploaded for this subject, so the
+// user can recall who they've already covered. Reads UPSCQA (the upload source of truth) rather
+// than the classified CSV, so it stays accurate even for questions uploaded since the last
+// classify run. Grouped by topper name, with each distinct year/rank/marks combination nested
+// underneath — differing metadata for the same name usually means a typo at upload time.
+export const listSubjectToppers = async (req, res) => {
+  const { slug } = req.params;
+  console.log(`[SubjectController] [listSubjectToppers] Request received for slug: '${slug}'.`);
+  try {
+    const subjectDoc = await Subject.findOne({ slug });
+    if (!subjectDoc) {
+      console.warn(`[SubjectController] [listSubjectToppers] Subject not found: '${slug}'.`);
+      return res.status(404).json({ error: 'Subject not found.' });
+    }
+
+    const subjectRegex = new RegExp(`^${escapeRegExp(subjectDoc.name)}$`, 'i');
+    const questions = await UPSCQA.find({ subject: subjectRegex })
+      .select('question_text file_urls')
+      .lean();
+    console.log(`[SubjectController] [listSubjectToppers] Scanning ${questions.length} question(s) for '${subjectDoc.name}'.`);
+
+    const byTopper = new Map();
+    let totalSheets = 0;
+    let questionsWithoutSheets = 0;
+
+    questions.forEach(q => {
+      if (!q.file_urls || q.file_urls.length === 0) {
+        questionsWithoutSheets++;
+        return;
+      }
+      q.file_urls.forEach(f => {
+        totalSheets++;
+        const displayName = (f.topper_name || '').trim() || 'Unknown Topper';
+        const key = displayName.toLowerCase();
+        if (!byTopper.has(key)) {
+          byTopper.set(key, { name: displayName, sheetCount: 0, questions: new Set(), entries: new Map() });
+        }
+        const topper = byTopper.get(key);
+        topper.sheetCount++;
+        if (q.question_text) topper.questions.add(q.question_text);
+
+        const year = cleanYear((f.topper_year || '').trim()) || '';
+        const rank = (f.topper_rank || '').trim();
+        const marks = (f.topper_marks || '').trim();
+        const entryKey = `${year}||${rank}||${marks}`;
+        if (!topper.entries.has(entryKey)) {
+          topper.entries.set(entryKey, { year, rank, marks, sheetCount: 0 });
+        }
+        topper.entries.get(entryKey).sheetCount++;
+      });
+    });
+
+    const toppers = [...byTopper.values()]
+      .map(t => ({
+        name: t.name,
+        sheetCount: t.sheetCount,
+        questionCount: t.questions.size,
+        entries: [...t.entries.values()].sort((a, b) => b.sheetCount - a.sheetCount)
+      }))
+      .sort((a, b) => b.sheetCount - a.sheetCount || a.name.localeCompare(b.name));
+
+    console.log(`[SubjectController] [listSubjectToppers] Found ${toppers.length} distinct topper(s) across ${totalSheets} answer sheet(s).`);
+    res.json({
+      subject: { name: subjectDoc.name, slug: subjectDoc.slug },
+      totalQuestions: questions.length,
+      totalSheets,
+      questionsWithoutSheets,
+      toppers
+    });
+  } catch (err) {
+    console.error('[SubjectController] [listSubjectToppers] Error:', err);
+    res.status(500).json({ error: 'Failed to list toppers for this subject.', details: err.message });
+  }
+};
+
 // --- Generic book-compilation pipeline (parameterized clone of psirController.js) ---
 
 export const previewSubjectBookData = async (req, res) => {

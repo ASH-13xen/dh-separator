@@ -6,6 +6,7 @@ import {
   classifySubject,
   activateSubject,
   reclassifySubject,
+  listSubjectToppers,
   previewSubjectBookData,
   generateSubjectBookPdf,
   getSubjectBookStatus,
@@ -24,6 +25,7 @@ router.post('/generate-syllabus', generateSyllabusText);
 router.post('/classify', classifySubject);
 router.post('/:slug/activate', activateSubject);
 router.post('/:slug/reclassify', reclassifySubject);
+router.get('/:slug/toppers', listSubjectToppers);
 
 // Generic book-compilation pipeline (parameterized clone of /api/psir)
 router.get('/:slug/preview', previewSubjectBookData);
