@@ -733,6 +733,144 @@ export const cleanupSubjectBookStorage = async (req, res) => {
   }
 };
 
+// --- All Uploads Management (subject reassignment + topper name correction) ---
+
+// A subject "has a book made" once it's been through Classify at least once (i.e. has a
+// non-empty CSV the book builder reads). Case-insensitive because UPSCQA.subject casing can
+// drift from Subject.name casing (see classifySubject's regex query against UPSCQA).
+async function findSubjectWithBook(name) {
+  if (!name) return null;
+  const doc = await Subject.findOne({ name: new RegExp(`^${escapeRegExp(name)}$`, 'i') });
+  if (!doc || !doc.csvData || !doc.csvData.trim()) return null;
+  return doc;
+}
+
+function distinctQuestionCount(rows) {
+  return new Set(rows.map(r => r[2]).filter(Boolean)).size;
+}
+
+// Moves a single uploaded question between subjects (and/or renames its topper(s)) from the
+// "Display All Uploads" admin view. If the question's old/new subject already has a compiled
+// book (a classified CSV), the CSV is kept in sync: the question's row(s) are removed from the
+// old subject's book and appended to the new subject's book under Paper 1 / Unassigned /
+// Unassigned (the same fallback bucket classifySubject uses for unclassifiable questions), so
+// nothing silently disappears — the user just needs to re-sort it within the book builder.
+export const updateUploadRecord = async (req, res) => {
+  const { id } = req.params;
+  const { subject: newSubjectRaw, toppers } = req.body;
+  console.log(`[SubjectController] [updateUploadRecord] Request for UPSCQA id '${id}'.`);
+  try {
+    const question = await UPSCQA.findById(id);
+    if (!question) {
+      console.warn(`[SubjectController] [updateUploadRecord] Upload not found: '${id}'.`);
+      return res.status(404).json({ error: 'Upload record not found.' });
+    }
+
+    const bookChanges = { removedFrom: null, addedTo: null, toppersSynced: false };
+
+    // Apply topper name edits first so any book sync below reflects the corrected names.
+    if (Array.isArray(toppers)) {
+      toppers.forEach(({ file_url, topper_name }) => {
+        const entry = (question.file_urls || []).find(f => f.url === file_url);
+        if (entry && typeof topper_name === 'string') {
+          entry.topper_name = topper_name.trim() || 'Unknown Topper';
+        }
+      });
+    }
+
+    const oldSubject = question.subject;
+    let subjectChanged = false;
+
+    if (newSubjectRaw !== undefined) {
+      const newSubject = String(newSubjectRaw).trim();
+      if (!newSubject) {
+        return res.status(400).json({ error: 'Subject cannot be empty.' });
+      }
+      if (newSubject.toLowerCase() !== (oldSubject || '').toLowerCase()) {
+        const usedSubjects = await UPSCQA.distinct('subject');
+        const match = usedSubjects.find(s => s.toLowerCase() === newSubject.toLowerCase());
+        if (!match) {
+          console.warn(`[SubjectController] [updateUploadRecord] Rejected subject '${newSubject}': not an existing subject.`);
+          return res.status(400).json({ error: `'${newSubject}' is not an existing subject. Pick one from the dropdown.` });
+        }
+        question.subject = match;
+        subjectChanged = true;
+      }
+    }
+
+    await question.save();
+    console.log(`[SubjectController] [updateUploadRecord] Saved UPSCQA doc '${id}'. Subject changed: ${subjectChanged}.`);
+
+    if (subjectChanged) {
+      const oldSubjectDoc = await findSubjectWithBook(oldSubject);
+      if (oldSubjectDoc) {
+        const rows = parseCSV(oldSubjectDoc.csvData).slice(1).filter(r => r.length >= 10 && r[2] !== question.question_text);
+        let csvContent = CSV_HEADERS.map(escapeCSV).join(',') + '\n';
+        rows.forEach(r => { csvContent += r.map(escapeCSV).join(',') + '\n'; });
+        oldSubjectDoc.csvData = csvContent;
+        oldSubjectDoc.questionCount = distinctQuestionCount(rows);
+        await oldSubjectDoc.save();
+        bookChanges.removedFrom = oldSubjectDoc.name;
+        console.log(`[SubjectController] [updateUploadRecord] Removed question from '${oldSubjectDoc.name}' book (${rows.length} row(s) remain).`);
+      }
+
+      const newSubjectDoc = await findSubjectWithBook(question.subject);
+      if (newSubjectDoc) {
+        const rows = parseCSV(newSubjectDoc.csvData).slice(1).filter(r => r.length >= 10);
+        const alreadyPresent = rows.some(r => r[2] === question.question_text);
+        if (!alreadyPresent) {
+          const allTags = `${newSubjectDoc.name}, Paper 1, Unassigned, Unassigned`;
+          if (question.file_urls && question.file_urls.length > 0) {
+            question.file_urls.forEach(f => {
+              rows.push(['Unassigned', 'Unassigned', question.question_text, f.topper_name || 'Unknown Topper', cleanYear(f.topper_year) || '', f.topper_rank || '', f.topper_marks || '', f.url || '', allTags, 'Paper 1']);
+            });
+          } else {
+            rows.push(['Unassigned', 'Unassigned', question.question_text, '', '', '', '', '', allTags, 'Paper 1']);
+          }
+          let csvContent = CSV_HEADERS.map(escapeCSV).join(',') + '\n';
+          rows.forEach(r => { csvContent += r.map(escapeCSV).join(',') + '\n'; });
+          newSubjectDoc.csvData = csvContent;
+          newSubjectDoc.questionCount = distinctQuestionCount(rows);
+          await newSubjectDoc.save();
+          bookChanges.addedTo = newSubjectDoc.name;
+          console.log(`[SubjectController] [updateUploadRecord] Added question to '${newSubjectDoc.name}' book as Unassigned/Unassigned (Paper 1).`);
+        }
+      }
+    } else if (Array.isArray(toppers) && toppers.length > 0) {
+      // Subject unchanged — keep any renamed topper(s) in sync with the current subject's book, if made.
+      const currentSubjectDoc = await findSubjectWithBook(question.subject);
+      if (currentSubjectDoc) {
+        const parsed = parseCSV(currentSubjectDoc.csvData);
+        const header = parsed[0];
+        const rows = parsed.slice(1);
+        let changed = false;
+        toppers.forEach(({ file_url, topper_name }) => {
+          if (!file_url || typeof topper_name !== 'string') return;
+          rows.forEach(r => {
+            if (r.length >= 10 && r[7] === file_url) {
+              r[3] = topper_name.trim() || 'Unknown Topper';
+              changed = true;
+            }
+          });
+        });
+        if (changed) {
+          let csvContent = header.map(escapeCSV).join(',') + '\n';
+          rows.forEach(r => { csvContent += r.map(escapeCSV).join(',') + '\n'; });
+          currentSubjectDoc.csvData = csvContent;
+          await currentSubjectDoc.save();
+          bookChanges.toppersSynced = true;
+          console.log(`[SubjectController] [updateUploadRecord] Synced renamed topper(s) into '${currentSubjectDoc.name}' book.`);
+        }
+      }
+    }
+
+    res.json({ question, bookChanges });
+  } catch (err) {
+    console.error('[SubjectController] [updateUploadRecord] Error:', err);
+    res.status(500).json({ error: 'Failed to update upload record.', details: err.message });
+  }
+};
+
 // Proxies a Cloudinary-hosted topper sheet so it can be previewed inline in an <iframe>
 // (Cloudinary serves 'raw' files with Content-Disposition: attachment by default).
 export const previewSubjectTopperFile = async (req, res) => {

@@ -13,7 +13,8 @@ import {
   downloadSubjectBook,
   cleanupSubjectBookStorage,
   previewSubjectTopperFile,
-  saveSubjectBookLayout
+  saveSubjectBookLayout,
+  updateUploadRecord
 } from '../controllers/subjectController.js';
 
 const router = express.Router();
@@ -26,6 +27,9 @@ router.post('/classify', classifySubject);
 router.post('/:slug/activate', activateSubject);
 router.post('/:slug/reclassify', reclassifySubject);
 router.get('/:slug/toppers', listSubjectToppers);
+
+// All Uploads admin view — reassign a question's subject / fix a topper's name
+router.put('/uploads/:id', updateUploadRecord);
 
 // Generic book-compilation pipeline (parameterized clone of /api/psir)
 router.get('/:slug/preview', previewSubjectBookData);
