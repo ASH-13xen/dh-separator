@@ -6,6 +6,7 @@ import os from "os";
 import path from "path";
 import dotenv from "dotenv";
 import { fileURLToPath } from "url";
+import { stripHindiText } from "../utils/hindiText.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -37,14 +38,18 @@ const withRetry = async (fn, retries = 3, delayMs = 5000) => {
   }
 };
 
-// Strips a leading question-number marker (e.g. "Q.12)", "Q 12)", "Question 12:") and any
-// trailing marks/word-count annotation (e.g. "(15 marks, 250 words)", "[10 Marks]") from
-// extracted question text. Gemini is also instructed to omit these in the prompt, but this
-// regex pass enforces it strictly regardless of how Gemini formats its output.
+// Strips a leading question-number marker (e.g. "Q.12)", "Q 12)", "Question 12:"), any Hindi
+// (Devanagari) portion of a bilingual question, and any trailing marks/word-count annotation
+// (e.g. "(15 marks, 250 words)", "[10 Marks]") from extracted question text. Gemini is also
+// instructed to omit these in the prompt, but this regex pass enforces it strictly regardless
+// of how Gemini formats its output. Hindi is stripped first since the Hindi portion (when
+// present) often carries its own Hindi-language marks annotation (e.g. "(10 अंक)") that would
+// otherwise survive as an orphaned "(10 )" fragment.
 function cleanQuestionText(text) {
   if (!text) return text;
   let cleaned = text.trim();
   cleaned = cleaned.replace(/^(?:Q\.?\s*\d+\)?|Question\s*\d+)[.):\s-]*/i, '');
+  cleaned = stripHindiText(cleaned);
   let prevLength;
   do {
     prevLength = cleaned.length;
@@ -109,6 +114,11 @@ CRITICAL INSTRUCTIONS FOR PDF READING:
 - The PDF may contain a topper's name and details pages; IGNORE these pages.
 - The questions are typically printed in TEXT format (not handwritten) and start with indicators like "Q1", "Q.1", "Question 1", etc. Use these text indicators to confidently find the start of a question.
 - For the 'end_page' of a question, it MUST include all pages until the exact page where the NEXT printed question (e.g., "Q2") starts (or until the end of the current answer sheet). Take everything in between as the solution.
+
+CRITICAL RULES FOR LANGUAGES:
+- IGNORE ALL Hindi text/characters and any other non-English languages. Keep ONLY English text.
+- If a question is bilingual (printed in both Hindi and English), extract ONLY the English portion of the question and completely ignore the Hindi translation/characters.
+- Ensure the extracted question text contains ONLY standard English alphanumeric characters, punctuation, and whitespace.
 
 For every question found, provide:
 1. 'question_text': The full text of the question, EXCLUDING the leading question number marker (e.g. "Q.12)", "Q 12)", "Question 12:") and EXCLUDING any trailing marks/word-count annotation (e.g. "(15 marks, 250 words)", "[10 Marks]"). Only the question's actual wording.
