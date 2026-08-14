@@ -5,9 +5,10 @@ import { fileURLToPath } from 'url';
 import { execFile } from 'child_process';
 import { promisify } from 'util';
 import { PDFDocument, rgb, StandardFonts, PDFString } from 'pdf-lib';
-import { GridFSBucket } from 'mongodb';
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
+import { v2 as cloudinary } from 'cloudinary';
+import streamifier from 'streamifier';
 import { SubjectBook } from '../models/SubjectBook.js';
 import { Subject } from '../models/Subject.js';
 import { parseCSV } from '../utils/csv.js';
@@ -231,17 +232,24 @@ async function fetchUrlsInParallel(urls, concurrencyLimit = 5) {
   return results;
 }
 
-const saveToGridFS = (db, buffer, filename, bucketName) => {
-  console.log(`[Runner] [saveToGridFS] Uploading '${filename}' to GridFS bucket '${bucketName}'...`);
+// Uploads the finished book to Cloudinary as a raw asset (same pattern as answer-sheet
+// uploads in uploadController.js) instead of MongoDB GridFS, so downloads can be served
+// directly from Cloudinary instead of proxied through the Render backend.
+const uploadPdfToCloudinary = (buffer, publicId) => {
+  console.log(`[Runner] [uploadPdfToCloudinary] Uploading '${publicId}' to Cloudinary...`);
   return new Promise((resolve, reject) => {
-    const bucket = new GridFSBucket(db, { bucketName });
-    const uploadStream = bucket.openUploadStream(filename, { contentType: 'application/pdf' });
-    uploadStream.on('error', reject);
-    uploadStream.on('finish', () => {
-      console.log(`[Runner] [saveToGridFS] Upload complete. File ID: ${uploadStream.id}`);
-      resolve(uploadStream.id);
-    });
-    uploadStream.end(buffer);
+    const stream = cloudinary.uploader.upload_stream(
+      { resource_type: 'raw', folder: 'compiled_books', public_id: publicId },
+      (error, result) => {
+        if (result) {
+          console.log(`[Runner] [uploadPdfToCloudinary] Upload complete: ${result.secure_url}`);
+          resolve(result);
+        } else {
+          reject(error);
+        }
+      }
+    );
+    streamifier.createReadStream(buffer).pipe(stream);
   });
 };
 
@@ -272,6 +280,15 @@ async function main() {
     console.error('[Runner] MONGO_URI is missing from environment. Terminating execution.');
     process.exit(1);
   }
+  if (!process.env.CLOUDINARY_CLOUD_NAME || !process.env.CLOUDINARY_API_KEY || !process.env.CLOUDINARY_API_SECRET) {
+    console.error('[Runner] CLOUDINARY_CLOUD_NAME/CLOUDINARY_API_KEY/CLOUDINARY_API_SECRET are missing from environment. Terminating execution.');
+    process.exit(1);
+  }
+  cloudinary.config({
+    cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+    api_key: process.env.CLOUDINARY_API_KEY,
+    api_secret: process.env.CLOUDINARY_API_SECRET
+  });
 
   console.log('[Runner] Connecting to MongoDB database...');
   await mongoose.connect(process.env.MONGO_URI);
@@ -1102,13 +1119,14 @@ async function main() {
     const pdfBytes = await pdfDoc.save({ useObjectStreams: true });
     console.log(`[Runner] PDF successfully built. File size: ${pdfBytes.length} bytes.`);
 
-    // Update job status and store the compiled binary PDF directly in MongoDB
-    const fileName = `${subjectSlug}_${paper.replace(/[^a-z0-9]/gi, '_')}_${jobId}.pdf`;
-    const gridFsFileId = await saveToGridFS(mongoose.connection.db, Buffer.from(pdfBytes), fileName, `${subjectSlug}_books`);
+    // Update job status and upload the compiled binary PDF to Cloudinary
+    const fileName = `${subjectSlug}_${paper.replace(/[^a-z0-9]/gi, '_')}_${jobId}`;
+    const uploadResult = await uploadPdfToCloudinary(Buffer.from(pdfBytes), fileName);
 
-    console.log('[Runner] Saving GridFS file ID and status: "completed" to MongoDB...');
+    console.log('[Runner] Saving Cloudinary URL and status: "completed" to MongoDB...');
     job.status = 'completed';
-    job.pdfFileId = gridFsFileId.toString();
+    job.pdfUrl = uploadResult.secure_url;
+    job.pdfPublicId = uploadResult.public_id;
     await job.save();
     console.log('[Runner] MongoDB update succeeded. Job completed.');
 

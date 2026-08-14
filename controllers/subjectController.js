@@ -3,6 +3,7 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import { GridFSBucket } from 'mongodb';
 import mongoose from 'mongoose';
+import { v2 as cloudinary } from 'cloudinary';
 import { UPSCQA } from '../models/UPSCQA.js';
 import { Subject } from '../models/Subject.js';
 import { SubjectBook } from '../models/SubjectBook.js';
@@ -686,11 +687,24 @@ export const downloadSubjectBook = async (req, res) => {
     }
 
     if (job.pdfUrl) {
-      console.log(`[SubjectController] [downloadSubjectBook] Fetching PDF from external URL and streaming as: ${fileName}`);
+      if (isDownload) {
+        // Cloudinary raw assets already default to Content-Disposition: attachment, so a
+        // plain redirect forces a download with no proxying — the frontend's own
+        // link.download attribute (see downloadFinalPdf in SubjectwiseBookPage.jsx)
+        // supplies the friendly filename once the browser saves it, so no URL flag is
+        // needed here. (Adding an fl_attachment:<name> flag was tried and rejected: giving
+        // the resource a recognized extension trips this Cloudinary account's strict-
+        // transformations setting and the delivery starts 401ing outright.)
+        console.log(`[SubjectController] [downloadSubjectBook] Redirecting download straight to Cloudinary: ${job.pdfUrl}`);
+        return res.redirect(302, job.pdfUrl);
+      }
+      // Cloudinary's raw resource type always forces Content-Disposition: attachment —
+      // there's no flag to make it inline — so previews still have to be proxied here.
+      console.log(`[SubjectController] [downloadSubjectBook] Fetching PDF from Cloudinary and proxying inline preview as: ${fileName}`);
       const cloudRes = await fetch(job.pdfUrl);
       if (!cloudRes.ok) throw new Error(`Failed to fetch PDF from storage: ${cloudRes.status}`);
       const cloudBuffer = Buffer.from(await cloudRes.arrayBuffer());
-      res.setHeader('Content-Disposition', `${disposition}; filename="${fileName}"`);
+      res.setHeader('Content-Disposition', 'inline');
       res.setHeader('Content-Type', 'application/pdf');
       res.send(cloudBuffer);
       return;
@@ -716,15 +730,29 @@ export const cleanupSubjectBookStorage = async (req, res) => {
     const db = mongoose.connection.db;
     const filesResult = await db.collection(`${slug}_books.files`).deleteMany({});
     const chunksResult = await db.collection(`${slug}_books.chunks`).deleteMany({});
+
+    // Also destroy any Cloudinary-hosted compiled books for this subject, so switching
+    // storage backends doesn't quietly leak files (and quota) into Cloudinary.
+    const cloudinaryJobs = await SubjectBook.find({ subject: slug, pdfPublicId: { $exists: true, $ne: null } }).select('pdfPublicId').lean();
+    const destroyResults = await Promise.allSettled(
+      cloudinaryJobs.map(j => cloudinary.uploader.destroy(j.pdfPublicId, { resource_type: 'raw' }))
+    );
+    const deletedFromCloudinary = destroyResults.filter(r => r.status === 'fulfilled').length;
+    const failedCloudinaryDeletes = destroyResults.length - deletedFromCloudinary;
+    if (failedCloudinaryDeletes > 0) {
+      console.warn(`[SubjectController] [cleanupSubjectBookStorage] ${failedCloudinaryDeletes} Cloudinary delete(s) failed for '${slug}'.`);
+    }
+
     const jobsUpdateResult = await SubjectBook.updateMany(
       { subject: slug },
-      { $unset: { pdfFileId: '', pdfUrl: '', pdfData: '' } }
+      { $unset: { pdfFileId: '', pdfUrl: '', pdfPublicId: '', pdfData: '' } }
     );
-    console.log(`[SubjectController] [cleanupSubjectBookStorage] Deleted ${filesResult.deletedCount} GridFS file(s), ${chunksResult.deletedCount} chunk(s). Cleared references on ${jobsUpdateResult.modifiedCount} job(s) for '${slug}'.`);
+    console.log(`[SubjectController] [cleanupSubjectBookStorage] Deleted ${filesResult.deletedCount} GridFS file(s), ${chunksResult.deletedCount} chunk(s), ${deletedFromCloudinary}/${cloudinaryJobs.length} Cloudinary file(s). Cleared references on ${jobsUpdateResult.modifiedCount} job(s) for '${slug}'.`);
     res.json({
       message: 'Subject book storage cleaned successfully.',
       deletedFiles: filesResult.deletedCount,
       deletedChunks: chunksResult.deletedCount,
+      deletedFromCloudinary,
       jobsUpdated: jobsUpdateResult.modifiedCount
     });
   } catch (err) {

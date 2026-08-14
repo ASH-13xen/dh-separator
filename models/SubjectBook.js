@@ -44,6 +44,9 @@ const subjectBookSchema = new mongoose.Schema({
   pdfUrl: {
     type: String
   },
+  pdfPublicId: {
+    type: String
+  },
   pdfData: {
     type: Buffer
   },

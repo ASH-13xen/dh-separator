@@ -4,6 +4,7 @@ import { fileURLToPath } from 'url';
 import { PDFDocument, rgb, StandardFonts } from 'pdf-lib';
 import { GridFSBucket } from 'mongodb';
 import mongoose from 'mongoose';
+import { v2 as cloudinary } from 'cloudinary';
 import { PsirBook } from '../models/PsirBook.js';
 import { BookLayout } from '../models/BookLayout.js';
 import { applyBookLayout, deriveIncludedAndSelections } from '../utils/bookLayout.js';
@@ -409,11 +410,24 @@ export const downloadPsirBook = async (req, res) => {
     }
 
     if (job.pdfUrl) {
-      console.log(`[PsirController] [downloadPsirBook] Fetching PDF from Cloudinary URL and streaming as: ${fileName}`);
+      if (isDownload) {
+        // Cloudinary raw assets already default to Content-Disposition: attachment, so a
+        // plain redirect forces a download with no proxying — the frontend's own
+        // link.download attribute (see downloadFinalPdf in the PSIR book pages) supplies
+        // the friendly filename once the browser saves it, so no URL flag is needed here.
+        // (Adding an fl_attachment:<name> flag was tried and rejected: giving the resource
+        // a recognized extension trips this Cloudinary account's strict-transformations
+        // setting and the delivery starts 401ing outright.)
+        console.log(`[PsirController] [downloadPsirBook] Redirecting download straight to Cloudinary: ${job.pdfUrl}`);
+        return res.redirect(302, job.pdfUrl);
+      }
+      // Cloudinary's raw resource type always forces Content-Disposition: attachment —
+      // there's no flag to make it inline — so previews still have to be proxied here.
+      console.log(`[PsirController] [downloadPsirBook] Fetching PDF from Cloudinary and proxying inline preview as: ${fileName}`);
       const cloudRes = await fetch(job.pdfUrl);
       if (!cloudRes.ok) throw new Error(`Failed to fetch PDF from storage: ${cloudRes.status}`);
       const cloudBuffer = Buffer.from(await cloudRes.arrayBuffer());
-      res.setHeader('Content-Disposition', `${disposition}; filename="${fileName}"`);
+      res.setHeader('Content-Disposition', 'inline');
       res.setHeader('Content-Type', 'application/pdf');
       res.send(cloudBuffer);
       return;
@@ -438,15 +452,29 @@ export const cleanupPsirStorage = async (req, res) => {
     const db = mongoose.connection.db;
     const filesResult = await db.collection('psir_books.files').deleteMany({});
     const chunksResult = await db.collection('psir_books.chunks').deleteMany({});
+
+    // Also destroy any Cloudinary-hosted compiled books, so switching storage backends
+    // doesn't quietly leak files (and quota) into Cloudinary.
+    const cloudinaryJobs = await PsirBook.find({ pdfPublicId: { $exists: true, $ne: null } }).select('pdfPublicId').lean();
+    const destroyResults = await Promise.allSettled(
+      cloudinaryJobs.map(j => cloudinary.uploader.destroy(j.pdfPublicId, { resource_type: 'raw' }))
+    );
+    const deletedFromCloudinary = destroyResults.filter(r => r.status === 'fulfilled').length;
+    const failedCloudinaryDeletes = destroyResults.length - deletedFromCloudinary;
+    if (failedCloudinaryDeletes > 0) {
+      console.warn(`[PsirController] [cleanupPsirStorage] ${failedCloudinaryDeletes} Cloudinary delete(s) failed.`);
+    }
+
     const jobsUpdateResult = await PsirBook.updateMany(
       {},
-      { $unset: { pdfFileId: '', pdfUrl: '', pdfData: '' } }
+      { $unset: { pdfFileId: '', pdfUrl: '', pdfPublicId: '', pdfData: '' } }
     );
-    console.log(`[PsirController] [cleanupPsirStorage] Deleted ${filesResult.deletedCount} GridFS files, ${chunksResult.deletedCount} chunks. Cleared references on ${jobsUpdateResult.modifiedCount} job(s).`);
+    console.log(`[PsirController] [cleanupPsirStorage] Deleted ${filesResult.deletedCount} GridFS files, ${chunksResult.deletedCount} chunks, ${deletedFromCloudinary}/${cloudinaryJobs.length} Cloudinary file(s). Cleared references on ${jobsUpdateResult.modifiedCount} job(s).`);
     res.json({
       message: 'PSIR file storage cleaned successfully.',
       deletedFiles: filesResult.deletedCount,
       deletedChunks: chunksResult.deletedCount,
+      deletedFromCloudinary,
       jobsUpdated: jobsUpdateResult.modifiedCount
     });
   } catch (err) {

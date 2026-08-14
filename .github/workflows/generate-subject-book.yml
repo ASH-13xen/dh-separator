@@ -37,6 +37,9 @@ jobs:
       - name: Compile and Upload PDF
         env:
           MONGO_URI: ${{ secrets.MONGO_URI }}
+          CLOUDINARY_CLOUD_NAME: ${{ secrets.CLOUDINARY_CLOUD_NAME }}
+          CLOUDINARY_API_KEY: ${{ secrets.CLOUDINARY_API_KEY }}
+          CLOUDINARY_API_SECRET: ${{ secrets.CLOUDINARY_API_SECRET }}
         run: |
           node scripts/generateSubjectBookPdf.js \
             --subject "${{ github.event.inputs.subject }}" \
