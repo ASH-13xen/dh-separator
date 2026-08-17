@@ -777,125 +777,294 @@ function distinctQuestionCount(rows) {
   return new Set(rows.map(r => r[2]).filter(Boolean)).size;
 }
 
-// Moves a single uploaded question between subjects (and/or renames its topper(s)) from the
-// "Display All Uploads" admin view. If the question's old/new subject already has a compiled
-// book (a classified CSV), the CSV is kept in sync: the question's row(s) are removed from the
-// old subject's book and appended to the new subject's book under Paper 1 / Unassigned /
-// Unassigned (the same fallback bucket classifySubject uses for unclassifiable questions), so
-// nothing silently disappears — the user just needs to re-sort it within the book builder.
-export const updateUploadRecord = async (req, res) => {
-  const { id } = req.params;
-  const { subject: newSubjectRaw, toppers } = req.body;
-  console.log(`[SubjectController] [updateUploadRecord] Request for UPSCQA id '${id}'.`);
+// Removes every row for a question from a subject's book CSV (used when the question itself
+// is leaving the subject entirely — reassigned elsewhere, or deleted outright).
+async function removeQuestionFromBook(subjectDoc, questionText) {
+  const rows = parseCSV(subjectDoc.csvData).slice(1).filter(r => r.length >= 10 && r[2] !== questionText);
+  let csvContent = CSV_HEADERS.map(escapeCSV).join(',') + '\n';
+  rows.forEach(r => { csvContent += r.map(escapeCSV).join(',') + '\n'; });
+  subjectDoc.csvData = csvContent;
+  subjectDoc.questionCount = distinctQuestionCount(rows);
+  await subjectDoc.save();
+}
+
+// Removes just the one row for a (question, specific topper answer sheet) pair — used when a
+// question has multiple toppers and only one of them is being removed, so the rest of the
+// question's book rows must survive untouched.
+async function removeTopperRowFromBook(subjectDoc, questionText, url) {
+  const rows = parseCSV(subjectDoc.csvData).slice(1).filter(r => !(r.length >= 10 && r[2] === questionText && r[7] === url));
+  let csvContent = CSV_HEADERS.map(escapeCSV).join(',') + '\n';
+  rows.forEach(r => { csvContent += r.map(escapeCSV).join(',') + '\n'; });
+  subjectDoc.csvData = csvContent;
+  subjectDoc.questionCount = distinctQuestionCount(rows);
+  await subjectDoc.save();
+}
+
+// Appends a question (all its current topper rows) into a subject's book CSV under Paper 1 /
+// Unassigned / Unassigned — the same fallback bucket classifySubject uses for unclassifiable
+// questions — so a reassigned question is never silently missing, just needs re-sorting in the
+// book builder. No-ops (returns false) if the question is already present.
+async function addQuestionToBook(subjectDoc, question) {
+  const rows = parseCSV(subjectDoc.csvData).slice(1).filter(r => r.length >= 10);
+  if (rows.some(r => r[2] === question.question_text)) return false;
+  const allTags = `${subjectDoc.name}, Paper 1, Unassigned, Unassigned`;
+  if (question.file_urls && question.file_urls.length > 0) {
+    question.file_urls.forEach(f => {
+      rows.push(['Unassigned', 'Unassigned', question.question_text, f.topper_name || 'Unknown Topper', cleanYear(f.topper_year) || '', f.topper_rank || '', f.topper_marks || '', f.url || '', allTags, 'Paper 1']);
+    });
+  } else {
+    rows.push(['Unassigned', 'Unassigned', question.question_text, '', '', '', '', '', allTags, 'Paper 1']);
+  }
+  let csvContent = CSV_HEADERS.map(escapeCSV).join(',') + '\n';
+  rows.forEach(r => { csvContent += r.map(escapeCSV).join(',') + '\n'; });
+  subjectDoc.csvData = csvContent;
+  subjectDoc.questionCount = distinctQuestionCount(rows);
+  await subjectDoc.save();
+  return true;
+}
+
+// Syncs renamed topper name(s) into a subject's book CSV for the given answer-sheet URLs of one
+// question. Returns whether anything actually changed.
+async function syncTopperNamesInBook(subjectDoc, question, urls) {
+  const parsed = parseCSV(subjectDoc.csvData);
+  const header = parsed[0];
+  const rows = parsed.slice(1);
+  let changed = false;
+  urls.forEach((url) => {
+    const entry = (question.file_urls || []).find(f => f.url === url);
+    if (!entry) return;
+    rows.forEach(r => {
+      if (r.length >= 10 && r[2] === question.question_text && r[7] === url) {
+        r[3] = entry.topper_name || 'Unknown Topper';
+        changed = true;
+      }
+    });
+  });
+  if (!changed) return false;
+  let csvContent = header.map(escapeCSV).join(',') + '\n';
+  rows.forEach(r => { csvContent += r.map(escapeCSV).join(',') + '\n'; });
+  subjectDoc.csvData = csvContent;
+  await subjectDoc.save();
+  return true;
+}
+
+// Extracts a Cloudinary public_id (including its folder prefix) from a delivery URL, e.g.
+// ".../raw/upload/v1786475336/upsc_answers/Q20_123" -> "upsc_answers/Q20_123".
+function extractCloudinaryPublicId(url) {
+  if (!url || typeof url !== 'string') return null;
+  const match = url.match(/\/upload\/(?:v\d+\/)?(.+)$/);
+  return match ? match[1] : null;
+}
+
+// Resolves an "All Uploads" batch key back to every (question, answer-sheet url) pair it
+// covers. A real batch key is the shared uploadBatchId stamped on every question a single PDF
+// upload produced; a "legacy:<url>" key is a synthetic one-member batch for answer sheets
+// uploaded before that field existed (see UPSCQA.js).
+async function resolveBatchMembers(batchKey) {
+  const isLegacy = batchKey.startsWith('legacy:');
+  const legacyUrl = isLegacy ? batchKey.slice('legacy:'.length) : null;
+  const questions = isLegacy
+    ? await UPSCQA.find({ 'file_urls.url': legacyUrl })
+    : await UPSCQA.find({ 'file_urls.uploadBatchId': batchKey });
+
+  const members = [];
+  questions.forEach((question) => {
+    (question.file_urls || []).forEach((f) => {
+      const matches = isLegacy ? f.url === legacyUrl : f.uploadBatchId === batchKey;
+      if (matches) members.push({ question, url: f.url });
+    });
+  });
+  return members;
+}
+
+// Lists every upload for the "Display All Uploads" admin view, grouped one row per upload
+// action (see resolveBatchMembers for how a "batch" is identified) instead of one row per
+// question, so a single PDF upload that produced a dozen questions shows as a single row.
+export const listUploadBatches = async (req, res) => {
+  console.log('[SubjectController] [listUploadBatches] Request received.');
   try {
-    const question = await UPSCQA.findById(id);
-    if (!question) {
-      console.warn(`[SubjectController] [updateUploadRecord] Upload not found: '${id}'.`);
-      return res.status(404).json({ error: 'Upload record not found.' });
+    const questions = await UPSCQA.find({}).select('question_text subject file_urls createdAt').lean();
+
+    const batches = new Map();
+    questions.forEach((q) => {
+      (q.file_urls || []).forEach((f) => {
+        const batchKey = f.uploadBatchId || `legacy:${f.url}`;
+        const candidateDate = f.uploadedAt || q.createdAt || null;
+        if (!batches.has(batchKey)) {
+          batches.set(batchKey, { batchKey, uploadedAt: candidateDate, toppers: new Set(), subjects: new Set(), questionIds: new Set(), answerSheetCount: 0 });
+        }
+        const batch = batches.get(batchKey);
+        batch.toppers.add(f.topper_name || 'Unknown Topper');
+        batch.subjects.add(q.subject);
+        batch.questionIds.add(q._id.toString());
+        batch.answerSheetCount++;
+        if (candidateDate && (!batch.uploadedAt || new Date(candidateDate) < new Date(batch.uploadedAt))) {
+          batch.uploadedAt = candidateDate;
+        }
+      });
+    });
+
+    const result = [...batches.values()]
+      .map((b) => ({
+        batchKey: b.batchKey,
+        uploadedAt: b.uploadedAt,
+        toppers: [...b.toppers].sort(),
+        subjects: [...b.subjects].sort(),
+        subject: b.subjects.size === 1 ? [...b.subjects][0] : null,
+        questionCount: b.questionIds.size,
+        answerSheetCount: b.answerSheetCount,
+      }))
+      .sort((a, b) => new Date(b.uploadedAt || 0) - new Date(a.uploadedAt || 0));
+
+    console.log(`[SubjectController] [listUploadBatches] Grouped ${questions.length} question(s) into ${result.length} upload batch(es).`);
+    res.json(result);
+  } catch (err) {
+    console.error('[SubjectController] [listUploadBatches] Error:', err);
+    res.status(500).json({ error: 'Failed to list uploads.', details: err.message });
+  }
+};
+
+// Renames topper(s) and/or reassigns the subject for every question one upload batch touched.
+// Subject reassignment keeps each affected subject's compiled book (if made) in sync exactly
+// like the old single-question edit did — removed from the old subject's book, added to the
+// new one's if it has a book too.
+export const updateUploadBatch = async (req, res) => {
+  const { batchKey } = req.params;
+  const { subject: newSubjectRaw, topperRenames } = req.body;
+  console.log(`[SubjectController] [updateUploadBatch] Request for batch '${batchKey}'.`);
+  try {
+    const members = await resolveBatchMembers(batchKey);
+    if (members.length === 0) {
+      console.warn(`[SubjectController] [updateUploadBatch] Batch not found: '${batchKey}'.`);
+      return res.status(404).json({ error: 'Upload batch not found.' });
     }
 
-    const bookChanges = { removedFrom: null, addedTo: null, toppersSynced: false };
-
-    // Apply topper name edits first so any book sync below reflects the corrected names.
-    if (Array.isArray(toppers)) {
-      toppers.forEach(({ file_url, topper_name }) => {
-        const entry = (question.file_urls || []).find(f => f.url === file_url);
-        if (entry && typeof topper_name === 'string') {
-          entry.topper_name = topper_name.trim() || 'Unknown Topper';
-        }
+    if (Array.isArray(topperRenames)) {
+      topperRenames.forEach(({ from, to }) => {
+        if (typeof from !== 'string' || typeof to !== 'string') return;
+        const trimmedTo = to.trim() || 'Unknown Topper';
+        members.forEach(({ question, url }) => {
+          const entry = (question.file_urls || []).find(f => f.url === url);
+          if (entry && entry.topper_name === from) entry.topper_name = trimmedTo;
+        });
       });
     }
 
-    const oldSubject = question.subject;
-    let subjectChanged = false;
-
+    let newSubjectMatch = null;
     if (newSubjectRaw !== undefined) {
       const newSubject = String(newSubjectRaw).trim();
-      if (!newSubject) {
-        return res.status(400).json({ error: 'Subject cannot be empty.' });
-      }
-      if (newSubject.toLowerCase() !== (oldSubject || '').toLowerCase()) {
-        const usedSubjects = await UPSCQA.distinct('subject');
-        const match = usedSubjects.find(s => s.toLowerCase() === newSubject.toLowerCase());
-        if (!match) {
-          console.warn(`[SubjectController] [updateUploadRecord] Rejected subject '${newSubject}': not an existing subject.`);
-          return res.status(400).json({ error: `'${newSubject}' is not an existing subject. Pick one from the dropdown.` });
-        }
-        question.subject = match;
-        subjectChanged = true;
+      if (!newSubject) return res.status(400).json({ error: 'Subject cannot be empty.' });
+      const usedSubjects = await UPSCQA.distinct('subject');
+      newSubjectMatch = usedSubjects.find(s => s.toLowerCase() === newSubject.toLowerCase());
+      if (!newSubjectMatch) {
+        console.warn(`[SubjectController] [updateUploadBatch] Rejected subject '${newSubject}': not an existing subject.`);
+        return res.status(400).json({ error: `'${newSubject}' is not an existing subject. Pick one from the dropdown.` });
       }
     }
 
-    await question.save();
-    console.log(`[SubjectController] [updateUploadRecord] Saved UPSCQA doc '${id}'. Subject changed: ${subjectChanged}.`);
+    const bookChanges = { removedFrom: new Set(), addedTo: new Set(), toppersSynced: false };
+    const uniqueQuestions = [...new Map(members.map(m => [m.question._id.toString(), m.question])).values()];
 
-    if (subjectChanged) {
-      const oldSubjectDoc = await findSubjectWithBook(oldSubject);
-      if (oldSubjectDoc) {
-        const rows = parseCSV(oldSubjectDoc.csvData).slice(1).filter(r => r.length >= 10 && r[2] !== question.question_text);
-        let csvContent = CSV_HEADERS.map(escapeCSV).join(',') + '\n';
-        rows.forEach(r => { csvContent += r.map(escapeCSV).join(',') + '\n'; });
-        oldSubjectDoc.csvData = csvContent;
-        oldSubjectDoc.questionCount = distinctQuestionCount(rows);
-        await oldSubjectDoc.save();
-        bookChanges.removedFrom = oldSubjectDoc.name;
-        console.log(`[SubjectController] [updateUploadRecord] Removed question from '${oldSubjectDoc.name}' book (${rows.length} row(s) remain).`);
-      }
+    for (const question of uniqueQuestions) {
+      const oldSubject = question.subject;
+      const subjectChanged = !!(newSubjectMatch && newSubjectMatch.toLowerCase() !== (oldSubject || '').toLowerCase());
+      if (subjectChanged) question.subject = newSubjectMatch;
+      await question.save();
 
-      const newSubjectDoc = await findSubjectWithBook(question.subject);
-      if (newSubjectDoc) {
-        const rows = parseCSV(newSubjectDoc.csvData).slice(1).filter(r => r.length >= 10);
-        const alreadyPresent = rows.some(r => r[2] === question.question_text);
-        if (!alreadyPresent) {
-          const allTags = `${newSubjectDoc.name}, Paper 1, Unassigned, Unassigned`;
-          if (question.file_urls && question.file_urls.length > 0) {
-            question.file_urls.forEach(f => {
-              rows.push(['Unassigned', 'Unassigned', question.question_text, f.topper_name || 'Unknown Topper', cleanYear(f.topper_year) || '', f.topper_rank || '', f.topper_marks || '', f.url || '', allTags, 'Paper 1']);
-            });
-          } else {
-            rows.push(['Unassigned', 'Unassigned', question.question_text, '', '', '', '', '', allTags, 'Paper 1']);
+      if (subjectChanged) {
+        const oldSubjectDoc = await findSubjectWithBook(oldSubject);
+        if (oldSubjectDoc) {
+          await removeQuestionFromBook(oldSubjectDoc, question.question_text);
+          bookChanges.removedFrom.add(oldSubjectDoc.name);
+        }
+        const newSubjectDoc = await findSubjectWithBook(question.subject);
+        if (newSubjectDoc && await addQuestionToBook(newSubjectDoc, question)) {
+          bookChanges.addedTo.add(newSubjectDoc.name);
+        }
+      } else if (Array.isArray(topperRenames) && topperRenames.length > 0) {
+        const currentSubjectDoc = await findSubjectWithBook(question.subject);
+        if (currentSubjectDoc) {
+          const memberUrls = members.filter(m => m.question._id.equals(question._id)).map(m => m.url);
+          if (await syncTopperNamesInBook(currentSubjectDoc, question, memberUrls)) {
+            bookChanges.toppersSynced = true;
           }
-          let csvContent = CSV_HEADERS.map(escapeCSV).join(',') + '\n';
-          rows.forEach(r => { csvContent += r.map(escapeCSV).join(',') + '\n'; });
-          newSubjectDoc.csvData = csvContent;
-          newSubjectDoc.questionCount = distinctQuestionCount(rows);
-          await newSubjectDoc.save();
-          bookChanges.addedTo = newSubjectDoc.name;
-          console.log(`[SubjectController] [updateUploadRecord] Added question to '${newSubjectDoc.name}' book as Unassigned/Unassigned (Paper 1).`);
-        }
-      }
-    } else if (Array.isArray(toppers) && toppers.length > 0) {
-      // Subject unchanged — keep any renamed topper(s) in sync with the current subject's book, if made.
-      const currentSubjectDoc = await findSubjectWithBook(question.subject);
-      if (currentSubjectDoc) {
-        const parsed = parseCSV(currentSubjectDoc.csvData);
-        const header = parsed[0];
-        const rows = parsed.slice(1);
-        let changed = false;
-        toppers.forEach(({ file_url, topper_name }) => {
-          if (!file_url || typeof topper_name !== 'string') return;
-          rows.forEach(r => {
-            if (r.length >= 10 && r[7] === file_url) {
-              r[3] = topper_name.trim() || 'Unknown Topper';
-              changed = true;
-            }
-          });
-        });
-        if (changed) {
-          let csvContent = header.map(escapeCSV).join(',') + '\n';
-          rows.forEach(r => { csvContent += r.map(escapeCSV).join(',') + '\n'; });
-          currentSubjectDoc.csvData = csvContent;
-          await currentSubjectDoc.save();
-          bookChanges.toppersSynced = true;
-          console.log(`[SubjectController] [updateUploadRecord] Synced renamed topper(s) into '${currentSubjectDoc.name}' book.`);
         }
       }
     }
 
-    res.json({ question, bookChanges });
+    console.log(`[SubjectController] [updateUploadBatch] Batch '${batchKey}': updated ${uniqueQuestions.length} question(s).`);
+    res.json({
+      batchKey,
+      updatedQuestionCount: uniqueQuestions.length,
+      bookChanges: {
+        removedFrom: [...bookChanges.removedFrom],
+        addedTo: [...bookChanges.addedTo],
+        toppersSynced: bookChanges.toppersSynced,
+      },
+    });
   } catch (err) {
-    console.error('[SubjectController] [updateUploadRecord] Error:', err);
-    res.status(500).json({ error: 'Failed to update upload record.', details: err.message });
+    console.error('[SubjectController] [updateUploadBatch] Error:', err);
+    res.status(500).json({ error: 'Failed to update upload batch.', details: err.message });
+  }
+};
+
+// Deletes an upload batch: removes each affected question's answer-sheet entries for this
+// batch (and the underlying Cloudinary file), and keeps any subject book in sync. A question
+// that ends up with no answer sheets left at all is deleted outright (and its rows removed from
+// its subject's book, if any); a question another topper/upload still answers is kept, with
+// just this batch's row(s) dropped from the book.
+export const deleteUploadBatch = async (req, res) => {
+  const { batchKey } = req.params;
+  console.log(`[SubjectController] [deleteUploadBatch] Request for batch '${batchKey}'.`);
+  try {
+    const members = await resolveBatchMembers(batchKey);
+    if (members.length === 0) {
+      console.warn(`[SubjectController] [deleteUploadBatch] Batch not found: '${batchKey}'.`);
+      return res.status(404).json({ error: 'Upload batch not found.' });
+    }
+
+    const uniqueQuestions = [...new Map(members.map(m => [m.question._id.toString(), m.question])).values()];
+    const cloudinaryPublicIds = [];
+    let deletedQuestions = 0;
+    let trimmedQuestions = 0;
+
+    for (const question of uniqueQuestions) {
+      const urlsToRemove = new Set(members.filter(m => m.question._id.equals(question._id)).map(m => m.url));
+      urlsToRemove.forEach((url) => {
+        const publicId = extractCloudinaryPublicId(url);
+        if (publicId) cloudinaryPublicIds.push(publicId);
+      });
+
+      const remaining = (question.file_urls || []).filter(f => !urlsToRemove.has(f.url));
+
+      if (remaining.length === 0) {
+        const subjectDoc = await findSubjectWithBook(question.subject);
+        if (subjectDoc) await removeQuestionFromBook(subjectDoc, question.question_text);
+        await UPSCQA.deleteOne({ _id: question._id });
+        deletedQuestions++;
+      } else {
+        question.file_urls = remaining;
+        await question.save();
+        const subjectDoc = await findSubjectWithBook(question.subject);
+        if (subjectDoc) {
+          for (const url of urlsToRemove) {
+            await removeTopperRowFromBook(subjectDoc, question.question_text, url);
+          }
+        }
+        trimmedQuestions++;
+      }
+    }
+
+    const destroyResults = await Promise.allSettled(
+      cloudinaryPublicIds.map(publicId => cloudinary.uploader.destroy(publicId, { resource_type: 'raw' }))
+    );
+    const deletedFiles = destroyResults.filter(r => r.status === 'fulfilled').length;
+
+    console.log(`[SubjectController] [deleteUploadBatch] Batch '${batchKey}': ${deletedQuestions} question(s) deleted outright, ${trimmedQuestions} trimmed (other toppers remain), ${deletedFiles}/${cloudinaryPublicIds.length} Cloudinary file(s) removed.`);
+    res.json({ deletedQuestions, trimmedQuestions, deletedFiles });
+  } catch (err) {
+    console.error('[SubjectController] [deleteUploadBatch] Error:', err);
+    res.status(500).json({ error: 'Failed to delete upload batch.', details: err.message });
   }
 };
 

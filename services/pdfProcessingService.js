@@ -1,3 +1,4 @@
+import { randomUUID } from 'crypto';
 import { processLargePdfInChunks } from './geminiService.js';
 import { UPSCQA } from '../models/UPSCQA.js';
 import { PDFDocument } from 'pdf-lib';
@@ -14,6 +15,11 @@ cloudinary.config({
 export const processPdf = async (fileBuffer, metadataList, subject) => {
   try {
     console.log(`[PdfProcessingService] Processing single-upload PDF for subject '${subject}'...`);
+
+    // One id shared by every question this single PDF upload produces, so the "All
+    // Uploads" admin view can treat them as one row instead of one row per question.
+    const uploadBatchId = randomUUID();
+    const uploadedAt = new Date();
 
     // 1. Get the Index from Gemini (Chunked Batched Call)
     const indexArray = await processLargePdfInChunks(fileBuffer);
@@ -96,14 +102,16 @@ export const processPdf = async (fileBuffer, metadataList, subject) => {
             start_page: record.start_page,
             end_page: record.end_page
           },
-          $push: { 
-            file_urls: { 
-              url: record.file_url, 
+          $push: {
+            file_urls: {
+              url: record.file_url,
               topper_name: record.topper_name,
               topper_year: record.topper_year,
               topper_rank: record.topper_rank,
-              topper_marks: record.topper_marks
-            } 
+              topper_marks: record.topper_marks,
+              uploadBatchId,
+              uploadedAt
+            }
           }
         },
         upsert: true

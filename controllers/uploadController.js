@@ -1,3 +1,4 @@
+import { randomUUID } from 'crypto';
 import { processPdf } from '../services/pdfProcessingService.js';
 import { UPSCQA } from '../models/UPSCQA.js';
 import streamifier from 'streamifier';
@@ -109,7 +110,9 @@ export const handleManualUpload = async (req, res) => {
             topper_name: topper_name || 'Unknown Topper',
             topper_year: topper_year || '',
             topper_rank: topper_rank || '',
-            topper_marks: topper_marks || ''
+            topper_marks: topper_marks || '',
+            uploadBatchId: randomUUID(),
+            uploadedAt: new Date()
           }
         }
       },
