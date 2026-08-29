@@ -12,9 +12,45 @@ import { cleanYear } from './csv.js';
 // trailing ".0" from spreadsheet-exported years without ever rewriting the stored override.
 
 export function applyBookLayout(hierarchy, layoutsByPaper) {
+  // A question can be explicitly placed into a DIFFERENT topic's — or even a different paper's
+  // — saved order than its CSV classification: the user dragged it to another topic, or moved
+  // it to another paper via the cross-paper modal (moveQuestionAcrossTopics /
+  // confirmMoveQuestionToPaper on the frontend). Each paper used to be processed in isolation,
+  // rebuilding every topic purely from that topic's own CSV-classified questions — so a moved
+  // question could never actually be found in its new topic (nothing there knew it existed),
+  // while its old topic kept silently re-adding it back in via the "unordered" fallback below.
+  // The move would save fine and immediately look correct, then vanish back to its original
+  // spot on the very next reload. Building one global lookup up front — across every paper, not
+  // just the one being processed — lets a topic's saved order pull in a question that "belongs"
+  // to a different topic (or paper) by CSV default, and lets every topic know which of its own
+  // CSV questions have been explicitly claimed elsewhere so it stops re-adding them.
+  const allQuestionsById = new Map();
+  hierarchy.forEach((paperNode) => {
+    paperNode.topics.forEach((topic) => {
+      topic.questions.forEach((q) => allQuestionsById.set(q._id, q));
+    });
+  });
+  const explicitlyPlacedIds = new Set();
+  Object.values(layoutsByPaper).forEach((layout) => {
+    Object.values(layout.questionOrder || {}).forEach((order) => {
+      (order || []).forEach((id) => { if (allQuestionsById.has(id)) explicitlyPlacedIds.add(id); });
+    });
+  });
+
   return hierarchy.map((paperNode) => {
     const layout = layoutsByPaper[paperNode.paper];
-    if (!layout) return paperNode;
+    if (!layout) {
+      // No saved layout for this paper, but another paper's saved order may have claimed one
+      // of this paper's CSV-default questions (moved it away) — drop it so it isn't shown in
+      // both places at once.
+      return {
+        ...paperNode,
+        topics: paperNode.topics.map((topic) => ({
+          ...topic,
+          questions: topic.questions.filter((q) => !explicitlyPlacedIds.has(q._id)),
+        })),
+      };
+    }
 
     const renames = layout.topicRenames || {};
     const questionOrders = layout.questionOrder || {};
@@ -23,24 +59,23 @@ export function applyBookLayout(hierarchy, layoutsByPaper) {
     const titlePages = layout.titlePages || {};
 
     let topics = paperNode.topics.map((topic) => {
-      const order = questionOrders[topic._key];
-      let questions = topic.questions;
-      if (order && order.length) {
-        const byId = new Map(questions.map((q) => [q._id, q]));
-        const orderedIds = new Set(order);
-        // An id in the saved order that isn't a real CSV question is a user-inserted
-        // title page (divider) — synthesize it here instead of silently dropping it.
-        const ordered = order.map((id) => {
-          if (byId.has(id)) return byId.get(id);
-          const tp = titlePages[id];
-          if (tp) return { _id: id, isTitlePage: true, subtitle: tp.subtitle, question_text: tp.subtitle, file_urls: [] };
-          return null;
-        }).filter(Boolean);
-        const remaining = questions.filter((q) => !orderedIds.has(q._id));
-        questions = [...ordered, ...remaining];
-      }
-
-      questions = questions.map((q) => ({
+      // De-duplicated defensively: a handful of older saved layouts (from before an autosave
+      // race was fixed) ended up with the same id listed twice in one topic's order, which
+      // rendered — and would have compiled into a book — as the same question appearing twice.
+      const order = [...new Set(questionOrders[topic._key] || [])];
+      const orderedIds = new Set(order);
+      // An id in the saved order that isn't a real question is a user-inserted title page
+      // (divider) — synthesize it here instead of silently dropping it.
+      const ordered = order.map((id) => {
+        if (allQuestionsById.has(id)) return allQuestionsById.get(id);
+        const tp = titlePages[id];
+        if (tp) return { _id: id, isTitlePage: true, subtitle: tp.subtitle, question_text: tp.subtitle, file_urls: [] };
+        return null;
+      }).filter(Boolean);
+      // This topic's own CSV questions that no order — this topic's or any other's — has
+      // claimed: never touched by the user, or genuinely new since the layout was last saved.
+      const remaining = topic.questions.filter((q) => !orderedIds.has(q._id) && !explicitlyPlacedIds.has(q._id));
+      const questions = [...ordered, ...remaining].map((q) => ({
         ...q,
         question_text: questionTextOverrides[q._id] || q.question_text,
         file_urls: (q.file_urls || []).map((f) => {
@@ -54,9 +89,10 @@ export function applyBookLayout(hierarchy, layoutsByPaper) {
     });
 
     if (layout.topicOrder && layout.topicOrder.length) {
+      const dedupedTopicOrder = [...new Set(layout.topicOrder)];
       const byKey = new Map(topics.map((t) => [t._key, t]));
-      const orderedKeys = new Set(layout.topicOrder);
-      const ordered = layout.topicOrder.map((key) => byKey.get(key)).filter(Boolean);
+      const orderedKeys = new Set(dedupedTopicOrder);
+      const ordered = dedupedTopicOrder.map((key) => byKey.get(key)).filter(Boolean);
       const remaining = topics.filter((t) => !orderedKeys.has(t._key));
       topics = [...ordered, ...remaining];
     }
