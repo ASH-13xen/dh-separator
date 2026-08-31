@@ -312,6 +312,7 @@ async function main() {
   const selections = job.selections || {};
   const includedQuestionIds = job.includedQuestionIds || [];
   const topicRenames = job.topicRenames || {};
+  const questionOrderByTopic = job.questionOrder || {};
   const topperOverrides = job.topperOverrides || {};
   const questionTextOverrides = job.questionTextOverrides || {};
   const titlePages = job.titlePages || {};
@@ -319,6 +320,15 @@ async function main() {
   console.log(`  - Selections Count: ${Object.keys(selections).length}`);
   console.log(`  - Included Questions Count: ${includedQuestionIds.length}`);
   console.log(`  - Topic Renames: ${Object.keys(topicRenames).length}, Topper Overrides: ${Object.keys(topperOverrides).length}, Question Text Overrides: ${Object.keys(questionTextOverrides).length}, Title Pages: ${Object.keys(titlePages).length}`);
+
+  // Which topic each question currently belongs to, per the saved layout — NOT necessarily
+  // its original CSV classification. A question dragged into a different topic in the book
+  // builder is still classified under its old topic in the CSV; this is what lets the compiled
+  // book group it under the topic the user actually placed it in instead.
+  const idToTopicKey = {};
+  Object.entries(questionOrderByTopic).forEach(([topicKey, ids]) => {
+    (ids || []).forEach(id => { idToTopicKey[id] = topicKey; });
+  });
 
   try {
     console.log('[Runner] Updating job status in DB to "processing"...');
@@ -336,8 +346,14 @@ async function main() {
     const rows = parsed.slice(1);
     console.log(`[Runner] Total CSV rows parsed: ${rows.length}`);
 
-    // Grouping mapping from ID to question details
-    console.log(`[Runner] Filtering and grouping questions for paper '${paper}'...`);
+    // Grouping mapping from ID to question details. Built across EVERY paper's rows, not just
+    // this one — a question moved to a different paper via the book builder's "move to another
+    // paper" modal is still classified under its ORIGINAL paper in the CSV, but its id (and
+    // what includedQuestionIds references) is computed from that original row regardless of
+    // where it now lives. Restricting this map to rowPaper === paper meant such a question
+    // could never be found here at all, so it was silently dropped from the compiled book —
+    // not mis-grouped, genuinely missing.
+    console.log(`[Runner] Building question lookup across the whole subject (so questions moved from another paper can still be found)...`);
     const questionsMap = {};
     // All rows for a given paper share the same section name in this CSV — capture it
     // once here instead of reading it off orderedQuestions[0], which would break if a
@@ -356,12 +372,15 @@ async function main() {
       const url = r[7].trim();
       const rowPaper = r[9].trim();
 
-      if (!questionText || rowPaper !== paper) return;
-      if (!csvSectionForPaper) csvSectionForPaper = section;
+      if (!questionText || !rowPaper) return;
+      if (rowPaper === paper && !csvSectionForPaper) csvSectionForPaper = section;
 
-      const qKey = `${paper}||${section}||${topic}||${questionText}`;
+      // Uses this row's OWN paper, not the paper being compiled — must match exactly how the
+      // book builder (buildHierarchyFromRows) computes the same id, or a moved question's id
+      // here would never match what includedQuestionIds actually references.
+      const qKey = `${rowPaper}||${section}||${topic}||${questionText}`;
       const qId = Buffer.from(qKey).toString('base64');
-      
+
       if (!questionsMap[qId]) {
         questionsMap[qId] = {
           _id: qId,
@@ -385,7 +404,7 @@ async function main() {
       }
     });
 
-    console.log(`[Runner] Found ${Object.keys(questionsMap).length} total questions belonging to '${paper}' in the CSV.`);
+    console.log(`[Runner] Found ${Object.keys(questionsMap).length} total question(s) across the whole subject.`);
 
     // Get selected questions in order
     console.log('[Runner] Ordering selected questions...');
@@ -407,8 +426,10 @@ async function main() {
         }
       });
     } else {
+      // Defensive fallback only — the controller always sends includedQuestionIds. questionsMap
+      // now spans every paper, so this has to filter back down to just this one explicitly.
       console.log('[Runner] No custom question ordering provided, falling back to database default order.');
-      Object.values(questionsMap).forEach(q => orderedQuestions.push(q));
+      Object.values(questionsMap).filter(q => q.paper === paper).forEach(q => orderedQuestions.push(q));
     }
 
     console.log(`[Runner] Total questions to include in the compiled book: ${orderedQuestions.length}`);
@@ -423,17 +444,22 @@ async function main() {
 
     const topicMap = {};
     orderedQuestions.forEach(q => {
-      if (!topicMap[q.topic]) {
-        topicMap[q.topic] = [];
+      // idToTopicKey reflects where the user actually placed this question in the book
+      // builder; q.topic (raw CSV) is only the fallback for a question nobody has moved
+      // (never touched by any saved order) or a legacy layout saved before this existed.
+      const topicKey = idToTopicKey[q._id] || q.topic;
+      if (!topicMap[topicKey]) {
+        topicMap[topicKey] = [];
       }
-      topicMap[q.topic].push(q);
+      topicMap[topicKey].push(q);
     });
 
-    // Grouping key stays the raw CSV topic so grouping itself never shifts under a rename;
-    // the rename is applied only to the displayed title. No re-sort here on purpose —
-    // topicMap was populated by iterating the already-correctly-ordered orderedQuestions,
-    // so Object.keys(topicMap) is already in the user's customized topic order. Sorting it
-    // (as this used to do) silently discarded any topic reordering done in the editor.
+    // Grouping key stays the raw CSV topic (or, now, the user's saved topic placement) so
+    // grouping itself never shifts under a rename; the rename is applied only to the displayed
+    // title. No re-sort here on purpose — topicMap was populated by iterating the
+    // already-correctly-ordered orderedQuestions, so Object.keys(topicMap) is already in the
+    // user's customized topic order. Sorting it (as this used to do) silently discarded any
+    // topic reordering done in the editor.
     const topicsArray = Object.keys(topicMap).map(topicTitle => {
       return {
         title: topicRenames[topicTitle] || topicTitle,

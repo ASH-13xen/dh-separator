@@ -548,6 +548,7 @@ export const generateSubjectBookPdf = async (req, res) => {
       selections,
       includedQuestionIds,
       topicRenames: layout?.topicRenames || {},
+      questionOrder: layout?.questionOrder || {},
       topperOverrides: layout?.topperOverrides || {},
       questionTextOverrides: layout?.questionTextOverrides || {},
       titlePages: layout?.titlePages || {}
