@@ -840,9 +840,10 @@ async function main() {
                                 
                                 const tName = activeFileObj.topper_name || 'Unknown Topper';
                                 const tYear = activeFileObj.topper_year || 'N/A';
-                                const tRank = activeFileObj.topper_rank || 'N/A';
-                                const tMarks = activeFileObj.topper_marks || 'N/A';
-                                const topperTagStr = sanitizeForPdf(`${tName} (${tYear}, Rank ${tRank}, Marks ${tMarks})`);
+                                const tagMetaParts = [tYear];
+                                if (activeFileObj.topper_rank) tagMetaParts.push(`Rank ${activeFileObj.topper_rank}`);
+                                if (activeFileObj.topper_marks) tagMetaParts.push(`Marks ${activeFileObj.topper_marks}`);
+                                const topperTagStr = sanitizeForPdf(`${tName} (${tagMetaParts.join(', ')})`);
                                 
                                 const tagWidth = fontBold.widthOfTextAtSize(topperTagStr, 10);
                                 newPage.drawText(topperTagStr, {
@@ -1097,7 +1098,7 @@ async function main() {
     summaryRows.forEach(row => {
         row.toppers.forEach(t => {
             if (!topperMap[t.name]) {
-                topperMap[t.name] = { name: t.name, year: t.year || 'N/A', rank: t.rank || 'N/A', marks: t.marks || 'N/A', count: 0 };
+                topperMap[t.name] = { name: t.name, year: t.year || 'N/A', rank: t.rank || '', marks: t.marks || '', count: 0 };
             }
             topperMap[t.name].count += 1;
         });

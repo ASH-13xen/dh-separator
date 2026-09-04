@@ -500,13 +500,14 @@ export const generateCollectivePdf = async (req, res) => {
                 if (activeFileObj) {
                     const tName = activeFileObj.topper_name || 'Unknown Topper';
                     const tYear = activeFileObj.topper_year || 'N/A';
-                    const tRank = activeFileObj.topper_rank || 'N/A';
-                    const tMarks = activeFileObj.topper_marks || 'N/A';
+                    const metaLineParts = [`Year:  ${tYear}`];
+                    if (activeFileObj.topper_rank) metaLineParts.push(`Rank:  ${activeFileObj.topper_rank}`);
+                    if (activeFileObj.topper_marks) metaLineParts.push(`Marks:  ${activeFileObj.topper_marks}`);
 
                     qPage.drawText(sanitizeForPdf(`Topper:  ${tName.toUpperCase()}`), {
                         x: 55, y: topperCardY + topperCardH - 40, size: 11, font: fontBold, color: rgb(0.1, 0.1, 0.2)
                     });
-                    qPage.drawText(sanitizeForPdf(`Year:  ${tYear}   |   Rank:  ${tRank}   |   Marks:  ${tMarks}`), {
+                    qPage.drawText(sanitizeForPdf(metaLineParts.join('   |   ')), {
                         x: 55, y: topperCardY + topperCardH - 60, size: 10, font: fontNormal, color: rgb(0.3, 0.3, 0.4)
                     });
                     qPage.drawText("The following pages contain the handwritten responses scanned directly from the topper's answer booklet.", {

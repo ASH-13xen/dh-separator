@@ -27,8 +27,8 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const execFileAsync = promisify(execFile);
 
-const RASTER_DPI = 120;
-const RASTER_QUALITY = 70;
+const RASTER_DPI = 72;
+const RASTER_QUALITY = 45;
 
 // Path to pdftoppm.exe. Override with PDFTOPPM_PATH env var if not on PATH (e.g. a portable
 // poppler-windows extraction, since this machine has no system-wide poppler install).
@@ -423,9 +423,10 @@ async function renderPaperIntoDoc(pdfDoc, { fontBold, fontNormal, dhLogoImage, t
 
               const tName = activeFileObj.topper_name || 'Unknown Topper';
               const tYear = activeFileObj.topper_year || 'N/A';
-              const tRank = activeFileObj.topper_rank || 'N/A';
-              const tMarks = activeFileObj.topper_marks || 'N/A';
-              const topperTagStr = sanitizeForPdf(`${tName} (${tYear}, Rank ${tRank}, Marks ${tMarks})`);
+              const tagMetaParts = [tYear];
+              if (activeFileObj.topper_rank) tagMetaParts.push(`Rank ${activeFileObj.topper_rank}`);
+              if (activeFileObj.topper_marks) tagMetaParts.push(`Marks ${activeFileObj.topper_marks}`);
+              const topperTagStr = sanitizeForPdf(`${tName} (${tagMetaParts.join(', ')})`);
               const tagWidth = fontBold.widthOfTextAtSize(topperTagStr, 10);
               newPage.drawText(topperTagStr, { x: (tw - tagWidth) / 2, y: th - 30, size: 10, font: fontBold, color: rgb(0, 0, 0) });
 
@@ -707,7 +708,7 @@ async function buildBook({ subjectSlug, papers, outFile }) {
   const topperMap = {};
   allSummaryRows.forEach(row => {
     row.toppers.forEach(t => {
-      if (!topperMap[t.name]) topperMap[t.name] = { name: t.name, year: t.year || 'N/A', rank: t.rank || 'N/A', marks: t.marks || 'N/A', count: 0 };
+      if (!topperMap[t.name]) topperMap[t.name] = { name: t.name, year: t.year || 'N/A', rank: t.rank || '', marks: t.marks || '', count: 0 };
       topperMap[t.name].count += 1;
     });
   });
