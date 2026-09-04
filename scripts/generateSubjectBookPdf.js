@@ -23,9 +23,13 @@ const execFileAsync = promisify(execFile);
 
 // Topper sheets are scanned documents; rasterizing them at a reduced DPI/JPEG quality
 // before embedding shrinks the compiled book drastically vs. copying the original
-// full-resolution scan pages.
-const RASTER_DPI = 120;
-const RASTER_QUALITY = 70;
+// full-resolution scan pages. Tuned down from 120/70 on 2026-09-04: Cloudinary's free-tier
+// raw-upload cap is a hard 10MB/file, and units with the most questions (e.g. Unit-7 of
+// GS-4, 76 embedded topper sheets) were coming out at 20MB+ at 120/70 and failing to
+// upload. 72/45 keeps handwriting fully legible (verified side-by-side) while landing the
+// largest known unit around 7.6MB of image data, comfortably under the cap.
+const RASTER_DPI = 72;
+const RASTER_QUALITY = 45;
 
 // Rasterizes every page of a source PDF to a compressed JPEG buffer using pdftoppm
 // (poppler-utils), returning one Buffer per page in order.
