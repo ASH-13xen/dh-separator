@@ -26,9 +26,14 @@ const __dirname = path.dirname(__filename);
 
 const execFileAsync = promisify(execFile);
 
-// Same tuning as the per-unit runner — see that file for the sizing rationale.
-const RASTER_DPI = 72;
-const RASTER_QUALITY = 45;
+// A combined book stacks every selected unit's topper sheets into ONE file, so it can blow
+// past Cloudinary's free-tier 10MB raw-upload cap far more easily than a single unit ever
+// could (a single unit alone was already tuned to land ~7.6MB at 72dpi/q45 — see the per-unit
+// runner). Tuned more aggressively here on purpose: -gray drops the wasted color channels from
+// what's really just ink on white paper (biggest single win, ~30-50% smaller with near-zero
+// legibility loss), and DPI/quality are dropped further on top of that.
+const RASTER_DPI = 50;
+const RASTER_QUALITY = 32;
 
 async function rasterizePdfToJpegs(pdfBuffer, dpi, quality) {
   const uniqueId = `${Date.now()}-${Math.random().toString(36).slice(2)}`;
@@ -37,7 +42,7 @@ async function rasterizePdfToJpegs(pdfBuffer, dpi, quality) {
 
   fs.writeFileSync(tempPdfPath, pdfBuffer);
   try {
-    await execFileAsync('pdftoppm', ['-jpeg', '-r', String(dpi), '-jpegopt', `quality=${quality}`, tempPdfPath, outPrefix]);
+    await execFileAsync('pdftoppm', ['-jpeg', '-gray', '-r', String(dpi), '-jpegopt', `quality=${quality}`, tempPdfPath, outPrefix]);
 
     const dir = path.dirname(outPrefix);
     const baseName = path.basename(outPrefix);
