@@ -24,14 +24,11 @@ const __dirname = path.dirname(__filename);
 
 const execFileAsync = promisify(execFile);
 
-// A combined book stacks every selected unit's topper sheets into ONE file, so it can blow
-// past Cloudinary's free-tier 10MB raw-upload cap far more easily than a single unit ever
-// could (a single unit alone was already tuned to land ~7.6MB at 72dpi/q45 — see the per-unit
-// runner). Tuned more aggressively here on purpose: -gray drops the wasted color channels from
-// what's really just ink on white paper (biggest single win, ~30-50% smaller with near-zero
-// legibility loss), and DPI/quality are dropped further on top of that.
-const RASTER_DPI = 50;
-const RASTER_QUALITY = 32;
+// Same rasterization settings as the per-unit runner — now that combined books are stored on
+// GitHub instead of Cloudinary, there's no file-size cap forcing a quality tradeoff, so this
+// matches generateSubjectBookPdf.js exactly rather than compressing harder.
+const RASTER_DPI = 72;
+const RASTER_QUALITY = 45;
 
 async function rasterizePdfToJpegs(pdfBuffer, dpi, quality) {
   const uniqueId = `${Date.now()}-${Math.random().toString(36).slice(2)}`;
@@ -40,7 +37,7 @@ async function rasterizePdfToJpegs(pdfBuffer, dpi, quality) {
 
   fs.writeFileSync(tempPdfPath, pdfBuffer);
   try {
-    await execFileAsync('pdftoppm', ['-jpeg', '-gray', '-r', String(dpi), '-jpegopt', `quality=${quality}`, tempPdfPath, outPrefix]);
+    await execFileAsync('pdftoppm', ['-jpeg', '-r', String(dpi), '-jpegopt', `quality=${quality}`, tempPdfPath, outPrefix]);
 
     const dir = path.dirname(outPrefix);
     const baseName = path.basename(outPrefix);
@@ -300,6 +297,18 @@ async function uploadPdfToGithubRelease(buffer, fileName) {
   const asset = await uploadRes.json();
   console.log(`[CollectiveRunner] [uploadPdfToGithubRelease] Upload complete. Asset ID: ${asset.id}`);
   return asset;
+}
+
+// Some subjects never really use "section" as a level distinct from "paper" — their CSV's
+// section column is just set to the same text as the paper name itself. Left alone, that means
+// the divider/TOC text (label + ": " + section) shows the renamed label right next to the
+// UNRENAMED real paper name, defeating the whole point of relabeling units for this book. If
+// section duplicates the real paper name, drop it and show the label alone instead.
+function formatUnitHeading(label, section, realPaper, separator) {
+  const normalizedSection = (section || '').trim();
+  const normalizedPaper = (realPaper || '').trim();
+  if (!normalizedSection || normalizedSection === normalizedPaper) return label;
+  return `${label}${separator}${section}`;
 }
 
 const wrapText = (text, size, maxW, font) => {
@@ -578,7 +587,7 @@ async function main() {
         console.log(`[CollectiveRunner] Processing Unit: ${secNode.label}`);
         indexData.push({
             type: 'section',
-            text: `${secNode.label} - ${secNode.section}`,
+            text: formatUnitHeading(secNode.label, secNode.section, secNode.realPaper, ' - '),
             targetPageInternal: pdfDoc.getPageCount()
         });
 
@@ -593,7 +602,7 @@ async function main() {
         });
 
         let sY = th - 200;
-        const sWords = sanitizeForPdf(`${secNode.label}: ${secNode.section}`).toUpperCase().split(' ');
+        const sWords = sanitizeForPdf(formatUnitHeading(secNode.label, secNode.section, secNode.realPaper, ': ')).toUpperCase().split(' ');
         let sLine = '';
         for (const word of sWords) {
             const testLine = sLine + word + ' ';
