@@ -53,7 +53,7 @@ async function generateUniqueSlug(name, existingSubjectId) {
 // hierarchy shape consumed by the frontend book builder. Mirrors psirController.js's
 // previewPsirData grouping algorithm exactly, except paper names/order are discovered
 // dynamically from the data instead of a hardcoded paperOrder map.
-function buildHierarchyFromRows(rows) {
+export function buildHierarchyFromRows(rows) {
   console.log(`[SubjectController] [buildHierarchyFromRows] Grouping ${rows.length} CSV row(s) into Paper > Topic > Question hierarchy...`);
   const hierarchy = {};
 
@@ -613,6 +613,162 @@ export const generateSubjectBookPdf = async (req, res) => {
   } catch (error) {
     console.error('[SubjectController] [generateSubjectBookPdf] Error:', error);
     res.status(500).json({ error: 'Failed to initiate PDF book generation.', details: error.message });
+  }
+};
+
+// Turns a real paper name into its sequential display label for a combined book (e.g. the
+// 2nd selected unit named "Unit 6" becomes "Unit 2") by renumbering the first number found
+// in the name. Purely cosmetic and computed fresh on every call — never persisted anywhere,
+// so the individual per-paper book/editor never sees or is affected by this renaming.
+function deriveCollectiveUnitLabel(paperName, position) {
+  const match = paperName.match(/^(.*?)(\d+)(\D*)$/);
+  if (match) {
+    return `${match[1]}${position + 1}${match[3]}`.trim();
+  }
+  return `${paperName} ${position + 1}`;
+}
+
+// Compiles several papers ("units") of a subject into ONE combined book: one shared table of
+// contents, one deduplicated topper summary page, and units relabeled 1..N (in the order they
+// appear in the subject, regardless of which units were picked) purely for that book's text —
+// none of this touches BookLayout or any other data the single-paper "Generate Unit N Book"
+// flow reads from. Mirrors generateSubjectBookPdf's job-record + GitHub Actions dispatch
+// pattern, but for scripts/generateCollectiveSubjectBookPdf.js instead.
+export const generateCollectiveSubjectBookPdf = async (req, res) => {
+  const { slug } = req.params;
+  console.log(`[SubjectController] [generateCollectiveSubjectBookPdf] Combined book request received for slug: '${slug}'.`);
+  try {
+    const { papers: requestedPapers } = req.body;
+    if (!Array.isArray(requestedPapers) || requestedPapers.length === 0) {
+      return res.status(400).json({ error: 'Select at least one unit to include in the combined book.' });
+    }
+
+    const subjectDoc = await Subject.findOne({ slug });
+    if (!subjectDoc || !subjectDoc.csvData) {
+      return res.status(404).json({ error: 'Subject questions CSV not found. Run Classify first.' });
+    }
+
+    const parsed = parseCSV(subjectDoc.csvData);
+    const rows = parsed.slice(1);
+    const hierarchy = buildHierarchyFromRows(rows);
+    const hierarchyWithSyllabus = mergeSyllabusIntoHierarchy(hierarchy, subjectDoc.syllabusJson);
+
+    const layoutDocs = await BookLayout.find({ subject: slug }).lean();
+    const layoutsByPaper = Object.fromEntries(layoutDocs.map(l => [l.paper, l]));
+    const mergedHierarchy = applyBookLayout(hierarchyWithSyllabus, layoutsByPaper);
+    const { excludedQuestionIds, selections } = deriveIncludedAndSelections(mergedHierarchy, layoutsByPaper);
+    const excludedSet = new Set(excludedQuestionIds);
+
+    // Keep the subject's own unit order (not click order) so 1,3,6 always compiles as 1,2,3 —
+    // never in whatever order the checkboxes happened to be ticked.
+    const requestedSet = new Set(requestedPapers);
+    const orderedSelectedPapers = mergedHierarchy.map(p => p.paper).filter(p => requestedSet.has(p));
+    const missing = requestedPapers.filter(p => !orderedSelectedPapers.includes(p));
+    if (missing.length > 0) {
+      console.warn(`[SubjectController] [generateCollectiveSubjectBookPdf] Requested unit(s) not found in subject, skipped: ${missing.join(', ')}`);
+    }
+
+    const paperJobsRaw = orderedSelectedPapers.map((paperName) => {
+      const paperNode = mergedHierarchy.find(p => p.paper === paperName);
+      const includedQuestionIds = paperNode.topics.flatMap(t =>
+        t.questions.filter(q => q.isTitlePage || !excludedSet.has(q._id)).map(q => q._id)
+      );
+      return { paperName, includedQuestionIds, layout: layoutsByPaper[paperName] || {} };
+    }).filter(pj => pj.includedQuestionIds.length > 0);
+
+    if (paperJobsRaw.length === 0) {
+      return res.status(400).json({ error: 'None of the selected units currently have any questions to include.' });
+    }
+
+    const paperJobs = paperJobsRaw.map((pj, idx) => {
+      // Scope down to just this unit's own question ids — selections is otherwise a
+      // subject-wide map, and duplicating all of it into every unit's job entry adds up fast.
+      const paperSelections = {};
+      pj.includedQuestionIds.forEach((id) => {
+        if (selections[id] !== undefined) paperSelections[id] = selections[id];
+      });
+      return {
+        paper: pj.paperName,
+        label: deriveCollectiveUnitLabel(pj.paperName, idx),
+        includedQuestionIds: pj.includedQuestionIds,
+        selections: paperSelections,
+        topicRenames: pj.layout.topicRenames || {},
+        questionOrder: pj.layout.questionOrder || {},
+        topperOverrides: pj.layout.topperOverrides || {},
+        questionTextOverrides: pj.layout.questionTextOverrides || {},
+        titlePages: pj.layout.titlePages || {}
+      };
+    });
+
+    console.log('[SubjectController] [generateCollectiveSubjectBookPdf] Step 1: Creating SubjectBook job tracking record...');
+    const job = await SubjectBook.create({
+      subject: slug,
+      paper: `Combined Book (${paperJobs.length} Units)`,
+      isCollective: true,
+      papers: paperJobs.map(p => p.paper),
+      paperLabels: paperJobs.map(p => p.label),
+      paperJobs,
+      status: 'pending'
+    });
+    console.log(`[SubjectController] [generateCollectiveSubjectBookPdf] Job record created. Job ID: ${job._id}, Units: ${paperJobs.length}`);
+
+    console.log('[SubjectController] [generateCollectiveSubjectBookPdf] Step 2: Reading GitHub Actions credentials from environment...');
+    const { GITHUB_PAT, GITHUB_REPO_OWNER, GITHUB_REPO_NAME, GITHUB_COLLECTIVE_BOOK_WORKFLOW_NAME, GITHUB_REF } = process.env;
+
+    if (!GITHUB_PAT || !GITHUB_REPO_OWNER || !GITHUB_REPO_NAME || !GITHUB_COLLECTIVE_BOOK_WORKFLOW_NAME) {
+      const errorMsg = 'GitHub Actions environment variables for combined book generation are missing from server configuration (.env) — GITHUB_COLLECTIVE_BOOK_WORKFLOW_NAME is required.';
+      console.error(`[SubjectController] [generateCollectiveSubjectBookPdf] Configuration error: ${errorMsg}`);
+      job.status = 'failed';
+      job.error = errorMsg;
+      await job.save();
+      return res.status(500).json({ error: errorMsg });
+    }
+
+    const githubUrl = `https://api.github.com/repos/${GITHUB_REPO_OWNER}/${GITHUB_REPO_NAME}/actions/workflows/${GITHUB_COLLECTIVE_BOOK_WORKFLOW_NAME}/dispatches`;
+    console.log(`[SubjectController] [generateCollectiveSubjectBookPdf] Step 3: Dispatching GitHub workflow. URL: ${githubUrl}`);
+
+    const payload = {
+      ref: GITHUB_REF || 'main',
+      inputs: {
+        subject: slug,
+        jobId: job._id.toString()
+      }
+    };
+
+    const response = await fetch(githubUrl, {
+      method: 'POST',
+      headers: {
+        Accept: 'application/vnd.github+json',
+        Authorization: `Bearer ${GITHUB_PAT}`,
+        'X-GitHub-Api-Version': '2022-11-28',
+        'User-Agent': 'DH-Separator-Backend'
+      },
+      body: JSON.stringify(payload)
+    });
+    console.log(`[SubjectController] [generateCollectiveSubjectBookPdf] GitHub API response status: ${response.status} (${response.statusText})`);
+
+    if (response.status !== 204) {
+      let responseBody = '';
+      try { responseBody = await response.text(); } catch (e) { responseBody = 'Failed to read response body.'; }
+      const errorDetails = `GitHub API returned status code ${response.status}: ${responseBody}`;
+      console.error(`[SubjectController] [generateCollectiveSubjectBookPdf] Dispatch failed: ${errorDetails}`);
+
+      job.status = 'failed';
+      job.error = errorDetails;
+      await job.save();
+
+      return res.status(500).json({ error: 'Failed to trigger compilation runner.', details: errorDetails });
+    }
+
+    console.log(`[SubjectController] [generateCollectiveSubjectBookPdf] Workflow dispatched successfully. Job ID: ${job._id}`);
+    res.status(202).json({
+      message: 'Combined book generation has been successfully offloaded and queued in GitHub Actions.',
+      jobId: job._id,
+      unitsIncluded: paperJobs.length
+    });
+  } catch (error) {
+    console.error('[SubjectController] [generateCollectiveSubjectBookPdf] Error:', error);
+    res.status(500).json({ error: 'Failed to initiate combined PDF book generation.', details: error.message });
   }
 };
 

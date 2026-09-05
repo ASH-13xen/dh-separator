@@ -9,6 +9,7 @@ import {
   listSubjectToppers,
   previewSubjectBookData,
   generateSubjectBookPdf,
+  generateCollectiveSubjectBookPdf,
   getSubjectBookStatus,
   downloadSubjectBook,
   cleanupSubjectBookStorage,
@@ -40,6 +41,7 @@ router.delete('/uploads/batches/:batchKey', deleteUploadBatch);
 router.get('/:slug/preview', previewSubjectBookData);
 router.post('/:slug/layout', saveSubjectBookLayout);
 router.post('/:slug/generate', generateSubjectBookPdf);
+router.post('/:slug/generate-collective', generateCollectiveSubjectBookPdf);
 router.get('/:slug/status/:id', getSubjectBookStatus);
 router.get('/:slug/download/:id', downloadSubjectBook);
 router.post('/:slug/cleanup-storage', cleanupSubjectBookStorage);

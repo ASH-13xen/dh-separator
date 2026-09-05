@@ -1,0 +1,43 @@
+name: Generate Collective Subject Book
+
+on:
+  workflow_dispatch:
+    inputs:
+      subject:
+        description: 'Subject slug'
+        required: true
+      jobId:
+        description: 'The MongoDB document ID tracking this build job (carries the selected units)'
+        required: true
+
+jobs:
+  generate-pdf:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+          cache-dependency-path: 'package-lock.json'
+
+      - name: Install Dependencies
+        run: |
+          npm ci
+
+      - name: Install poppler-utils (pdftoppm)
+        run: sudo apt-get update && sudo apt-get install -y poppler-utils
+
+      - name: Compile and Upload Combined PDF
+        env:
+          MONGO_URI: ${{ secrets.MONGO_URI }}
+          CLOUDINARY_CLOUD_NAME: ${{ secrets.CLOUDINARY_CLOUD_NAME }}
+          CLOUDINARY_API_KEY: ${{ secrets.CLOUDINARY_API_KEY }}
+          CLOUDINARY_API_SECRET: ${{ secrets.CLOUDINARY_API_SECRET }}
+        run: |
+          node scripts/generateCollectiveSubjectBookPdf.js \
+            --subject "${{ github.event.inputs.subject }}" \
+            --jobId "${{ github.event.inputs.jobId }}"

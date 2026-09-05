@@ -46,6 +46,31 @@ const subjectBookSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.Mixed,
     default: {}
   },
+  // Combined-book ("Generate All Books") jobs only — built by generateCollectiveSubjectBookPdf
+  // and consumed by scripts/generateCollectiveSubjectBookPdf.js. Left undefined for a normal
+  // single-paper job so that flow is untouched.
+  isCollective: {
+    type: Boolean,
+    default: false
+  },
+  // Real paper names actually included (in the order they appear in the combined book).
+  papers: {
+    type: [String],
+    default: undefined
+  },
+  // Sequential display labels (e.g. "Unit 1", "Unit 2") parallel to `papers` — cosmetic-only,
+  // computed fresh at generate time, never written back into any BookLayout.
+  paperLabels: {
+    type: [String],
+    default: undefined
+  },
+  // One entry per included paper: { paper, label, selections, includedQuestionIds,
+  // topicRenames, questionOrder, topperOverrides, questionTextOverrides, titlePages } — the
+  // same per-paper fields a single-paper job carries, snapshotted for every selected unit.
+  paperJobs: {
+    type: [mongoose.Schema.Types.Mixed],
+    default: undefined
+  },
   pdfFileId: {
     type: String
   },
