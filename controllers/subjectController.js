@@ -796,12 +796,60 @@ export const downloadSubjectBook = async (req, res) => {
   console.log(`[SubjectController] [downloadSubjectBook] Serving ${isDownload ? 'download' : 'preview'} for Job ID: ${id}`);
   try {
     const job = await SubjectBook.findById(id);
-    if (!job || (!job.pdfFileId && !job.pdfUrl && !job.pdfData)) {
+    if (!job || (!job.pdfFileId && !job.pdfUrl && !job.pdfData && !job.pdfGithubAssetId)) {
       console.warn(`[SubjectController] [downloadSubjectBook] PDF not found or not yet generated for Job ID: ${id}`);
       return res.status(404).json({ error: 'PDF book not found or compilation not finished yet.' });
     }
 
     const fileName = `Formal_${job.subject}_${job.paper.replace(/[^a-z0-9]/gi, '_')}.pdf`;
+
+    if (job.pdfGithubAssetId) {
+      // A combined book stored as an asset on a draft GitHub release — never publicly listed
+      // or downloadable, so it has to be fetched with the same PAT used to dispatch the
+      // compile workflow and proxied through here (unlike Cloudinary's job.pdfUrl below,
+      // there's no public URL to redirect the browser to).
+      const { GITHUB_PAT, GITHUB_REPO_OWNER, GITHUB_REPO_NAME } = process.env;
+      if (!GITHUB_PAT || !GITHUB_REPO_OWNER || !GITHUB_REPO_NAME) {
+        throw new Error('GitHub Actions environment variables are missing from server configuration (.env) — cannot fetch a combined book stored on GitHub.');
+      }
+      console.log(`[SubjectController] [downloadSubjectBook] Fetching combined book from GitHub release asset ${job.pdfGithubAssetId}...`);
+      const assetRes = await fetch(
+        `https://api.github.com/repos/${GITHUB_REPO_OWNER}/${GITHUB_REPO_NAME}/releases/assets/${job.pdfGithubAssetId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${GITHUB_PAT}`,
+            Accept: 'application/octet-stream',
+            'User-Agent': 'DH-Separator-Backend'
+          }
+        }
+      );
+      if (!assetRes.ok) throw new Error(`Failed to fetch compiled book from GitHub: ${assetRes.status}`);
+      const assetBuffer = Buffer.from(await assetRes.arrayBuffer());
+
+      console.log(`[SubjectController] [downloadSubjectBook] Streaming ${assetBuffer.length} bytes as: ${fileName}`);
+      res.setHeader('Content-Disposition', `${disposition}; filename="${fileName}"`);
+      res.setHeader('Content-Type', 'application/pdf');
+      res.setHeader('Content-Length', assetBuffer.length);
+      res.send(assetBuffer);
+
+      if (isDownload) {
+        try {
+          const deleteRes = await fetch(
+            `https://api.github.com/repos/${GITHUB_REPO_OWNER}/${GITHUB_REPO_NAME}/releases/assets/${job.pdfGithubAssetId}`,
+            { method: 'DELETE', headers: { Authorization: `Bearer ${GITHUB_PAT}`, 'User-Agent': 'DH-Separator-Backend' } }
+          );
+          if (deleteRes.ok || deleteRes.status === 404) {
+            await SubjectBook.findByIdAndUpdate(id, { $unset: { pdfGithubAssetId: '' } });
+            console.log(`[SubjectController] [downloadSubjectBook] GitHub release asset ${job.pdfGithubAssetId} deleted after successful download.`);
+          } else {
+            console.warn(`[SubjectController] [downloadSubjectBook] Failed to delete GitHub release asset ${job.pdfGithubAssetId}: ${deleteRes.status}`);
+          }
+        } catch (delErr) {
+          console.error('[SubjectController] [downloadSubjectBook] Failed to delete GitHub release asset:', delErr);
+        }
+      }
+      return;
+    }
 
     if (job.pdfFileId) {
       console.log(`[SubjectController] [downloadSubjectBook] Streaming from GridFS bucket '${job.subject}_books', file ID: ${job.pdfFileId}`);
@@ -900,16 +948,40 @@ export const cleanupSubjectBookStorage = async (req, res) => {
       console.warn(`[SubjectController] [cleanupSubjectBookStorage] ${failedCloudinaryDeletes} Cloudinary delete(s) failed for '${slug}'.`);
     }
 
+    // Also destroy any combined books stored as GitHub release assets for this subject —
+    // same reasoning as the Cloudinary cleanup above.
+    let deletedFromGithub = 0;
+    const githubJobs = await SubjectBook.find({ subject: slug, pdfGithubAssetId: { $exists: true, $ne: null } }).select('pdfGithubAssetId').lean();
+    if (githubJobs.length > 0) {
+      const { GITHUB_PAT, GITHUB_REPO_OWNER, GITHUB_REPO_NAME } = process.env;
+      if (GITHUB_PAT && GITHUB_REPO_OWNER && GITHUB_REPO_NAME) {
+        const githubDestroyResults = await Promise.allSettled(
+          githubJobs.map(j => fetch(
+            `https://api.github.com/repos/${GITHUB_REPO_OWNER}/${GITHUB_REPO_NAME}/releases/assets/${j.pdfGithubAssetId}`,
+            { method: 'DELETE', headers: { Authorization: `Bearer ${GITHUB_PAT}`, 'User-Agent': 'DH-Separator-Backend' } }
+          ).then(r => { if (!r.ok && r.status !== 404) throw new Error(`status ${r.status}`); }))
+        );
+        deletedFromGithub = githubDestroyResults.filter(r => r.status === 'fulfilled').length;
+        const failedGithubDeletes = githubDestroyResults.length - deletedFromGithub;
+        if (failedGithubDeletes > 0) {
+          console.warn(`[SubjectController] [cleanupSubjectBookStorage] ${failedGithubDeletes} GitHub release asset delete(s) failed for '${slug}'.`);
+        }
+      } else {
+        console.warn('[SubjectController] [cleanupSubjectBookStorage] GitHub env vars missing — skipping release asset cleanup.');
+      }
+    }
+
     const jobsUpdateResult = await SubjectBook.updateMany(
       { subject: slug },
-      { $unset: { pdfFileId: '', pdfUrl: '', pdfPublicId: '', pdfData: '' } }
+      { $unset: { pdfFileId: '', pdfUrl: '', pdfPublicId: '', pdfData: '', pdfGithubAssetId: '' } }
     );
-    console.log(`[SubjectController] [cleanupSubjectBookStorage] Deleted ${filesResult.deletedCount} GridFS file(s), ${chunksResult.deletedCount} chunk(s), ${deletedFromCloudinary}/${cloudinaryJobs.length} Cloudinary file(s). Cleared references on ${jobsUpdateResult.modifiedCount} job(s) for '${slug}'.`);
+    console.log(`[SubjectController] [cleanupSubjectBookStorage] Deleted ${filesResult.deletedCount} GridFS file(s), ${chunksResult.deletedCount} chunk(s), ${deletedFromCloudinary}/${cloudinaryJobs.length} Cloudinary file(s), ${deletedFromGithub}/${githubJobs.length} GitHub release asset(s). Cleared references on ${jobsUpdateResult.modifiedCount} job(s) for '${slug}'.`);
     res.json({
       message: 'Subject book storage cleaned successfully.',
       deletedFiles: filesResult.deletedCount,
       deletedChunks: chunksResult.deletedCount,
       deletedFromCloudinary,
+      deletedFromGithub,
       jobsUpdated: jobsUpdateResult.modifiedCount
     });
   } catch (err) {

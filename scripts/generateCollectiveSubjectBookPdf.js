@@ -7,8 +7,6 @@ import { promisify } from 'util';
 import { PDFDocument, rgb, StandardFonts, PDFString } from 'pdf-lib';
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
-import { v2 as cloudinary } from 'cloudinary';
-import streamifier from 'streamifier';
 import { SubjectBook } from '../models/SubjectBook.js';
 import { Subject } from '../models/Subject.js';
 import { parseCSV } from '../utils/csv.js';
@@ -229,23 +227,77 @@ async function fetchUrlsInParallel(urls, concurrencyLimit = 5) {
   return results;
 }
 
-const uploadPdfToCloudinary = (buffer, publicId) => {
-  console.log(`[CollectiveRunner] [uploadPdfToCloudinary] Uploading '${publicId}' to Cloudinary...`);
-  return new Promise((resolve, reject) => {
-    const stream = cloudinary.uploader.upload_stream(
-      { resource_type: 'raw', folder: 'compiled_books', public_id: publicId },
-      (error, result) => {
-        if (result) {
-          console.log(`[CollectiveRunner] [uploadPdfToCloudinary] Upload complete: ${result.secure_url}`);
-          resolve(result);
-        } else {
-          reject(error);
-        }
-      }
-    );
-    streamifier.createReadStream(buffer).pipe(stream);
+// Combined books routinely exceed Cloudinary's free-tier 10MB raw-asset cap (confirmed live —
+// even chunked upload still enforces it, since Cloudinary checks the declared total size, not
+// the per-request payload). GitHub has no such ceiling on a release asset (~2GB), and this repo
+// already carries a PAT with push access (used to dispatch the compile workflow itself), so
+// combined books are stored there instead — as an asset on one persistent DRAFT release, reused
+// across every combined-book job. A draft release's assets are never publicly listed or
+// downloadable, unlike a normal published release, so this keeps the same privacy posture
+// Cloudinary gave these files: reachable only via an authenticated call using the same PAT
+// (downloadSubjectBook proxies it), never a public/browsable link.
+const GITHUB_API_BASE = 'https://api.github.com';
+const COMPILED_BOOKS_RELEASE_TAG = 'compiled-books-storage';
+
+function githubHeaders(pat, accept = 'application/vnd.github+json') {
+  return {
+    Authorization: `Bearer ${pat}`,
+    Accept: accept,
+    'X-GitHub-Api-Version': '2022-11-28',
+    'User-Agent': 'DH-Separator-Backend'
+  };
+}
+
+async function findOrCreateStorageRelease({ owner, repo, pat }) {
+  // The "get release by tag" endpoint only ever matches PUBLISHED releases, so a draft has to
+  // be found by listing releases instead (that list does include drafts for an authenticated
+  // caller with push access).
+  const listRes = await fetch(`${GITHUB_API_BASE}/repos/${owner}/${repo}/releases?per_page=100`, {
+    headers: githubHeaders(pat)
   });
-};
+  if (!listRes.ok) throw new Error(`Failed to list GitHub releases: ${listRes.status} ${await listRes.text()}`);
+  const releases = await listRes.json();
+  const existing = releases.find(r => r.tag_name === COMPILED_BOOKS_RELEASE_TAG);
+  if (existing) return existing.id;
+
+  console.log('[CollectiveRunner] [findOrCreateStorageRelease] No existing storage release found — creating one...');
+  const createRes = await fetch(`${GITHUB_API_BASE}/repos/${owner}/${repo}/releases`, {
+    method: 'POST',
+    headers: githubHeaders(pat),
+    body: JSON.stringify({
+      tag_name: COMPILED_BOOKS_RELEASE_TAG,
+      name: 'Compiled Books Storage (auto-managed — do not edit or publish)',
+      body: 'Internal file storage for generated combined books. Kept as a draft so its assets are never publicly listed or downloadable.',
+      draft: true
+    })
+  });
+  if (!createRes.ok) throw new Error(`Failed to create GitHub storage release: ${createRes.status} ${await createRes.text()}`);
+  const created = await createRes.json();
+  return created.id;
+}
+
+async function uploadPdfToGithubRelease(buffer, fileName) {
+  const owner = process.env.GITHUB_REPO_OWNER;
+  const repo = process.env.GITHUB_REPO_NAME;
+  const pat = process.env.GITHUB_PAT;
+
+  console.log(`[CollectiveRunner] [uploadPdfToGithubRelease] Resolving storage release on ${owner}/${repo}...`);
+  const releaseId = await findOrCreateStorageRelease({ owner, repo, pat });
+
+  console.log(`[CollectiveRunner] [uploadPdfToGithubRelease] Uploading '${fileName}.pdf' (${buffer.length} bytes) as a release asset...`);
+  const uploadRes = await fetch(
+    `https://uploads.github.com/repos/${owner}/${repo}/releases/${releaseId}/assets?name=${encodeURIComponent(`${fileName}.pdf`)}`,
+    {
+      method: 'POST',
+      headers: { ...githubHeaders(pat), 'Content-Type': 'application/pdf' },
+      body: buffer
+    }
+  );
+  if (!uploadRes.ok) throw new Error(`Failed to upload release asset: ${uploadRes.status} ${await uploadRes.text()}`);
+  const asset = await uploadRes.json();
+  console.log(`[CollectiveRunner] [uploadPdfToGithubRelease] Upload complete. Asset ID: ${asset.id}`);
+  return asset;
+}
 
 const wrapText = (text, size, maxW, font) => {
   const sanitized = sanitizeForPdf(text);
@@ -288,15 +340,10 @@ async function main() {
     console.error('[CollectiveRunner] MONGO_URI is missing from environment. Terminating execution.');
     process.exit(1);
   }
-  if (!process.env.CLOUDINARY_CLOUD_NAME || !process.env.CLOUDINARY_API_KEY || !process.env.CLOUDINARY_API_SECRET) {
-    console.error('[CollectiveRunner] CLOUDINARY_CLOUD_NAME/CLOUDINARY_API_KEY/CLOUDINARY_API_SECRET are missing from environment. Terminating execution.');
+  if (!process.env.GITHUB_PAT || !process.env.GITHUB_REPO_OWNER || !process.env.GITHUB_REPO_NAME) {
+    console.error('[CollectiveRunner] GITHUB_PAT/GITHUB_REPO_OWNER/GITHUB_REPO_NAME are missing from environment. Terminating execution.');
     process.exit(1);
   }
-  cloudinary.config({
-    cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-    api_key: process.env.CLOUDINARY_API_KEY,
-    api_secret: process.env.CLOUDINARY_API_SECRET
-  });
 
   console.log('[CollectiveRunner] Connecting to MongoDB database...');
   await mongoose.connect(process.env.MONGO_URI);
@@ -1024,11 +1071,10 @@ async function main() {
     console.log(`[CollectiveRunner] PDF successfully built. File size: ${pdfBytes.length} bytes.`);
 
     const fileName = `${subjectSlug}_Combined_${docData.length}Units_${jobId}`;
-    const uploadResult = await uploadPdfToCloudinary(Buffer.from(pdfBytes), fileName);
+    const asset = await uploadPdfToGithubRelease(Buffer.from(pdfBytes), fileName);
 
     job.status = 'completed';
-    job.pdfUrl = uploadResult.secure_url;
-    job.pdfPublicId = uploadResult.public_id;
+    job.pdfGithubAssetId = asset.id;
     await job.save();
     console.log('[CollectiveRunner] MongoDB update succeeded. Job completed.');
 

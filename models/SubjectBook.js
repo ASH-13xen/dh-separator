@@ -83,6 +83,13 @@ const subjectBookSchema = new mongoose.Schema({
   pdfData: {
     type: Buffer
   },
+  // Set instead of pdfUrl/pdfPublicId when the compiled book was stored as an asset on a
+  // draft GitHub release (used for combined books too large for Cloudinary's free-tier raw
+  // upload cap). A draft release's assets aren't publicly listed/downloadable, so
+  // downloadSubjectBook proxies them through the same GitHub PAT used to dispatch workflows.
+  pdfGithubAssetId: {
+    type: Number
+  },
   error: {
     type: String
   }
