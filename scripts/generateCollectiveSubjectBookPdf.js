@@ -277,9 +277,12 @@ async function findOrCreateStorageRelease({ owner, repo, pat }) {
 }
 
 async function uploadPdfToGithubRelease(buffer, fileName) {
-  const owner = process.env.GITHUB_REPO_OWNER;
-  const repo = process.env.GITHUB_REPO_NAME;
-  const pat = process.env.GITHUB_PAT;
+  // GITHUB_REPOSITORY ("owner/repo") is a default env var every Actions run gets automatically
+  // — no need to pass it in explicitly. The token, though, has to be piped in via the workflow's
+  // env block (as GITHUB_TOKEN) since it's Actions' own short-lived run token, not the Render
+  // backend's GITHUB_PAT (that one only exists on Render, used solely to dispatch this run).
+  const [owner, repo] = (process.env.GITHUB_REPOSITORY || '').split('/');
+  const pat = process.env.GITHUB_TOKEN;
 
   console.log(`[CollectiveRunner] [uploadPdfToGithubRelease] Resolving storage release on ${owner}/${repo}...`);
   const releaseId = await findOrCreateStorageRelease({ owner, repo, pat });
@@ -340,8 +343,8 @@ async function main() {
     console.error('[CollectiveRunner] MONGO_URI is missing from environment. Terminating execution.');
     process.exit(1);
   }
-  if (!process.env.GITHUB_PAT || !process.env.GITHUB_REPO_OWNER || !process.env.GITHUB_REPO_NAME) {
-    console.error('[CollectiveRunner] GITHUB_PAT/GITHUB_REPO_OWNER/GITHUB_REPO_NAME are missing from environment. Terminating execution.');
+  if (!process.env.GITHUB_TOKEN || !process.env.GITHUB_REPOSITORY) {
+    console.error('[CollectiveRunner] GITHUB_TOKEN/GITHUB_REPOSITORY are missing from environment. Terminating execution.');
     process.exit(1);
   }
 

@@ -13,6 +13,10 @@ on:
 jobs:
   generate-pdf:
     runs-on: ubuntu-latest
+    # Needed so the run's own auto-issued GITHUB_TOKEN (passed in below) can create/upload to
+    # the draft release the combined book is stored on — no separate PAT secret required.
+    permissions:
+      contents: write
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
@@ -37,6 +41,10 @@ jobs:
           CLOUDINARY_CLOUD_NAME: ${{ secrets.CLOUDINARY_CLOUD_NAME }}
           CLOUDINARY_API_KEY: ${{ secrets.CLOUDINARY_API_KEY }}
           CLOUDINARY_API_SECRET: ${{ secrets.CLOUDINARY_API_SECRET }}
+          # The run's own short-lived token (not the Render backend's GITHUB_PAT, which only
+          # exists on Render and is never available inside an Actions run) — scoped to this
+          # run, sufficient to create a release/upload an asset given contents:write above.
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           node scripts/generateCollectiveSubjectBookPdf.js \
             --subject "${{ github.event.inputs.subject }}" \
