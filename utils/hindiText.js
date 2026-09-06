@@ -1,6 +1,13 @@
 const DEVANAGARI_RE = /[ऀ-ॿ]/;
 const LATIN_LETTER_RE = /[a-zA-Z]/g;
 
+// A short leading acronym/initialism (e.g. "BRICS", "POCSO", "NHRC", "UPSC") sitting right
+// before the Hindi block starts is still a Hindi-first layout, not an ambiguous one — without
+// this, a 5+ letter acronym alone pushed `englishBefore` over the strict per-character
+// threshold below and got misfiled as "can't confidently tell", even though the layout is
+// exactly as clean as any other Hindi-first question.
+const LEADING_ACRONYM_RE = /^["'“”‘’]?[A-Z][A-Z0-9.&/-]{1,11}\b$/;
+
 function countLatinLetters(str) {
   return (str.match(LATIN_LETTER_RE) || []).length;
 }
@@ -32,10 +39,12 @@ export function stripHindiText(text) {
     }
   }
 
-  const englishBefore = countLatinLetters(text.slice(0, firstHindiIdx));
+  const beforeHindi = text.slice(0, firstHindiIdx);
+  const englishBefore = countLatinLetters(beforeHindi);
   const englishAfter = countLatinLetters(text.slice(lastHindiIdx + 1));
+  const hasOnlyLeadingAcronym = LEADING_ACRONYM_RE.test(beforeHindi.trim());
 
-  if (englishAfter >= 15 && englishBefore < 5) {
+  if (englishAfter >= 15 && (englishBefore < 5 || hasOnlyLeadingAcronym)) {
     // Hindi-first layout: keep everything after the last Devanagari character.
     return text.slice(lastHindiIdx + 1).replace(/^[\s?.!)\]]+/, '').trim();
   }

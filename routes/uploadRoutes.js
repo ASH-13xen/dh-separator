@@ -1,6 +1,6 @@
 import express from 'express';
 import multer from 'multer';
-import { handlePdfUpload, handleManualUpload } from '../controllers/uploadController.js';
+import { handlePdfUpload, handleManualUpload, finalizeUploadReview } from '../controllers/uploadController.js';
 
 const router = express.Router();
 
@@ -16,6 +16,9 @@ router.post('/upload', upload.single('pdf'), handlePdfUpload);
 
 // POST /api/upload/manual route
 router.post('/upload/manual', upload.single('pdf'), handleManualUpload);
+
+// POST /api/upload/finalize route — commits records held back for Hindi-ambiguity review
+router.post('/upload/finalize', finalizeUploadReview);
 
 // POST /api/upload/update-toppers route
 import { updateTopperDetails } from '../controllers/uploadController.js';

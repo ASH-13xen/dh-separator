@@ -1,5 +1,5 @@
 import { randomUUID } from 'crypto';
-import { processPdf } from '../services/pdfProcessingService.js';
+import { prepareUpload, finalizeUpload } from '../services/pdfProcessingService.js';
 import { UPSCQA } from '../models/UPSCQA.js';
 import streamifier from 'streamifier';
 import { v2 as cloudinary } from 'cloudinary';
@@ -47,27 +47,61 @@ export const handlePdfUpload = async (req, res) => {
     }
 
     console.log(`[UploadController] Received file: ${req.file.originalname}, Sheets specified: ${parsedMetadataList.length}, Size: ${req.file.size} bytes`);
-    console.log(`[UploadController] Initiating processPdf...`);
-    
-    // Pass the memory buffer and metadata array to the service layer
-    const results = await processPdf(req.file.buffer, parsedMetadataList, subject);
+    console.log(`[UploadController] Initiating prepareUpload...`);
 
-    console.log(`[UploadController] processPdf completed successfully. Total records generated: ${results.length}`);
+    // Pass the memory buffer and metadata array to the service layer. If any question still
+    // contains Hindi after the extraction pipeline's own auto-clean pass, nothing is written
+    // to the database yet — the frontend shows a review modal and calls finalizeUploadReview
+    // once the user has resolved every flagged question (edited or removed).
+    const { needsReview, records } = await prepareUpload(req.file.buffer, parsedMetadataList, subject);
+
+    console.log(`[UploadController] prepareUpload completed. Total records: ${records.length}, needsReview: ${needsReview}`);
 
     res.status(200).json({
-      message: 'PDF successfully processed and analyzed.',
-      totalRecords: results.length,
-      data: results
+      message: needsReview
+        ? 'PDF processed — some questions need review before saving.'
+        : 'PDF successfully processed and analyzed.',
+      totalRecords: records.length,
+      needsReview,
+      data: records
     });
 
   } catch (error) {
     console.error("[UploadController] Upload controller error:", error);
     if (error.message === 'LOCATION_NOT_SUPPORTED' || (error.message && error.message.includes('User location is not supported'))) {
-      return res.status(403).json({ 
-        error: 'Google Gemini API is restricted in the server\'s current location. Please deploy the server to a supported region (e.g. US Oregon) or use a proxy.' 
+      return res.status(403).json({
+        error: 'Google Gemini API is restricted in the server\'s current location. Please deploy the server to a supported region (e.g. US Oregon) or use a proxy.'
       });
     }
     res.status(500).json({ error: 'Failed to process the uploaded PDF document.', details: error.message });
+  }
+};
+
+// Called after the user resolves every flagged question in the review modal (edited its text,
+// or marked it for removal) — persists the final record set to the database. Only reached when
+// handlePdfUpload's prepareUpload call returned needsReview: true; otherwise records are
+// already committed and this is never called.
+export const finalizeUploadReview = async (req, res) => {
+  console.log('[UploadController] [finalizeUploadReview] Request received.');
+  try {
+    const { records } = req.body;
+    if (!records || !Array.isArray(records)) {
+      console.warn('[UploadController] [finalizeUploadReview] Validation failed: missing records array.');
+      return res.status(400).json({ error: 'Records array is required.' });
+    }
+
+    const results = await finalizeUpload(records);
+    console.log(`[UploadController] [finalizeUploadReview] Finalized ${results.length} record(s).`);
+
+    res.status(200).json({
+      message: 'Review complete — records saved.',
+      totalRecords: results.length,
+      needsReview: false,
+      data: results
+    });
+  } catch (error) {
+    console.error("[UploadController] [finalizeUploadReview] Error:", error);
+    res.status(500).json({ error: 'Failed to save reviewed questions.', details: error.message });
   }
 };
 

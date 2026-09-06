@@ -4,26 +4,97 @@ import { UPSCQA } from '../models/UPSCQA.js';
 import { PDFDocument } from 'pdf-lib';
 import streamifier from 'streamifier';
 import { v2 as cloudinary } from 'cloudinary';
+import { containsHindi } from '../utils/hindiText.js';
 
 // Cloudinary Configuration mappings
-cloudinary.config({ 
-  cloud_name: process.env.CLOUDINARY_CLOUD_NAME, 
-  api_key: process.env.CLOUDINARY_API_KEY, 
-  api_secret: process.env.CLOUDINARY_API_SECRET 
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET
 });
 
-export const processPdf = async (fileBuffer, metadataList, subject) => {
-  try {
-    console.log(`[PdfProcessingService] Processing single-upload PDF for subject '${subject}'...`);
+function extractCloudinaryPublicId(url) {
+  if (!url || typeof url !== 'string') return null;
+  const match = url.match(/\/upload\/(?:v\d+\/)?(.+)$/);
+  return match ? match[1] : null;
+}
 
-    // One id shared by every question this single PDF upload produces, so the "All
-    // Uploads" admin view can treat them as one row instead of one row per question.
-    const uploadBatchId = randomUUID();
-    const uploadedAt = new Date();
+// Upserts records into UPSCQA (one shared uploadBatchId so the "All Uploads" admin view
+// treats this whole upload as one row) and returns each record enriched with its saved _id —
+// the exact tail-end behavior processPdf always had, now shared by both the "nothing needed
+// review" fast path and the post-review finalize step.
+async function commitRecords(finalRecords) {
+  if (finalRecords.length === 0) return [];
+
+  console.log(`[PdfProcessingService] [commitRecords] Committing ${finalRecords.length} record(s). Applying deduplication rules...`);
+  const uploadBatchId = randomUUID();
+  const uploadedAt = new Date();
+
+  const bulkOps = finalRecords.map(record => ({
+    updateOne: {
+      filter: { question_text: record.question_text },
+      update: {
+        $setOnInsert: {
+          subject: record.subject,
+          start_page: record.start_page,
+          end_page: record.end_page
+        },
+        $push: {
+          file_urls: {
+            url: record.file_url,
+            topper_name: record.topper_name,
+            topper_year: record.topper_year,
+            topper_rank: record.topper_rank,
+            topper_marks: record.topper_marks,
+            uploadBatchId,
+            uploadedAt
+          }
+        }
+      },
+      upsert: true
+    }
+  }));
+
+  const bulkResult = await UPSCQA.bulkWrite(bulkOps);
+  console.log(`[PdfProcessingService] [commitRecords] Merged to DB. Matched: ${bulkResult.matchedCount}, Inserted: ${bulkResult.upsertedCount}, Modified: ${bulkResult.modifiedCount}`);
+
+  const savedRecords = await UPSCQA.find({
+    'file_urls.url': { $in: finalRecords.map(r => r.file_url) }
+  }).lean();
+
+  return finalRecords.map(record => {
+    const saved = savedRecords.find(r =>
+      r.file_urls && r.file_urls.some(f => f.url === record.file_url)
+    );
+    return {
+      ...record,
+      _id: saved?._id?.toString(),
+      file_urls: [{
+        url: record.file_url,
+        topper_name: record.topper_name,
+        topper_year: record.topper_year,
+        topper_rank: record.topper_rank,
+        topper_marks: record.topper_marks
+      }]
+    };
+  });
+}
+
+// Phase 1: extracts questions, splits the source PDF per question, uploads each answer sheet
+// to Cloudinary, and flags any question whose text still contains Hindi after the extraction
+// pipeline's own best-effort auto-clean (see cleanQuestionText/stripHindiText in
+// geminiService.js) as needsReview — genuinely ambiguous bilingual layouts that tool can't
+// confidently resolve on its own. If nothing needs review, this commits to the database
+// immediately (identical to the old single-step behavior); if anything does, it returns the
+// prepared records WITHOUT writing to Mongo — the caller must route them through a human
+// review step and then call finalizeUpload to actually persist them.
+export const prepareUpload = async (fileBuffer, metadataList, subject) => {
+  try {
+    console.log(`[PdfProcessingService] Preparing single-upload PDF for subject '${subject}'...`);
 
     // 1. Get the Index from Gemini (Chunked Batched Call)
     const indexArray = await processLargePdfInChunks(fileBuffer);
-    
+
     if (!indexArray || indexArray.length === 0) {
       throw new Error("No questions detected in document.");
     }
@@ -64,9 +135,9 @@ export const processPdf = async (fileBuffer, metadataList, subject) => {
         copiedPages.forEach((page) => subPdf.addPage(page));
 
         const subPdfBytes = await subPdf.save();
-        
+
         // FIX 2: Removed the hardcoded .pdf so Cloudinary doesn't generate .pdf.pdf
-        const fileNameObj = `Q${i + 1}_${Date.now()}`; 
+        const fileNameObj = `Q${i + 1}_${Date.now()}`;
 
         // Shift processing straight into Native Cloud Engine
         console.log(`[PdfProcessingService] Streaming chunk Q${i + 1} to Cloudinary...`);
@@ -86,64 +157,42 @@ export const processPdf = async (fileBuffer, metadataList, subject) => {
             topper_name: mappedTopper.topperName || 'Unknown Topper',
             topper_year: mappedTopper.topperYear || '',
             topper_rank: mappedTopper.topperRank || '',
-            topper_marks: mappedTopper.topperMarks || ''
+            topper_marks: mappedTopper.topperMarks || '',
+            needsReview: containsHindi(item.question_text)
         });
     }
 
-    console.log(`[PdfProcessingService] Prepared ${finalRecords.length} records. Applying deduplication rules...`);
-    
-    // Perform bulkWrite to upsert duplicate questions and push to file_urls array
-    const bulkOps = finalRecords.map(record => ({
-      updateOne: {
-        filter: { question_text: record.question_text },
-        update: {
-          $setOnInsert: {
-            subject: record.subject,
-            start_page: record.start_page,
-            end_page: record.end_page
-          },
-          $push: {
-            file_urls: {
-              url: record.file_url,
-              topper_name: record.topper_name,
-              topper_year: record.topper_year,
-              topper_rank: record.topper_rank,
-              topper_marks: record.topper_marks,
-              uploadBatchId,
-              uploadedAt
-            }
-          }
-        },
-        upsert: true
-      }
-    }));
+    const reviewCount = finalRecords.filter(r => r.needsReview).length;
+    if (reviewCount === 0) {
+      console.log('[PdfProcessingService] No ambiguous questions detected — committing immediately.');
+      return { needsReview: false, records: await commitRecords(finalRecords) };
+    }
 
-    const bulkResult = await UPSCQA.bulkWrite(bulkOps);
-    console.log(`[PdfProcessingService] Successfully merged to DB. Matched: ${bulkResult.matchedCount}, Inserted: ${bulkResult.upsertedCount}, Modified: ${bulkResult.modifiedCount}`);
-    
-    const savedRecords = await UPSCQA.find({
-      'file_urls.url': { $in: finalRecords.map(r => r.file_url) }
-    }).lean();
-
-    return finalRecords.map(record => {
-      const saved = savedRecords.find(r => 
-        r.file_urls && r.file_urls.some(f => f.url === record.file_url)
-      );
-      return { 
-        ...record, 
-        _id: saved?._id?.toString(),
-        file_urls: [{
-          url: record.file_url,
-          topper_name: record.topper_name,
-          topper_year: record.topper_year,
-          topper_rank: record.topper_rank,
-          topper_marks: record.topper_marks
-        }]
-      };
-    });
+    console.log(`[PdfProcessingService] ${reviewCount} question(s) still contain Hindi after auto-clean — holding for review, nothing written to the database yet.`);
+    return { needsReview: true, records: finalRecords };
 
   } catch (error) {
-    console.error("[PdfProcessingService] Error:", error);
+    console.error("[PdfProcessingService] [prepareUpload] Error:", error);
     throw error;
   }
+};
+
+// Phase 2: takes the record list back from the frontend's review modal (each question the
+// user edited carries its corrected question_text; any they chose to drop is marked
+// `removed: true` and is skipped here — its already-uploaded answer sheet is deleted from
+// Cloudinary instead of being left orphaned) and commits the rest, same as the old one-step
+// processPdf always did.
+export const finalizeUpload = async (records) => {
+  const toRemove = records.filter(r => r.removed);
+  const toCommit = records.filter(r => !r.removed);
+
+  if (toRemove.length > 0) {
+    console.log(`[PdfProcessingService] [finalizeUpload] Discarding ${toRemove.length} record(s) the user removed during review...`);
+    await Promise.allSettled(toRemove.map(r => {
+      const publicId = extractCloudinaryPublicId(r.file_url);
+      return publicId ? cloudinary.uploader.destroy(publicId, { resource_type: 'raw' }) : Promise.resolve();
+    }));
+  }
+
+  return commitRecords(toCommit);
 };
