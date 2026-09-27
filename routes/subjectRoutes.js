@@ -15,6 +15,8 @@ import {
   cleanupSubjectBookStorage,
   previewSubjectTopperFile,
   saveSubjectBookLayout,
+  createTopperBook,
+  deleteTopperBook,
   listUploadBatches,
   updateUploadBatch,
   deleteUploadBatch
@@ -40,6 +42,10 @@ router.delete('/uploads/batches/:batchKey', deleteUploadBatch);
 // Generic book-compilation pipeline (parameterized clone of /api/psir)
 router.get('/:slug/preview', previewSubjectBookData);
 router.post('/:slug/layout', saveSubjectBookLayout);
+
+// Topper books — frozen copies of a subject's book restricted to chosen toppers' answers.
+router.post('/:slug/topper-book', createTopperBook);
+router.delete('/:slug', deleteTopperBook);
 router.post('/:slug/generate', generateSubjectBookPdf);
 router.post('/:slug/generate-collective', generateCollectiveSubjectBookPdf);
 router.get('/:slug/status/:id', getSubjectBookStatus);

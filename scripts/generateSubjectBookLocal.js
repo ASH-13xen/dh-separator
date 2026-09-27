@@ -605,7 +605,7 @@ async function buildBook({ subjectSlug, papers, outFile }) {
   const isMultiPaper = targetPapers.length > 1;
   const headline = isMultiPaper ? 'COMPLETE BOOK' : targetPapers[0].paper;
   const subheadline = isMultiPaper ? `All ${targetPapers.length} Units Compiled` : targetPapers[0].section;
-  const { tw, th } = drawCoverPage(pdfDoc, fontBold, fontNormal, subjectDoc.name, headline, subheadline);
+  const { tw, th } = drawCoverPage(pdfDoc, fontBold, fontNormal, subjectDoc.parentName || subjectDoc.name, headline, subheadline);
 
   // Pre-fetch every topper URL across every paper being compiled, in one batch.
   const urlsToFetch = [];

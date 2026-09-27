@@ -137,7 +137,7 @@ export const listRegistrySubjects = async (req, res) => {
     const filter = {};
     if (req.query.status) filter.status = req.query.status;
     const subjects = await Subject.find(filter)
-      .select('name slug status questionCount createdAt')
+      .select('name slug status questionCount createdAt parentSlug parentName topperFilter')
       .sort({ name: 1 })
       .lean();
     console.log(`[SubjectController] [listRegistrySubjects] Found ${subjects.length} subject(s) in registry.`);
@@ -184,6 +184,9 @@ export const classifySubject = async (req, res) => {
       subjectDoc = new Subject({ name: trimmedName, slug, syllabusText: syllabusText || '', csvData: '' });
       console.log(`[SubjectController] [classifySubject] Created new draft Subject record. Slug: '${slug}'.`);
     } else {
+      if (subjectDoc.parentSlug) {
+        return res.status(400).json({ error: `"${trimmedName}" is a topper book name, not an uploaded subject. Use a different subject name.` });
+      }
       if (syllabusText) subjectDoc.syllabusText = syllabusText;
       console.log(`[SubjectController] [classifySubject] Found existing Subject record. Slug: '${subjectDoc.slug}', Status: '${subjectDoc.status}'. Re-classifying.`);
     }
@@ -301,6 +304,9 @@ export const reclassifySubject = async (req, res) => {
     const subjectDoc = await Subject.findOne({ slug });
     if (!subjectDoc) {
       return res.status(404).json({ error: 'Subject not found.' });
+    }
+    if (subjectDoc.parentSlug) {
+      return res.status(400).json({ error: 'This is a topper book — a frozen copy — so it cannot be re-synced. Sync the original subject and build a new topper book instead.' });
     }
 
     const hasSyllabusJson = subjectDoc.syllabusJson && Array.isArray(subjectDoc.syllabusJson) && subjectDoc.syllabusJson.length > 0;
@@ -515,6 +521,200 @@ export const saveSubjectBookLayout = async (req, res) => {
   } catch (err) {
     console.error('[SubjectController] [saveSubjectBookLayout] Error:', err);
     res.status(500).json({ error: 'Failed to save book layout.', details: err.message });
+  }
+};
+
+// --- Topper books ---
+
+// Topper identity is the name alone (year/rank/marks differences under one name are almost
+// always upload typos), compared case/whitespace-insensitively. A blank name is its own
+// "Unknown Topper" bucket. Must match normalizeTopperName in SubjectwiseBookPage.jsx.
+function normalizeTopperName(name) {
+  return (name || '').trim().replace(/\s+/g, ' ').toLowerCase() || 'unknown topper';
+}
+
+// Creates a "topper book": a brand-new, independent Subject whose questions are a one-time
+// frozen copy of this subject's, keeping only the answer sheets of the chosen toppers. Every
+// question is kept — ones with no answer from the chosen toppers just start unticked. The
+// parent's saved layouts (topic/question order, renames, question-text edits, title pages,
+// topper-detail edits, deliberate exclusions) are copied over, and each question's answers are
+// auto-ticked in the order the toppers were picked (max 3). Nothing links back afterwards:
+// later uploads, syncs, or edits to the parent never touch the topper book, and vice versa.
+export const createTopperBook = async (req, res) => {
+  const { slug } = req.params;
+  const { name, toppers, allowDuplicateSet } = req.body;
+  console.log(`[SubjectController] [createTopperBook] Request for parent '${slug}': name='${name}', toppers=${JSON.stringify(toppers)}.`);
+  try {
+    const parent = await Subject.findOne({ slug });
+    if (!parent || !parent.csvData) {
+      return res.status(404).json({ error: 'Subject questions CSV not found. Run Classify first.' });
+    }
+    if (parent.parentSlug) {
+      return res.status(400).json({ error: 'A topper book can only be built from an original subject, not from another topper book.' });
+    }
+
+    const trimmedName = String(name || '').trim();
+    if (!trimmedName) {
+      return res.status(400).json({ error: 'Give the topper book a name.' });
+    }
+    if (!Array.isArray(toppers) || toppers.length === 0) {
+      return res.status(400).json({ error: 'Select at least one topper.' });
+    }
+    const nameTaken = await Subject.findOne({ name: new RegExp(`^${escapeRegExp(trimmedName)}$`, 'i') });
+    if (nameTaken) {
+      return res.status(409).json({ error: `A book named "${nameTaken.name}" already exists. Pick a different name.` });
+    }
+
+    // Pick order → rank; duplicates (same normalized name picked twice) keep their first spot.
+    const rankByKey = new Map();
+    const topperNames = [];
+    toppers.forEach((t) => {
+      const key = normalizeTopperName(t);
+      if (rankByKey.has(key)) return;
+      rankByKey.set(key, rankByKey.size);
+      topperNames.push(String(t || '').trim() || 'Unknown Topper');
+    });
+
+    if (!allowDuplicateSet) {
+      const setKey = [...rankByKey.keys()].sort().join('|');
+      const siblings = await Subject.find({ parentSlug: slug }).select('name slug topperFilter').lean();
+      const dup = siblings.find((s) => [...new Set((s.topperFilter || []).map(normalizeTopperName))].sort().join('|') === setKey);
+      if (dup) {
+        return res.status(409).json({
+          code: 'DUPLICATE_TOPPER_SET',
+          error: `"${dup.name}" already uses exactly these toppers.`,
+          existing: { slug: dup.slug, name: dup.name, parentName: parent.name, topperFilter: dup.topperFilter }
+        });
+      }
+    }
+
+    const parentLayouts = await BookLayout.find({ subject: slug }).lean();
+    const parentLayoutsByPaper = Object.fromEntries(parentLayouts.map((l) => [l.paper, l]));
+    // A topper renamed via the book editor's pencil lives only in the layout's topperOverrides
+    // (keyed by sheet URL) — match on that edited name, since it's the one the user sees.
+    const overrideNameByUrl = new Map();
+    parentLayouts.forEach((l) => {
+      Object.entries(l.topperOverrides || {}).forEach(([url, o]) => {
+        if (o && o.topper_name !== undefined) overrideNameByUrl.set(url, o.topper_name);
+      });
+    });
+
+    const parsed = parseCSV(parent.csvData);
+    const header = parsed[0];
+    const rows = parsed.slice(1).filter((r) => r.length >= 10);
+    const rankByUrl = new Map();
+    const filteredRows = rows.map((r) => {
+      const url = r[7].trim();
+      if (!url) return r;
+      const effectiveName = overrideNameByUrl.has(url) ? overrideNameByUrl.get(url) : r[3];
+      const rank = rankByKey.get(normalizeTopperName(effectiveName));
+      if (rank !== undefined) {
+        rankByUrl.set(url, rank);
+        return r;
+      }
+      // Blank the answer sheet but keep the row, so the question itself still appears.
+      return [r[0], r[1], r[2], '', '', '', '', '', r[8], r[9], ...r.slice(10)];
+    });
+    if (rankByUrl.size === 0) {
+      return res.status(400).json({ error: 'None of the selected toppers have any answer sheets in this subject.' });
+    }
+
+    let csvContent = header.map(escapeCSV).join(',') + '\n';
+    filteredRows.forEach((r) => { csvContent += r.map(escapeCSV).join(',') + '\n'; });
+
+    const newSlug = await generateUniqueSlug(trimmedName);
+    const merged = applyBookLayout(
+      mergeSyllabusIntoHierarchy(buildHierarchyFromRows(filteredRows), parent.syllabusJson),
+      parentLayoutsByPaper
+    );
+
+    let questionsWithAnswers = 0;
+    const newLayouts = merged.map((paperNode) => {
+      const parentLayout = parentLayoutsByPaper[paperNode.paper] || {};
+      const parentExcluded = new Set(parentLayout.excludedQuestionIds || []);
+      const excludedQuestionIds = [];
+      const selections = {};
+      paperNode.topics.forEach((t) => {
+        t.questions.forEach((q) => {
+          if (q.isTitlePage) return;
+          const picked = (q.file_urls || [])
+            .map((f, i) => ({ url: f.url, i, rank: rankByUrl.get(f.url) }))
+            .sort((a, b) => a.rank - b.rank || a.i - b.i)
+            .slice(0, 3)
+            .map((x) => x.url);
+          selections[q._id] = picked;
+          if (picked.length > 0) questionsWithAnswers++;
+          if (picked.length === 0 || parentExcluded.has(q._id)) excludedQuestionIds.push(q._id);
+        });
+      });
+      const topperOverrides = {};
+      Object.entries(parentLayout.topperOverrides || {}).forEach(([url, o]) => {
+        if (rankByUrl.has(url)) topperOverrides[url] = o;
+      });
+      return {
+        subject: newSlug,
+        paper: paperNode.paper,
+        topicOrder: parentLayout.topicOrder || [],
+        topicRenames: parentLayout.topicRenames || {},
+        expandedTopics: parentLayout.expandedTopics || [],
+        questionOrder: parentLayout.questionOrder || {},
+        excludedQuestionIds,
+        selections,
+        topperOverrides,
+        questionTextOverrides: parentLayout.questionTextOverrides || {},
+        titlePages: parentLayout.titlePages || {}
+      };
+    });
+
+    const book = await Subject.create({
+      name: trimmedName,
+      slug: newSlug,
+      syllabusText: parent.syllabusText,
+      syllabusJson: parent.syllabusJson,
+      csvData: csvContent,
+      status: 'active',
+      questionCount: parent.questionCount,
+      parentSlug: parent.slug,
+      parentName: parent.name,
+      topperFilter: topperNames
+    });
+    // Clear any leftovers from an earlier, deleted book that happened to use the same slug.
+    await BookLayout.deleteMany({ subject: newSlug });
+    await BookLayout.insertMany(newLayouts);
+
+    console.log(`[SubjectController] [createTopperBook] Created '${book.name}' (${newSlug}) from '${slug}': ${rankByUrl.size} answer sheet(s) kept, ${questionsWithAnswers} question(s) with answers, ${newLayouts.length} layout(s) copied.`);
+    res.status(201).json({
+      subject: { name: book.name, slug: book.slug, parentSlug: book.parentSlug, parentName: book.parentName, topperFilter: book.topperFilter },
+      answerSheets: rankByUrl.size,
+      questionsWithAnswers
+    });
+  } catch (err) {
+    console.error('[SubjectController] [createTopperBook] Error:', err);
+    res.status(500).json({ error: 'Failed to create topper book.', details: err.message });
+  }
+};
+
+// Deletes a topper book and its saved layouts. Refuses original subjects — those hold the
+// classification of real uploads and have no delete flow. Compiled PDFs aren't touched here;
+// "Clean File Storage" on the book removes those beforehand if wanted.
+export const deleteTopperBook = async (req, res) => {
+  const { slug } = req.params;
+  console.log(`[SubjectController] [deleteTopperBook] Request for '${slug}'.`);
+  try {
+    const book = await Subject.findOne({ slug });
+    if (!book) {
+      return res.status(404).json({ error: 'Book not found.' });
+    }
+    if (!book.parentSlug) {
+      return res.status(400).json({ error: 'Only topper books can be deleted.' });
+    }
+    const { deletedCount } = await BookLayout.deleteMany({ subject: slug });
+    await Subject.deleteOne({ _id: book._id });
+    console.log(`[SubjectController] [deleteTopperBook] Deleted '${book.name}' (${slug}) and ${deletedCount} layout(s).`);
+    res.json({ message: 'Topper book deleted.' });
+  } catch (err) {
+    console.error('[SubjectController] [deleteTopperBook] Error:', err);
+    res.status(500).json({ error: 'Failed to delete topper book.', details: err.message });
   }
 };
 

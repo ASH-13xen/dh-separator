@@ -557,10 +557,10 @@ async function main() {
     titlePage.drawRectangle({ x: 0, y: th - 180, width: tw * 0.6, height: 10, color: rgb(0.96, 0.35, 0.14) });
     titlePage.drawRectangle({ x: 0, y: th - 180, width: tw * 0.4, height: 10, color: rgb(0.25, 0.51, 0.96) });
 
-    titlePage.drawText(sanitizeForPdf(`${subjectDoc.name.toUpperCase()} SERIES`), {
+    titlePage.drawText(sanitizeForPdf(`${(subjectDoc.parentName || subjectDoc.name).toUpperCase()} SERIES`), {
       x: 50, y: th - 85, size: 32, font: fontBold, color: rgb(1, 1, 1)
     });
-    titlePage.drawText(sanitizeForPdf(subjectDoc.name), {
+    titlePage.drawText(sanitizeForPdf(subjectDoc.parentName || subjectDoc.name), {
       x: 50, y: th - 125, size: 15, font: fontNormal, color: rgb(0.8, 0.8, 0.9)
     });
 
